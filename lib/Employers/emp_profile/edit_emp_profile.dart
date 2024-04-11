@@ -1,15 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:intl/intl.dart';
-import 'package:project1/Employers/bridgeTOemp_home_page.dart';
+// import 'package:intl/intl.dart';
+// import 'package:project1/Employers/bridgeTOemp_home_page.dart';
 import 'package:project1/Employers/home_page/tabs_screen.dart';
 import 'package:project1/Employers/models/jobs_model.dart';
 import './compLogo_picker.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
+
 import 'dart:io';
 import '../Employers_account/empUtils.dart';
 

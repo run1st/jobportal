@@ -21,53 +21,93 @@ class _loginOptionState extends State<loginOption> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login Page'),
-      ),
-      body: Center(
+      // appBar: AppBar(
+      //   title:const Text('Login Page'),
+      // ),
+      body: Container(
+        color: Colors.white,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Select your user type:',
-              style: TextStyle(fontSize: 16.0),
+            const SizedBox(
+              height: 30,
             ),
-            SizedBox(height: 10.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Radio(
-                  value: UserType.jobSeeker,
-                  groupValue: _userType,
-                  onChanged: (value) {
-                    setState(() {
-                      _userType = value as UserType;
-                    });
-                  },
-                ),
-                Text('Job Seeker'),
-                SizedBox(width: 30.0),
-                Radio(
-                  value: UserType.recruiter,
-                  groupValue: _userType,
-                  onChanged: (value) {
-                    setState(() {
-                      _userType = value as UserType;
-                    });
-                  },
-                ),
-                Text('Recruiter'),
-              ],
+            IconButton(
+                alignment: Alignment.topLeft,
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.arrow_back_ios_new_sharp)),
+            const SizedBox(
+              height: 50,
             ),
-            ElevatedButton(
-              onPressed: () {
-                if (_userType == UserType.jobSeeker) {
-                  Navigator.pushNamed(context, AuthPage.routName);
-                } else {
-                  Navigator.pushNamed(context, EmpAuthPage.routName);
-                }
-              },
-              child: Text('Login'),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20.0),
+                boxShadow: [],
+              ),
+              child: Container(
+                width: MediaQuery.of(context).size.width - 100,
+                height: MediaQuery.of(context).size.height - 450,
+                decoration: BoxDecoration(
+                  image: const DecorationImage(
+                    image: AssetImage("assets/images/login2.jpg"),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 100,
+            ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Select your user type:',
+                    style: const TextStyle(fontSize: 16.0),
+                  ),
+                  const SizedBox(height: 10.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Radio(
+                        value: UserType.jobSeeker,
+                        groupValue: _userType,
+                        onChanged: (value) {
+                          setState(() {
+                            _userType = value as UserType;
+                          });
+                        },
+                      ),
+                      const Text('Job Seeker'),
+                      const SizedBox(width: 30.0),
+                      Radio(
+                        value: UserType.recruiter,
+                        groupValue: _userType,
+                        onChanged: (value) {
+                          setState(() {
+                            _userType = value as UserType;
+                          });
+                        },
+                      ),
+                      const Text('Recruiter'),
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_userType == UserType.jobSeeker) {
+                        Navigator.pushNamed(context, AuthPage.routName);
+                      } else {
+                        Navigator.pushNamed(context, EmpAuthPage.routName);
+                      }
+                    },
+                    child: const Text('Login'),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

@@ -4,6 +4,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:project1/job_seeker_home_page/applied_jobs.dart';
 import 'package:project1/job_seeker_home_page/jobSeekerSetting.dart';
+import 'package:project1/user_account/rgister.dart';
 
 import '../profile/job_seeker_profile.dart';
 
@@ -109,8 +110,8 @@ class _DrowerState extends State<Drower> {
             leading: Icon(Icons.logout),
             title: Text("Logout"),
             onTap: () {
-              // FirebaseAuth.instance.signOut();
-              // Navigator.pushNamed(context, Register.routeName);
+              FirebaseAuth.instance.signOut();
+              Navigator.pushNamed(context, Register.routeName);
             },
           ),
         ],

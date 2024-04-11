@@ -17,7 +17,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   bool _isLoading = true;
   bool _isError = false;
   int _currentPage = 0;
-  int _totalPages = 0;
+  int? _totalPages;
   PDFViewController? _pdfViewController;
 
   @override
@@ -81,7 +81,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
 
   @override
   void dispose() {
-    _pdfViewController?.dispose();
+    //  _pdfViewController?.dispose();
     super.dispose();
   }
 }

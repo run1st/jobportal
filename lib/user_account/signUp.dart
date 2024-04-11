@@ -33,15 +33,16 @@ class _signUpState extends State<signUp> {
     super.dispose();
   }
 
+// A sign up function *****************************************
   Future signUp() async {
     final isValid = formKey.currentState!.validate();
     if (!isValid) return;
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-              child: CircularProgressIndicator(),
-            ));
+    // showDialog(
+    //     context: context,
+    //     barrierDismissible: false,
+    //     builder: (context) => Center(
+    //           child: CircularProgressIndicator(),
+    //         ));
     try {
       await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
@@ -57,12 +58,12 @@ class _signUpState extends State<signUp> {
         });
       });
 
-      VerifyEmail();
+      const VerifyEmail();
     } on FirebaseAuthException catch (e) {
       print(e);
       Utils.showSnackBar(e.message, Colors.red);
     }
-    Navigator.of(context).pop();
+    // Navigator.of(context).pop();
   }
 
   @override
@@ -224,22 +225,9 @@ class _signUpState extends State<signUp> {
                           size: 30.0,
                         ),
                         label: Text('Sign up')),
-                    SizedBox(
+                    const SizedBox(
                       height: 24,
                     ),
-                    // RichText(
-                    //     text: TextSpan(
-                    //         style: TextStyle(color: Colors.black),
-                    //         text: 'already have accont ?  ',
-                    //         children: [
-                    //       TextSpan(
-                    //           recognizer: TapGestureRecognizer()
-                    //             ..onTap = widget.onclickedSignUp,
-                    //           text: 'Sign in',
-                    //           style: TextStyle(
-                    //               color: Colors.blue,
-                    //               decoration: TextDecoration.underline))
-                    //     ]))
                   ],
                 ),
               ),

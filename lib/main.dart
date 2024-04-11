@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -8,28 +8,30 @@ import 'package:project1/Employers/bridgeTOemp_home_page.dart';
 import 'package:project1/Employers/emp_profile/emp_form.dart';
 import 'package:project1/Employers/home_page/applyers_detail.dart';
 import 'package:project1/Employers/home_page/candidateProfile.dart';
-import 'package:project1/Employers/home_page/detail_page.dart';
-import 'package:project1/Employers/home_page/emp_home_page.dart';
+//import 'package:project1/Employers/home_page/detail_page.dart';
+//import 'package:project1/Employers/home_page/emp_home_page.dart';
 import 'package:project1/Employers/manage_posts/edit_posts.dart';
 import 'package:project1/Employers/manage_posts/manage_post.dart';
 import 'package:project1/hompage.dart';
 import 'package:project1/job_seeker_home_page/applied_jobs.dart';
-import 'package:project1/profile/job_seeker_view_profile.dart';
+//import 'package:project1/profile/job_seeker_view_profile.dart';
 import 'package:project1/profile/personal_info.dart';
 import 'package:project1/start_page.dart';
-import 'package:project1/user_account/login.dart';
+//import 'package:project1/user_account/login.dart';
 import 'package:project1/user_account/utils.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'jobSeekerModel/job_seeker_profile_model.dart';
 import 'user_account/auth_page.dart';
-import '../user_account/verify_email.dart';
+//import '../user_account/verify_email.dart';
 import 'profile/education.dart';
 import 'profile/skills.dart';
 import 'profile/experience.dart';
 import 'job_seeker_home_page/jobSeekerHome.dart';
 import 'Employers/Employers_account/emp_auth_page.dart';
+
 import 'user_account/rgister.dart';
+import 'user_account/signup_signin.dart';
 import './loginOption.dart';
 import 'profile/job_seeker_profile.dart';
 import 'Employers/home_page/tabs_screen.dart';
@@ -51,6 +53,7 @@ Future<void> main() async {
 // void main() {
 //   runApp(MyApp());
 // }
+
 class JobSeekerProfileWrapper extends StatelessWidget {
   const JobSeekerProfileWrapper({Key? key}) : super(key: key);
 
@@ -80,7 +83,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of our application.
   @override
   Widget build(BuildContext context) {
-    PersonalInfoProvider personal = Provider.of<PersonalInfoProvider>(context);
+//    PersonalInfoProvider personal = Provider.of<PersonalInfoProvider>(context);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -94,30 +97,31 @@ class MyApp extends StatelessWidget {
       ),
       home: MyHomePage(),
       routes: {
-        AuthPage.routName: (context) => AuthPage(),
-        EmpAuthPage.routName: (context) => EmpAuthPage(),
-        personal_info.routeName: (context) => personal_info(),
+        AuthPage.routName: (context) => const AuthPage(),
+        EmpAuthPage.routName: (context) => const EmpAuthPage(),
+        personal_info.routeName: (context) => const personal_info(),
         EducationForm.routeName: (context) => EducationForm(),
         SkillSet.routeName: (context) => SkillSet(),
-        Experience.routeName: (context) => Experience(),
-        home.routeName: ((context) => home()),
-        Register.routeName: (context) => Register(),
+        Experience.routeName: (context) => const Experience(),
+        home.routeName: ((context) => const home()),
+        Register.routeName: (context) => const Register(),
         loginOption.routeName: ((context) => loginOption()),
-        ProfilePage.routeName: (context) => ProfilePage(),
-        EmpRegister.routeName: ((context) => EmpRegister()),
+        ProfilePage.routeName: (context) => const ProfilePage(),
+        EmpRegister.routeName: ((context) => const EmpRegister()),
         EmployerRegistrationForm.routeName: ((context) =>
-            EmployerRegistrationForm()),
-        TabsScreen.routeName: ((context) => TabsScreen()),
+            const EmployerRegistrationForm()),
+        TabsScreen.routeName: ((context) => const TabsScreen()),
         JobPostingForm.routName: ((context) => JobPostingForm()),
         Manage_posts.routeName: ((context) => Manage_posts()),
-        Emp_home.routeName: ((context) => Emp_home()),
-        HomePage.routeName: ((context) => HomePage()),
+        Emp_home.routeName: ((context) => const Emp_home()),
+        HomePage.routeName: ((context) => const HomePage()),
         ApplicantPage.routeName: ((context) => ApplicantPage()),
         EditJobPostingForm.routName: ((context) => EditJobPostingForm()),
         candidateProfile.routeName: ((context) => candidateProfile()),
         StartPage.routName: (context) => StartPage(),
-        Applied_jobs_list.routeName: (context) => Applied_jobs_list(),
-        VerifyEmpEmail.routeName: (context) => VerifyEmpEmail(),
+        Applied_jobs_list.routeName: (context) => const Applied_jobs_list(),
+        VerifyEmpEmail.routeName: (context) => const VerifyEmpEmail(),
+        Sign_up_in.routeName: (context) => Sign_up_in(),
         // JobDetailPage.routName: (context) => JobDetailPage(),
         //   ProfilePageView.routeName: ((context) => ProfilePageView())
       },
@@ -159,10 +163,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Container(),
-            Container(),
             SizedBox(
-              height: 100,
+              height: 30,
             ),
             SizedBox(
               height: 200,
@@ -182,8 +184,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15)),
                       elevation: 10,
-                      color: Color.fromARGB(255, 18, 211, 224),
-                      child: Center(
+                      color: const Color.fromARGB(255, 18, 211, 224),
+                      child: const Center(
                           child: Image(
                         image: AssetImage('assets/images/search.jpg'),
                       )),
@@ -195,23 +197,24 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15)),
-                      color: Color.fromARGB(255, 18, 211, 224),
-                      child: Center(
+                      color: const Color.fromARGB(255, 18, 211, 224),
+                      child: const Center(
                         child: Image(
                           image: AssetImage('assets/images/post2.jpeg'),
                         ),
                       ),
                     ),
                   ),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Card(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15)),
-                      color: Color.fromARGB(255, 18, 211, 224),
-                      child: Center(
+                      color: const Color.fromARGB(255, 18, 211, 224),
+                      child: const Center(
                         child: Text(
-                          'All can be done in Hullu Jobs',
+                          'All through Hullu Jobs',
                           style: TextStyle(fontSize: 25),
                         ),
                       ),
@@ -224,13 +227,11 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[for (int i = 0; i < 3; i++) dotIndicator(i)],
             ),
-            Container(
-              child: Text(
-                'Register As',
-              ),
+            const Text(
+              'Register As',
             ),
             Container(
-              width: 200,
+              width: MediaQuery.of(context).size.width - 50,
               margin: EdgeInsets.all(20),
               child: FloatingActionButton(
                 heroTag: "btn1",
@@ -242,11 +243,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 // color: Colors.deepPurple,
                 // padding: EdgeInsets.all(20),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50)),
+                    borderRadius: BorderRadius.circular(20)),
               ),
             ),
             Container(
-              width: 200,
+              width: MediaQuery.of(context).size.width - 50,
               margin: EdgeInsets.all(20),
               child: FloatingActionButton(
                 heroTag: "btn2",
@@ -257,7 +258,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 // color: Colors.deepPurple,
                 // padding: EdgeInsets.all(20),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50)),
+                    borderRadius: BorderRadius.circular(20)),
               ),
             ),
             Row(
@@ -302,12 +303,12 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton.icon(
-                      onPressed: () {
-                        Navigator.popAndPushNamed(context, home.routeName);
-                      },
-                      icon: Icon(Icons.skip_next),
-                      label: Text('Skip')),
+                  // TextButton.icon(
+                  //     onPressed: () {
+                  //       Navigator.popAndPushNamed(context, home.routeName);
+                  //     },
+                  //     icon: Icon(Icons.skip_next),
+                  //     label: Text('Skip')),
                 ],
               ),
             )

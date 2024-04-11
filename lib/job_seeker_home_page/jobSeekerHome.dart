@@ -41,11 +41,13 @@ class _homeState extends State<home> {
   ];
 
   int selecetedPageIndex = 0;
-  void _selectPage(int index) {
-    setState(() {
-      selecetedPageIndex = index;
-    });
-  }
+  //asign the index of the selected tab bar
+
+  // void selectPage(int index) {
+  //   setState(() {
+  //     selecetedPageIndex = index;
+  //   });
+  // }
 
   String getCurrentUserUid() {
     User? user = FirebaseAuth.instance.currentUser;
@@ -72,6 +74,7 @@ class _homeState extends State<home> {
   }
 
 //print(DateFormat.yMMMd().format(DateTime.now()));
+
   Future<QuerySnapshot<Map<String, dynamic>>> getRecentPosts() async {
     String date = '2023-05-30T00:00:00.000';
     final ref = FirebaseFirestore.instance
@@ -97,9 +100,9 @@ class _homeState extends State<home> {
       child: Scaffold(
         key: _scaffoldKey,
         resizeToAvoidBottomInset: false,
-        drawer: Container(
+        drawer: SizedBox(
           height: MediaQuery.of(context).size.height * 0.85,
-          child: Align(
+          child: const Align(
             alignment: Alignment.topLeft,
             child: Drawer(
               child: Drower(),
@@ -146,19 +149,4 @@ class _homeState extends State<home> {
       ),
     );
   }
-  // ugyuftfffffffffff
 }
-
-// class SavedJobs extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: Text(
-//         "Saved Jobs",
-//         style: TextStyle(fontSize: 24),
-//       ),
-//     );
-//   }
-// }
-
-

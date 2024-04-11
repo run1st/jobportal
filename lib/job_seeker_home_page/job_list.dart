@@ -37,6 +37,7 @@ class _JobsListState extends State<JobsList> {
   bool isJobTitleMatched = false;
   String searchQuery = '';
   final searchController = TextEditingController();
+  // a job searching function ********************************************
   void searchJobs(String query) {
     filtered_Jobs = postedJobs.where((job) {
       String jobTitle = job['title'].toLowerCase() as String;
@@ -50,6 +51,7 @@ class _JobsListState extends State<JobsList> {
     // }
   }
 
+//a dropdown filter to show the options to be filtered
   void showFilterOption(BuildContext context) {
     DropdownButton<String>(
       value: selectedCategory,
@@ -131,6 +133,8 @@ class _JobsListState extends State<JobsList> {
   }
 
   bool isFilterVisible = false;
+
+  // a method used to make the filtering dropdown button visible *********************
   void toggleFilterVisibility() {
     setState(() {
       isFilterVisible = !isFilterVisible;
@@ -183,12 +187,15 @@ class _JobsListState extends State<JobsList> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
+
+            //Search Bar ***********************************************************
+
             Container(
               height: 50,
-              margin: EdgeInsets.symmetric(horizontal: 20),
+              margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25),
                 color: Colors.white,
@@ -197,7 +204,7 @@ class _JobsListState extends State<JobsList> {
                     color: Colors.grey.withOpacity(0.2),
                     spreadRadius: 2,
                     blurRadius: 7,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -236,7 +243,7 @@ class _JobsListState extends State<JobsList> {
                       color: Colors.deepPurpleAccent,
                     ),
                     child: IconButton(
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.close,
                         color: Colors.white,
                       ),
@@ -248,23 +255,24 @@ class _JobsListState extends State<JobsList> {
                       },
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                 ],
               ),
             ),
-            SizedBox(
+
+            //End of search bar *******************************************************
+
+            const SizedBox(
               height: 20,
             ),
+// The job category griedview*****************************************************
             SizedBox(
               height: 100,
               child: GridView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 scrollDirection: Axis.horizontal,
                 itemCount: recentJobs.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  // crossAxisCount: 1,
-                  // mainAxisSpacing: 8,
-                  // childAspectRatio: 1,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 1,
                   mainAxisSpacing: 16.0,
                   crossAxisSpacing: 16.0,
@@ -303,7 +311,7 @@ class _JobsListState extends State<JobsList> {
                       ),
                       child: Text(
                         recentJobs[index],
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15.0,
                           fontWeight: FontWeight.bold,
@@ -314,6 +322,10 @@ class _JobsListState extends State<JobsList> {
                 },
               ),
             ),
+
+            // End of job category gridview********************************************
+
+// A row that contains see all button, filter icon and recommended button ****************************
             Container(
               width: MediaQuery.of(context).size.width,
               child: Row(
@@ -392,12 +404,12 @@ class _JobsListState extends State<JobsList> {
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: TextButton(
                         onPressed: () {
-                          final profile = FirebaseFirestore.instance
-                              .collection('job-seeker')
-                              .doc(getCurrentUserUid())
-                              .collection('jobseeker-profile')
-                              .doc('profile')
-                              .snapshots();
+                          // final profile = FirebaseFirestore.instance
+                          //     .collection('job-seeker')
+                          //     .doc(getCurrentUserUid())
+                          //     .collection('jobseeker-profile')
+                          //     .doc('profile')
+                          //     .snapshots();
                           setState(() {
                             selectRecommended = true;
                           });
@@ -407,6 +419,9 @@ class _JobsListState extends State<JobsList> {
                 ],
               ),
             ),
+
+            //End of filtering row ***************************************
+
             StreamBuilder<List<dynamic>>(
               stream: CombineLatestStream.list([
                 FirebaseFirestore.instance
@@ -427,7 +442,7 @@ class _JobsListState extends State<JobsList> {
                   return Text('Error: ${snapshot.error}');
                 }
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Text('Loading...');
+                  return const Text('Loading...');
                 }
                 DocumentSnapshot profileData =
                     snapshot.data?[0]; // Get the profile data
@@ -454,6 +469,7 @@ class _JobsListState extends State<JobsList> {
                 // Map<String, dynamic>? experience =
                 //     snapshot.data?[0]!.data()?['experiences']['experience']
                 //         as Map<String, dynamic>?;
+
                 Map<String, dynamic>? education = snapshot.data?[0]!
                     .data()?['education'] as Map<String, dynamic>?;
                 QuerySnapshot jobPostings = snapshot.data?[1];
