@@ -237,7 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 heroTag: "btn1",
                 // clipBehavior: Clip.hardEdge,
                 onPressed: () =>
-                    Navigator.pushNamed(context, Register.routeName),
+                    Navigator.pushNamed(context, Sign_up_in.routeName),
                 child: Text('JOB SEEKER'),
                 // textColor: Colors.white,
                 // color: Colors.deepPurple,
