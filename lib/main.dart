@@ -17,6 +17,7 @@ import 'package:project1/job_seeker_home_page/applied_jobs.dart';
 //import 'package:project1/profile/job_seeker_view_profile.dart';
 import 'package:project1/profile/personal_info.dart';
 import 'package:project1/start_page.dart';
+import 'package:project1/user_account/login_page.dart';
 //import 'package:project1/user_account/login.dart';
 import 'package:project1/user_account/utils.dart';
 import 'package:provider/provider.dart';
@@ -121,7 +122,7 @@ class MyApp extends StatelessWidget {
         StartPage.routName: (context) => StartPage(),
         Applied_jobs_list.routeName: (context) => const Applied_jobs_list(),
         VerifyEmpEmail.routeName: (context) => const VerifyEmpEmail(),
-        Sign_up_in.routeName: (context) => Sign_up_in(),
+        //  LoginPage.routeName: (context) => LoginPage(onclickedSignIn: () {}),
         // JobDetailPage.routName: (context) => JobDetailPage(),
         //   ProfilePageView.routeName: ((context) => ProfilePageView())
       },
@@ -237,7 +238,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 heroTag: "btn1",
                 // clipBehavior: Clip.hardEdge,
                 onPressed: () =>
-                    Navigator.pushNamed(context, Sign_up_in.routeName),
+                    Navigator.pushNamed(context, Register.routeName),
                 child: Text('JOB SEEKER'),
                 // textColor: Colors.white,
                 // color: Colors.deepPurple,
@@ -276,8 +277,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             clipBehavior: Clip.antiAliasWithSaveLayer,
                             // shape: RoundedRectangleBorder(
                             //     borderRadius: BorderRadius.circular(50)),
-                            onPressed: () => Navigator.pushNamed(
-                                context, loginOption.routeName),
+                            onPressed: () =>
+                                Navigator.pushNamed(context, AuthPage.routName),
+
+                            //  context, loginOption.routeName),
                             child: Text(
                               ' Login',
                               style: TextStyle(color: Colors.blue),

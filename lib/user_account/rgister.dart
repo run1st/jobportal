@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:project1/user_account/signUp.dart';
+import 'package:project1/user_account/signup_signin.dart';
 import 'verify_email.dart';
 import 'auth_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -29,9 +30,12 @@ class _RegisterState extends State<Register> {
           } else if (snapshot.hasData)
             return VerifyEmail();
           else
-            return signUp(
+            return Sign_up_in(
               onclickedSignUp: () {},
             );
+          // return signUp(
+          //   onclickedSignUp: () {},
+          // );
         },
       ),
     );

@@ -1,7 +1,9 @@
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:project1/user_account/login.dart';
+import 'package:project1/user_account/login_page.dart';
 import 'package:project1/user_account/signUp.dart';
+import 'package:project1/user_account/signup_signin.dart';
 
 class AuthPage extends StatefulWidget {
   static const routName = '/AuthPage';
@@ -22,7 +24,7 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     return isLogin
-        ? LoginWidget(onclickedSignIn: toggle)
-        : signUp(onclickedSignUp: toggle);
+        ? LoginPage(onclickedSignIn: toggle)
+        : Sign_up_in(onclickedSignUp: toggle);
   }
 }

@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:project1/user_account/emp_login_form.dart';
 import 'package:project1/user_account/emp_sign_up_form.dart';
+import 'package:project1/user_account/job_seeker_login_form.dart';
 import 'package:project1/user_account/rgister.dart';
 import 'package:project1/user_account/seeker_sign_up_form.dart';
 
-class Sign_up_in extends StatefulWidget {
-  final VoidCallback onclickedSignUp;
-  const Sign_up_in({Key? key, required this.onclickedSignUp}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  static const routeName = 'LoginPage';
+  final VoidCallback onclickedSignIn;
+
+  const LoginPage({super.key, required this.onclickedSignIn});
 
   @override
-  State<Sign_up_in> createState() => _Sign_up_inState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _Sign_up_inState extends State<Sign_up_in> {
+class _LoginPageState extends State<LoginPage> {
   bool button1 = true;
   bool button2 = false;
 
@@ -92,13 +96,13 @@ class _Sign_up_inState extends State<Sign_up_in> {
                 ),
               ],
             ),
-            button1 == true ? JobSeekerSignUPForm() : EmpSignUpForm(),
-            Text('Alrady have an account'),
+            button1 == true ? JobSeekerLoginForm() : EmpLoginForm(),
+            Text("Doesn't have account ?"),
             TextButton(
                 onPressed: () {
-                  widget.onclickedSignUp;
+                  widget.onclickedSignIn;
                 },
-                child: Text('Sing In')),
+                child: Text('CREATE ACCOUNT')),
             ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text('back'))
