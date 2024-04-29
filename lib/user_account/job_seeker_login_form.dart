@@ -65,58 +65,99 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
   }
 
   bool _showProgressIndicator = false;
-  Future signIn() async {
+  // Future signIn() async {
+  //   setState(() {
+  //     _showProgressIndicator = true;
+  //   });
+  //   Visibility(
+  //     visible: _showProgressIndicator,
+  //     child: Center(
+  //       child: CircularProgressIndicator(),
+  //     ),
+  //   );
+  //   // showDialog(
+  //   //     context: context,
+  //   //     barrierDismissible: false,
+  //   //     builder: (context) => Center(
+  //   //           child: CircularProgressIndicator(),
+  //   //         ));
+
+  //   try {
+  //     await FirebaseAuth.instance
+  //         .signInWithEmailAndPassword(
+  //             email: emailController.text.trim(),
+  //             password: passwordController1.text.trim())
+  //         .then((value) {
+  //       checkUserRole(value.toString());
+  //     });
+  //     if (isJobSeeker) {
+  //       Navigator.pushNamed(context, VerifyEmail.routeName);
+  //     } else {
+  //       Utils.showSnackBar('Job seeker not found', Colors.red);
+  //       FirebaseAuth.instance.signOut();
+  //     }
+
+  //     // if (isJobSeeker) {
+  //     //   Navigator.pushNamed(context, home.routeName);
+  //     //   //  Navigator.of(context).pop();
+  //     //   // Utils.showSnackBar('Job seeker not found', Colors.red);
+  //     //   // FirebaseAuth.instance.signOut();
+  //     // } else {
+  //     //   Utils.showSnackBar('Job seeker not found', Colors.red);
+  //     //   FirebaseAuth.instance.signOut();
+  //     //   //  Navigator.of(context).pop();
+  //     // }
+  //   } on FirebaseAuthException catch (e) {
+  //     Utils.showSnackBar(e.message, Colors.red);
+  //     print(e.message);
+  //   }
+  //   setState(() {
+  //     _showProgressIndicator = false;
+  //   });
+  //   // if (mounted) {
+  //   //   Navigator.of(context).pop();
+  //   // }
+  // }
+  Future<void> signIn() async {
     setState(() {
-      _showProgressIndicator = true;
+      _showProgressIndicator = true; // Show progress indicator
     });
     Visibility(
       visible: _showProgressIndicator,
-      child: Center(
+      child: const Center(
         child: CircularProgressIndicator(),
       ),
     );
-    // showDialog(
-    //     context: context,
-    //     barrierDismissible: false,
-    //     builder: (context) => Center(
-    //           child: CircularProgressIndicator(),
-    //         ));
-
     try {
-      await FirebaseAuth.instance
+      final UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
               email: emailController.text.trim(),
-              password: passwordController1.text.trim())
-          .then((value) {
-        checkUserRole(value.toString());
-      });
-      if (isJobSeeker) {
-        Navigator.pushNamed(context, VerifyEmail.routeName);
-      } else {
-        Utils.showSnackBar('Job seeker not found', Colors.red);
-        FirebaseAuth.instance.signOut();
-      }
+              password: passwordController1.text.trim());
 
-      // if (isJobSeeker) {
-      //   Navigator.pushNamed(context, home.routeName);
-      //   //  Navigator.of(context).pop();
-      //   // Utils.showSnackBar('Job seeker not found', Colors.red);
-      //   // FirebaseAuth.instance.signOut();
-      // } else {
-      //   Utils.showSnackBar('Job seeker not found', Colors.red);
-      //   FirebaseAuth.instance.signOut();
-      //   //  Navigator.of(context).pop();
-      // }
+      // Check if sign-in was successful
+      if (userCredential.user != null) {
+        // Authentication successful, check user role
+        checkUserRole(userCredential.user!.uid);
+        if (isJobSeeker) {
+          Navigator.pushNamed(context, VerifyEmail.routeName);
+        }
+      } else {
+        // Authentication failed (user is null)
+        Utils.showSnackBar('Sign-in failed', Colors.red);
+      }
     } on FirebaseAuthException catch (e) {
-      Utils.showSnackBar(e.message, Colors.red);
-      print(e.message);
+      // Handle FirebaseAuthException errors
+      Utils.showSnackBar('Sign-in failed: ${e.message}', Colors.red);
+      print('FirebaseAuthException: ${e.message}');
+    } catch (e) {
+      // Handle other errors
+      Utils.showSnackBar('Sign-in failed: $e', Colors.red);
+      print('Error: $e');
     }
+
     setState(() {
-      _showProgressIndicator = false;
+      _showProgressIndicator = false; // Hide progress indicator
     });
-    // if (mounted) {
-    //   Navigator.of(context).pop();
-    // }
   }
 
   @override

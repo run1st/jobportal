@@ -121,7 +121,7 @@ class _EmpLoginFormState extends State<EmpLoginForm> {
     });
     Visibility(
       visible: _showProgressIndicator,
-      child: Center(
+      child: const Center(
         child: CircularProgressIndicator(),
       ),
     );
@@ -135,6 +135,9 @@ class _EmpLoginFormState extends State<EmpLoginForm> {
       if (userCredential.user != null) {
         // Authentication successful, check user role
         checkUserRole(userCredential.user!.uid);
+        if (isEmployer) {
+          Navigator.pushNamed(context, VerifyEmpEmail.routeName);
+        }
       } else {
         // Authentication failed (user is null)
         EmpUtils.showSnackBar('Sign-in failed', Colors.red);
