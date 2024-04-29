@@ -24,7 +24,20 @@ import 'package:flutter/src/widgets/framework.dart';
 // import 'package:flutter/material.dart';
 
 // //void main() => runApp(Manage_posts());
+// rules_version = '2';
+// service cloud.firestore {
+//   match /databases/{database}/documents {
+//     match /{document=**} {
+//       allow read, write: if
+//           request.auth != null;
+//     }
+//   }match /databases/{database}/documents {
 
+//     match /employer/{currentUser}/{document=**} {
+//       allow read, write: if request.auth != null && request.auth.uid == currentUser;
+//     }
+//   }
+// }
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project1/Employers/Employers_account/empUtils.dart';
 import 'package:project1/Employers/manage_posts/edit_posts.dart';
@@ -39,12 +52,27 @@ class Manage_posts extends StatefulWidget {
 }
 
 class _Manage_postsState extends State<Manage_posts> {
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
+  String? currentUser;
+  Future<String> getCurrentUserUid() async {
+    User? user = await FirebaseAuth.instance.currentUser;
+
     if (user != null) {
+      print('Curent user id ${user}');
       return user.uid;
     } else {
       return '';
+    }
+  }
+
+  void getUserUid() async {
+    try {
+      currentUser = await getCurrentUserUid();
+      print('the current user is  ${currentUser}');
+      if (currentUser != null) {
+        print('the current user is not null');
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
     }
   }
 
@@ -79,7 +107,7 @@ class _Manage_postsState extends State<Manage_posts> {
                               .delete();
                           FirebaseFirestore.instance
                               .collection('employer')
-                              .doc(getCurrentUserUid())
+                              .doc(currentUser)
                               .collection('job posting')
                               .doc(id)
                               .delete();
@@ -104,6 +132,13 @@ class _Manage_postsState extends State<Manage_posts> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    getUserUid();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
@@ -114,14 +149,14 @@ class _Manage_postsState extends State<Manage_posts> {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('employer')
-            .doc(getCurrentUserUid())
+            .doc(currentUser)
             .collection('job posting')
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
-              return new Text('Loading...');
+              return Center(child: new Text('Loading...'));
             default:
               return SafeArea(
                 child: SingleChildScrollView(

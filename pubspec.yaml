@@ -85,6 +85,12 @@ flutter:
     - assets/images/post2.jpeg
     - assets/images/login.jpg
     - assets/images/login2.jpg
+    - assets/images/handShake.jpg
+    - assets/images/splash3.jpg
+    - assets/images/splash8.jpg
+    - assets/images/splash9.jpg
+    - assets/images/splash11.jpeg
+    - assets/images/splash12.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

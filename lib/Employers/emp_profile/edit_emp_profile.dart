@@ -29,9 +29,11 @@ class _EditEmployerProfileState extends State<EditEmployerProfile> {
     });
   }
 
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
+  String? currentUser;
+  Future<String> getCurrentUserUid() async {
+    User? user = await FirebaseAuth.instance.currentUser;
     if (user != null) {
+      print('Curent user id ${user}');
       return user.uid;
     } else {
       return '';
@@ -43,14 +45,13 @@ class _EditEmployerProfileState extends State<EditEmployerProfile> {
   }
 
   Future saveEmployerInfo(Company companyInfonfo) async {
-    final emp_document_ref = FirebaseFirestore.instance
-        .collection('employer')
-        .doc(getCurrentUserUid());
-    final emp_profile_ref =
-        emp_document_ref.collection('company profile').doc('profile');
-    _companyId = emp_document_ref.id;
+    final empDocumentReference =
+        FirebaseFirestore.instance.collection('employer').doc(currentUser);
+    final empPrifileReference =
+        empDocumentReference.collection('company profile').doc('profile');
+    _companyId = empDocumentReference.id;
     final json = companyInfonfo.toJson();
-    await emp_profile_ref
+    await empPrifileReference
         // .collection('Employer profile')
         // .doc('personal_info')
         .set(json);
@@ -90,7 +91,7 @@ class _EditEmployerProfileState extends State<EditEmployerProfile> {
   String _city = '';
   String _state = '';
   String _country = '';
-  String _zipCode = '';
+  // String _zipCode = '';
   String companyName = '';
   String phoneNumber = '';
   String email = '';
@@ -106,43 +107,52 @@ class _EditEmployerProfileState extends State<EditEmployerProfile> {
     'Option 3',
   ];
   @override
+  void initState() {
+    super.initState();
+
+    getCurrentUserUid();
+  }
+
+  Map<String, dynamic>? profileData;
+  @override
   Widget build(BuildContext context) {
+    // currentUser = getCurrentUserUid();
     // printImagePath();
     return Scaffold(
       body: SingleChildScrollView(
         child: StreamBuilder(
             stream: FirebaseFirestore.instance
                 .collection('employer')
-                .doc(getCurrentUserUid())
+                .doc(currentUser)
                 .collection('company profile')
                 .doc('profile')
                 .snapshots(),
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
                     snapshot) {
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
-
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
+                return const CircularProgressIndicator();
+              } else if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (!snapshot.hasData || !snapshot.data!.exists) {
+                  return const Text('No data available');
+                } else {
+                  profileData = snapshot.data!.data() as Map<String, dynamic>;
+                }
               }
 
-              if (!snapshot.hasData || !snapshot.data!.exists) {
-                return Text('No data available');
-              }
-              Map<String, dynamic>? profileData = snapshot.data!.data();
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Form(
                     key: _formKey,
                     child: Column(
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           height: 40,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
                           child: Center(
                             child: Text(
                               'Update Company Information',
@@ -566,10 +576,11 @@ class _EditEmployerProfileState extends State<EditEmployerProfile> {
                               validator: ((value) {
                                 if (value == null) {
                                   return 'please select an option';
+                                } else {
+                                  return value.toString();
                                 }
                               }),
-                              value:
-                                  profileData?['industry'] ?? 'endustry type',
+                              value: profileData?['industry'] ?? 'Option 1',
                               items: _dropdownItems.map((item) {
                                 return DropdownMenuItem(
                                   child: Text(item),
@@ -607,10 +618,11 @@ class _EditEmployerProfileState extends State<EditEmployerProfile> {
                               validator: ((value) {
                                 if (value == null) {
                                   return 'please select an option';
+                                } else {
+                                  return value.toString();
                                 }
                               }),
-                              value: profileData?['company-size'] ??
-                                  'company size',
+                              value: profileData?['company-size'] ?? 'Option 1',
                               items: _dropdownItems.map((item) {
                                 return DropdownMenuItem(
                                   child: Text(item),

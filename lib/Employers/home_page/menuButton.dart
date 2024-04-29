@@ -35,11 +35,11 @@ class _popUpMenuState extends State<popUpMenu> {
                 }
             },
         itemBuilder: (context) => [
-              PopupMenuItem(
+              const PopupMenuItem(
                 child: Text('Update profile'),
                 value: menu.updateProfile,
               ),
-              PopupMenuItem(
+              const PopupMenuItem(
                 child: Text('Logout'),
                 value: menu.logout,
               )

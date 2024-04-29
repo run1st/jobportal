@@ -11,6 +11,7 @@ import '../hompage.dart';
 import './auth_page.dart';
 
 class VerifyEmail extends StatefulWidget {
+  static const routeName = '/VerifyEmail';
   const VerifyEmail({Key? key}) : super(key: key);
 
   @override
@@ -44,19 +45,25 @@ class _VerifyEmailState extends State<VerifyEmail> {
       });
       timer = Timer.periodic(
         Duration(seconds: 3),
-        (Timer) => chekEmailVerified(),
+        (timer) => checkEmailVerified(),
       );
     } catch (e) {
-      Utils.showSnackBar(e.toString(), Colors.red);
+      // Print out the error message
+      print("Error sending verification email: $e");
+      // Show a snackbar with the error message
+      Utils.showSnackBar("Error sending verification email", Colors.red);
     }
   }
 
-  Future chekEmailVerified() async {
+  Future checkEmailVerified() async {
     await FirebaseAuth.instance.currentUser?.reload();
     setState(() {
       isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
-    if (isEmailVerified) timer?.cancel();
+    if (isEmailVerified) {
+      // Email verified, cancel the timer
+      timer?.cancel();
+    }
   }
 
   @override

@@ -21,17 +21,17 @@ class _EmpLoginFormState extends State<EmpLoginForm> {
   final passwordController2 = TextEditingController();
   void initState() {
     super.initState();
-    FirebaseAuth.instance.authStateChanges().listen((user) async {
-      if (user != null) {
-        await checkUserRole(user.uid);
-        if (isEmployer) {
-          Navigator.pushNamed(context, EmpHomePage.routeName);
-        } else {
-          EmpUtils.showSnackBar('Job seeker not found', Colors.red);
-          FirebaseAuth.instance.signOut();
-        }
-      }
-    });
+    // FirebaseAuth.instance.authStateChanges().listen((user) async {
+    //   if (user != null) {
+    //     await checkUserRole(user.uid);
+    //     if (isEmployer) {
+    //       Navigator.pushNamed(context, EmpHomePage.routeName);
+    //     } else {
+    //       EmpUtils.showSnackBar('Employer  not found', Colors.red);
+    //       // FirebaseAuth.instance.signOut();
+    //     }
+    //   }
+    // });
   }
 
   bool isEmployer = false;
@@ -62,9 +62,62 @@ class _EmpLoginFormState extends State<EmpLoginForm> {
   }
 
   bool _showProgressIndicator = false;
-  Future signIn() async {
+  // Future signIn() async {
+  //   setState(() {
+  //     _showProgressIndicator = true;
+  //   });
+  //   Visibility(
+  //     visible: _showProgressIndicator,
+  //     child: Center(
+  //       child: CircularProgressIndicator(),
+  //     ),
+  //   );
+  //   // showDialog(
+  //   //     context: context,
+  //   //     barrierDismissible: false,
+  //   //     builder: (context) => Center(
+  //   //           child: CircularProgressIndicator(),
+  //   //         ));
+  //   try {
+  //     await FirebaseAuth.instance
+  //         .signInWithEmailAndPassword(
+  //             email: emailController.text.trim(),
+  //             password: passwordController1.text.trim())
+  //         .then((value) {
+  //       checkUserRole(value.toString());
+  //     });
+  //     if (isEmployer) {
+  //       Navigator.pushNamed(context, VerifyEmpEmail.routeName);
+  //     } else {
+  //       EmpUtils.showSnackBar('Job seeker not found', Colors.red);
+  //       //   FirebaseAuth.instance.signOut();
+  //     }
+
+  //     // await checkUserRole();
+  //     // if (isJobSeeker) {
+  //     //   Navigator.pushNamed(context, home.routeName);
+  //     //   //  Navigator.of(context).pop();
+  //     //   // Utils.showSnackBar('Job seeker not found', Colors.red);
+  //     //   // FirebaseAuth.instance.signOut();
+  //     // } else {
+  //     //   Utils.showSnackBar('Job seeker not found', Colors.red);
+  //     //   FirebaseAuth.instance.signOut();
+  //     //   //  Navigator.of(context).pop();
+  //     // }
+  //   } on FirebaseAuthException catch (e) {
+  //     EmpUtils.showSnackBar(e.message, Colors.red);
+  //     print(e.message);
+  //   }
+  //   setState(() {
+  //     _showProgressIndicator = false;
+  //   });
+  //   // if (mounted) {
+  //   //   Navigator.of(context).pop();
+  //   // }
+  // }
+  Future<void> signIn() async {
     setState(() {
-      _showProgressIndicator = true;
+      _showProgressIndicator = true; // Show progress indicator
     });
     Visibility(
       visible: _showProgressIndicator,
@@ -72,38 +125,33 @@ class _EmpLoginFormState extends State<EmpLoginForm> {
         child: CircularProgressIndicator(),
       ),
     );
-    // showDialog(
-    //     context: context,
-    //     barrierDismissible: false,
-    //     builder: (context) => Center(
-    //           child: CircularProgressIndicator(),
-    //         ));
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController1.text.trim());
-      Navigator.pushNamed(context, VerifyEmpEmail.routeName);
-      // await checkUserRole();
-      // if (isJobSeeker) {
-      //   Navigator.pushNamed(context, home.routeName);
-      //   //  Navigator.of(context).pop();
-      //   // Utils.showSnackBar('Job seeker not found', Colors.red);
-      //   // FirebaseAuth.instance.signOut();
-      // } else {
-      //   Utils.showSnackBar('Job seeker not found', Colors.red);
-      //   FirebaseAuth.instance.signOut();
-      //   //  Navigator.of(context).pop();
-      // }
+      final UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: emailController.text.trim(),
+              password: passwordController1.text.trim());
+
+      // Check if sign-in was successful
+      if (userCredential.user != null) {
+        // Authentication successful, check user role
+        checkUserRole(userCredential.user!.uid);
+      } else {
+        // Authentication failed (user is null)
+        EmpUtils.showSnackBar('Sign-in failed', Colors.red);
+      }
     } on FirebaseAuthException catch (e) {
-      EmpUtils.showSnackBar(e.message, Colors.red);
-      print(e.message);
+      // Handle FirebaseAuthException errors
+      EmpUtils.showSnackBar('Sign-in failed: ${e.message}', Colors.red);
+      print('FirebaseAuthException: ${e.message}');
+    } catch (e) {
+      // Handle other errors
+      EmpUtils.showSnackBar('Sign-in failed: $e', Colors.red);
+      print('Error: $e');
     }
+
     setState(() {
-      _showProgressIndicator = false;
+      _showProgressIndicator = false; // Hide progress indicator
     });
-    // if (mounted) {
-    //   Navigator.of(context).pop();
-    // }
   }
 
   @override

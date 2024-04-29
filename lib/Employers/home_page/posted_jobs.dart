@@ -16,17 +16,40 @@ class Posted_jobs extends StatefulWidget {
 }
 
 class _Posted_jobsState extends State<Posted_jobs> {
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
+  String? currentUser;
+  Future<String> getCurrentUserUid() async {
+    User? user = await FirebaseAuth.instance.currentUser;
+
     if (user != null) {
+      print('Curent user id ${user}');
       return user.uid;
     } else {
       return '';
     }
   }
 
+  void getUserUid() async {
+    try {
+      currentUser = await getCurrentUserUid();
+      print('the current user is  ${currentUser.toString()}');
+      if (currentUser != null) {
+        print('the current user is not null');
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    getUserUid();
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('the document pathe is ${currentUser}');
     return Scaffold(
       // backgroundColor: Colors.grey[200],
       body: StreamBuilder<QuerySnapshot>(
@@ -38,7 +61,7 @@ class _Posted_jobsState extends State<Posted_jobs> {
             // .snapshots(),
             FirebaseFirestore.instance
                 .collection('employer')
-                .doc(getCurrentUserUid())
+                .doc(currentUser)
                 .collection('job posting')
                 .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -46,7 +69,7 @@ class _Posted_jobsState extends State<Posted_jobs> {
           if (!snapshot.hasData) return Text('OOPS there is no posted jobs');
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
-              return new Text('Loading...');
+              return Center(child: Text('Loading...'));
 
             default:
               return SafeArea(

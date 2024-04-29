@@ -96,7 +96,7 @@ class _Sign_up_inState extends State<Sign_up_in> {
             Text('Alrady have an account'),
             TextButton(
                 onPressed: () {
-                  widget.onclickedSignUp;
+                  widget.onclickedSignUp();
                 },
                 child: Text('Sing In')),
             ElevatedButton(

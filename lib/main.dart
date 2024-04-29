@@ -16,10 +16,12 @@ import 'package:project1/hompage.dart';
 import 'package:project1/job_seeker_home_page/applied_jobs.dart';
 //import 'package:project1/profile/job_seeker_view_profile.dart';
 import 'package:project1/profile/personal_info.dart';
+import 'package:project1/splashScreen/splash2.dart';
 import 'package:project1/start_page.dart';
 import 'package:project1/user_account/login_page.dart';
 //import 'package:project1/user_account/login.dart';
 import 'package:project1/user_account/utils.dart';
+import 'package:project1/user_account/verify_email.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'jobSeekerModel/job_seeker_profile_model.dart';
@@ -56,7 +58,7 @@ Future<void> main() async {
 // }
 
 class JobSeekerProfileWrapper extends StatelessWidget {
-  const JobSeekerProfileWrapper({Key? key}) : super(key: key);
+  JobSeekerProfileWrapper({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -96,9 +98,11 @@ class MyApp extends StatelessWidget {
         backgroundColor: Colors.blue,
         errorColor: Colors.red,
       ),
-      home: MyHomePage(),
+      home: Splash1(),
       routes: {
-        AuthPage.routName: (context) => const AuthPage(),
+        AuthPage.routName: (context) => AuthPage(
+              isLogin: true,
+            ),
         EmpAuthPage.routName: (context) => const EmpAuthPage(),
         personal_info.routeName: (context) => const personal_info(),
         EducationForm.routeName: (context) => EducationForm(),
@@ -122,6 +126,7 @@ class MyApp extends StatelessWidget {
         StartPage.routName: (context) => StartPage(),
         Applied_jobs_list.routeName: (context) => const Applied_jobs_list(),
         VerifyEmpEmail.routeName: (context) => const VerifyEmpEmail(),
+        VerifyEmail.routeName: (context) => VerifyEmail(),
         //  LoginPage.routeName: (context) => LoginPage(onclickedSignIn: () {}),
         // JobDetailPage.routName: (context) => JobDetailPage(),
         //   ProfilePageView.routeName: ((context) => ProfilePageView())
@@ -231,15 +236,18 @@ class _MyHomePageState extends State<MyHomePage> {
             const Text(
               'Register As',
             ),
+            SizedBox(
+              height: 20,
+            ),
             Container(
               width: MediaQuery.of(context).size.width - 50,
               margin: EdgeInsets.all(20),
               child: FloatingActionButton(
                 heroTag: "btn1",
                 // clipBehavior: Clip.hardEdge,
-                onPressed: () =>
-                    Navigator.pushNamed(context, Register.routeName),
-                child: Text('JOB SEEKER'),
+                onPressed: () => Navigator.pushNamed(context, AuthPage.routName,
+                    arguments: AuthPage(isLogin: false)),
+                child: Text('Register'),
                 // textColor: Colors.white,
                 // color: Colors.deepPurple,
                 // padding: EdgeInsets.all(20),
@@ -247,21 +255,21 @@ class _MyHomePageState extends State<MyHomePage> {
                     borderRadius: BorderRadius.circular(20)),
               ),
             ),
-            Container(
-              width: MediaQuery.of(context).size.width - 50,
-              margin: EdgeInsets.all(20),
-              child: FloatingActionButton(
-                heroTag: "btn2",
-                onPressed: () =>
-                    Navigator.pushNamed(context, EmpRegister.routeName),
-                child: Text('RECRUITER'),
-                // textColor: Colors.white,
-                // color: Colors.deepPurple,
-                // padding: EdgeInsets.all(20),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-              ),
-            ),
+            // Container(
+            //   width: MediaQuery.of(context).size.width - 50,
+            //   margin: EdgeInsets.all(20),
+            //   child: FloatingActionButton(
+            //     heroTag: "btn2",
+            //     onPressed: () =>
+            //         Navigator.pushNamed(context, EmpRegister.routeName),
+            //     child: Text('RECRUITER'),
+            //     // textColor: Colors.white,
+            //     // color: Colors.deepPurple,
+            //     // padding: EdgeInsets.all(20),
+            //     shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(20)),
+            //   ),
+            // ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -277,11 +285,12 @@ class _MyHomePageState extends State<MyHomePage> {
                             clipBehavior: Clip.antiAliasWithSaveLayer,
                             // shape: RoundedRectangleBorder(
                             //     borderRadius: BorderRadius.circular(50)),
-                            onPressed: () =>
-                                Navigator.pushNamed(context, AuthPage.routName),
+                            onPressed: () => Navigator.pushNamed(
+                                context, AuthPage.routName,
+                                arguments: AuthPage(isLogin: true)),
 
                             //  context, loginOption.routeName),
-                            child: Text(
+                            child: const Text(
                               ' Login',
                               style: TextStyle(color: Colors.blue),
                             )),

@@ -19,7 +19,9 @@ class HomePage extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => AuthPage(),
+              builder: (context) => AuthPage(
+                isLogin: true,
+              ),
             ),
           );
           // Navigator.of(context).
