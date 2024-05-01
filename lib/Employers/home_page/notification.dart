@@ -111,7 +111,6 @@ class _EmpNotificationState extends State<EmpNotification> {
                 ),
               );
           }
-          ;
         },
       ),
     );

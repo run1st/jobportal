@@ -53,23 +53,18 @@ class Manage_posts extends StatefulWidget {
 
 class _Manage_postsState extends State<Manage_posts> {
   String? currentUser;
-  Future<String> getCurrentUserUid() async {
-    User? user = await FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      print('Curent user id ${user}');
-      return user.uid;
-    } else {
-      return '';
-    }
-  }
-
-  void getUserUid() async {
+  Future<void> getUserUid() async {
     try {
-      currentUser = await getCurrentUserUid();
-      print('the current user is  ${currentUser}');
-      if (currentUser != null) {
-        print('the current user is not null');
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUser = user.uid;
+          jobPostingsStream = FirebaseFirestore.instance
+              .collection('employer')
+              .doc(currentUser)
+              .collection('job posting')
+              .snapshots();
+        });
       }
     } catch (e) {
       print('Error getting current user UID: $e');
@@ -131,106 +126,113 @@ class _Manage_postsState extends State<Manage_posts> {
         });
   }
 
+  Stream<QuerySnapshot>? jobPostingsStream;
   @override
   void initState() {
     super.initState();
 
     getUserUid();
+    // jobPostingsStream = FirebaseFirestore.instance
+    //     .collection('employer')
+    //     .doc(currentUser)
+    //     .collection('job posting')
+    //     .snapshots();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Employer Dashboard'),
+        title: const Text('Employer Dashboard'),
         backgroundColor: Colors.blue[900],
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('employer')
-            .doc(currentUser)
-            .collection('job posting')
-            .snapshots(),
+        stream: jobPostingsStream,
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
-              return Center(child: new Text('Loading...'));
+              return const Center(child: CircularProgressIndicator());
+
             default:
-              return SafeArea(
-                child: SingleChildScrollView(
-                  child: SizedBox(
-                    height: 600,
-                    child: new ListView(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                      children:
-                          snapshot.data!.docs.map((DocumentSnapshot document) {
-                        return GestureDetector(
-                          onTap: () {},
-                          child: Card(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 5, vertical: 10),
-                            child: new ListTile(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(color: Colors.black, width: 1),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              style: ListTileStyle.drawer,
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: ((context, index) {
+                      final DocumentSnapshot jobPosting =
+                          snapshot.data!.docs[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 3),
+                        child: Card(
+                          //  color: Color.fromARGB(255, 252, 234, 240),
+                          color: const Color.fromARGB(255, 247, 244, 244),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
+                          child: SizedBox(
+                            height: 100,
+                            child: ListTile(
+                              dense: false,
                               leading: CircleAvatar(
-                                foregroundImage: NetworkImage(document[
+                                foregroundImage: NetworkImage(jobPosting[
                                         'company']['logoUrl'] ??
                                     'https://www.bing.com/images/search?view=detailV2&ccid=q182Q4Zy&id=D8C88B9D55DB76A095EADD6BDE4D4DF28EFD9B65&thid=OIP.q182Q4ZyCS-WUHuYGfac4QHaDt&mediaurl=https%3a%2f%2fhitechengineeringindia.com%2fimg%2fheader-img%2fprofile.jpg&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.ab5f36438672092f96507b9819f69ce1%3frik%3dZZv9jvJNTd5r3Q%26pid%3dImgRaw%26r%3d0&exph=834&expw=1666&q=image+for+company+profile+picture&simid=608015538228691274&FORM=IRPRST&ck=97AE052C55DA4BCF742295A439E9F6CE&selectedIndex=22'),
 
                                 // :child: Icon(Icons.person),
                               ),
-                              //  leading: new Text(document['job category']),
-                              title: new Text(document['title']),
-                              subtitle: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  width: 20,
-                                  child: Row(
-                                    children: [
-                                      new Text(document['job category']),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      new Text(document['employment type']),
-                                    ],
-                                  )),
+                              title: Text(
+                                jobPosting['title'],
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                ),
+                              ),
+                              subtitle: Column(
+                                children: [
+                                  Chip(label: Text(jobPosting['job category'])),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(jobPosting['employment type']),
+                                ],
+                              ),
                               trailing: Container(
-                                width: 100,
+                                width: MediaQuery.of(context).size.width -
+                                    (MediaQuery.of(context).size.width - 98),
                                 child: Row(
                                   children: [
                                     IconButton(
-                                        onPressed: () {
-                                          Navigator.pushNamed(context,
-                                              EditJobPostingForm.routName,
-                                              arguments: document);
-                                        },
-                                        icon: Icon(
-                                          Icons.edit,
-                                          color: Theme.of(context).primaryColor,
-                                        )),
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          EditJobPostingForm.routName,
+                                          arguments: jobPosting,
+                                        );
+                                      },
+                                      icon: Icon(Icons.edit,
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                    ),
                                     IconButton(
-                                        onPressed: () {
-                                          deleteJob(document.id);
-                                        },
-                                        icon: Icon(
-                                          Icons.delete,
-                                          color: Theme.of(context).errorColor,
-                                        ))
+                                      onPressed: () {
+                                        deleteJob(jobPosting.id);
+                                      },
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: Colors.red,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                             ),
                           ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
+                        ),
+                      );
+                    })),
               );
           }
         },
@@ -238,3 +240,84 @@ class _Manage_postsState extends State<Manage_posts> {
     );
   }
 }
+
+
+
+// return SafeArea(
+//                   child: SingleChildScrollView(
+//                     child: SizedBox(
+//                       height: 600,
+//                       child: ListView(
+//                         padding:
+//                             EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+//                         children: snapshot.data!.docs
+//                             .map((DocumentSnapshot document) {
+//                           print('the profile data is ${document}');
+//                           return GestureDetector(
+//                             onTap: () {},
+//                             child: Card(
+//                               margin: EdgeInsets.symmetric(
+//                                   horizontal: 5, vertical: 10),
+//                               child: ListTile(
+//                                 shape: RoundedRectangleBorder(
+//                                   side:
+//                                       BorderSide(color: Colors.black, width: 1),
+//                                   borderRadius: BorderRadius.circular(5),
+//                                 ),
+//                                 style: ListTileStyle.drawer,
+//                                 leading: CircleAvatar(
+//                                   foregroundImage: NetworkImage(document[
+//                                           'company']['logoUrl'] ??
+//                                       'https://www.bing.com/images/search?view=detailV2&ccid=q182Q4Zy&id=D8C88B9D55DB76A095EADD6BDE4D4DF28EFD9B65&thid=OIP.q182Q4ZyCS-WUHuYGfac4QHaDt&mediaurl=https%3a%2f%2fhitechengineeringindia.com%2fimg%2fheader-img%2fprofile.jpg&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.ab5f36438672092f96507b9819f69ce1%3frik%3dZZv9jvJNTd5r3Q%26pid%3dImgRaw%26r%3d0&exph=834&expw=1666&q=image+for+company+profile+picture&simid=608015538228691274&FORM=IRPRST&ck=97AE052C55DA4BCF742295A439E9F6CE&selectedIndex=22'),
+
+//                                   // :child: Icon(Icons.person),
+//                                 ),
+//                                 //  leading:  Text(document['job category']),
+//                                 title: Text(document['title']),
+//                                 subtitle: Container(
+//                                     padding:
+//                                         EdgeInsets.symmetric(horizontal: 20),
+//                                     width: 20,
+//                                     child: Row(
+//                                       children: [
+//                                         Text(document['job category']),
+//                                         SizedBox(
+//                                           width: 5,
+//                                         ),
+//                                         Text(document['employment type']),
+//                                       ],
+//                                     )),
+//                                 trailing: Container(
+//                                   width: 100,
+//                                   child: Row(
+//                                     children: [
+//                                       IconButton(
+//                                           onPressed: () {
+//                                             Navigator.pushNamed(context,
+//                                                 EditJobPostingForm.routName,
+//                                                 arguments: document);
+//                                           },
+//                                           icon: Icon(
+//                                             Icons.edit,
+//                                             color:
+//                                                 Theme.of(context).primaryColor,
+//                                           )),
+//                                       IconButton(
+//                                           onPressed: () {
+//                                             deleteJob(document.id);
+//                                           },
+//                                           icon: Icon(
+//                                             Icons.delete,
+//                                             color: Theme.of(context).cardColor,
+//                                           ))
+//                                     ],
+//                                   ),
+//                                 ),
+//                               ),
+//                             ),
+//                           );
+//                         }).toList(),
+//                       ),
+//                     ),
+//                   ),
+//                 );

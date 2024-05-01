@@ -22,6 +22,8 @@ import '../hompage.dart';
 import './job_list.dart';
 import 'favorites.dart';
 import './jobSeekerNotification.dart';
+import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
+import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
 
 class home extends StatefulWidget {
   static const routeName = '/home';
@@ -126,24 +128,24 @@ class _homeState extends State<home> {
 
         //cccccccccccccccccccccccccccc,
 
-        bottomNavigationBar: BottomNavigationBar(
+        bottomNavigationBar: CurvedNavigationBar(
           // onTap: _selectPage,
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.work),
+          items: const <CurvedNavigationBarItem>[
+            CurvedNavigationBarItem(
+              child: Icon(Icons.work),
               label: 'Jobs',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.favorite),
+            CurvedNavigationBarItem(
+              child: Icon(Icons.favorite),
               label: 'Saved Jobs',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.notification_add),
+            CurvedNavigationBarItem(
+              child: Icon(Icons.notification_add),
               label: 'Notification',
             ),
           ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: Colors.deepPurpleAccent,
+          index: _selectedIndex,
+          // selectedItemColor: Colors.deepPurpleAccent,
           onTap: _onItemTapped,
         ),
       ),

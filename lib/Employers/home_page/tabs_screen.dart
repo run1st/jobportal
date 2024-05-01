@@ -8,6 +8,8 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'posted_jobs.dart';
 import 'notification.dart';
 import 'candidates.dart';
+import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
+import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
 
 class abc {}
 
@@ -46,6 +48,7 @@ class _TabsScreenState extends State<TabsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: _pages[selecetedPageIndex]['title'],
         actions: [
@@ -53,33 +56,31 @@ class _TabsScreenState extends State<TabsScreen> {
         ],
       ),
       body: _pages[selecetedPageIndex]['page'],
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: CurvedNavigationBar(
           backgroundColor: Colors.blue,
-          unselectedItemColor: Colors.amber,
-          selectedItemColor: Colors.pink,
-          currentIndex: selecetedPageIndex,
-          type: BottomNavigationBarType.shifting,
+          // unselectedItemColor: Colors.amber,
+          // selectedItemColor: Colors.pink,
+          index: selecetedPageIndex,
+          //  type: BottomNavigationBarType.shifting,
           onTap: _selectPage,
           items: [
-            BottomNavigationBarItem(
-                backgroundColor: Colors.blue,
-                icon: Icon(Icons.home),
-                tooltip: 'Home',
+            CurvedNavigationBarItem(
+                // backgroundColor: Colors.white,
+                child: Icon(Icons.home),
+                // tooltip: 'Home',
                 label: 'home'),
-            BottomNavigationBarItem(
-                backgroundColor: Colors.blue,
-                icon: Icon(Icons.post_add),
-                tooltip: 'job posts',
-                label: 'post'),
-            BottomNavigationBarItem(
-                backgroundColor: Colors.blue,
-                icon: Icon(Icons.people),
-                tooltip: 'candidates',
+            CurvedNavigationBarItem(
+              // backgroundColor: Colors.blue,
+              child: Icon(Icons.post_add),
+              label: 'job posts',
+            ),
+            CurvedNavigationBarItem(
+                //   backgroundColor: Colors.blue,
+                child: Icon(Icons.people),
                 label: 'candidates'),
-            BottomNavigationBarItem(
-                backgroundColor: Colors.blue,
-                icon: Icon(Icons.notification_add),
-                tooltip: 'notification',
+            CurvedNavigationBarItem(
+                //  backgroundColor: Colors.blue,
+                child: Icon(Icons.notification_add),
                 label: 'not')
           ]),
     );

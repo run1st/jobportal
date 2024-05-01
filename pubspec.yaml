@@ -55,6 +55,7 @@ dependencies:
   flutter_pdfview: ^1.2.5
   file_picker: ^5.2.1
   rxdart: ^0.27.7
+  curved_labeled_navigation_bar: ^2.0.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
