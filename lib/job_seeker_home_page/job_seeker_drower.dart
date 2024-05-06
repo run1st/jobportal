@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -16,32 +17,66 @@ class Drower extends StatefulWidget {
 }
 
 class _DrowerState extends State<Drower> {
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return user.uid;
-    } else {
-      return 'null';
+  Future<DocumentSnapshot<Map<String, dynamic>>>? currentUserData;
+  String? currentUser;
+  String? currentUemail;
+  Future<void> getUserUid() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUser = user.uid;
+        });
+
+        final currentUserDataRef = FirebaseFirestore.instance
+            .collection('job-seeker')
+            .doc(currentUser);
+
+        final currentUserData = await currentUserDataRef.get();
+
+        if (currentUserData.exists) {
+          setState(() {
+            currentUemail = currentUserData['email'];
+          });
+        }
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    getUserUid();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print('the current user id is ${getCurrentUserUid()}');
+    print('the current user id is ${currentUser}');
     return Container(
       height: MediaQuery.of(context).size.height - 500,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text("Ablante Daniel"),
-            accountEmail: Text("ablantedaniel@gmail.com"),
+            accountName: currentUemail == null
+                ? Text("No Email Found")
+                : Text('${currentUemail?.trim()}'),
+            accountEmail: currentUemail == null
+                ? Text("No Email Found")
+                : Text('${currentUemail?.trim()}'),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
-              child: Text(
-                "AD",
-                style: TextStyle(fontSize: 28),
-              ),
+              child: currentUemail == null
+                  ? Text(
+                      "",
+                      style: TextStyle(fontSize: 28),
+                    )
+                  : Text(
+                      '${currentUemail?.substring(0, 2).toUpperCase()}',
+                      style: TextStyle(fontSize: 28),
+                    ),
             ),
           ),
           ListTile(
@@ -52,7 +87,7 @@ class _DrowerState extends State<Drower> {
             onTap: () {
               Navigator.pop(context); // Close the drawer
 
-              if (getCurrentUserUid() != 'null') {
+              if (currentUser != 'null') {
                 Navigator.pushNamed(context, ProfilePage.routeName);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -75,7 +110,7 @@ class _DrowerState extends State<Drower> {
             leading: Icon(Icons.work),
             title: Text("Applied Jobs"),
             onTap: () {
-              if (getCurrentUserUid() != 'null') {
+              if (currentUser != 'null') {
                 Navigator.pushNamed(context, Applied_jobs_list.routeName);
               }
             },
@@ -84,7 +119,7 @@ class _DrowerState extends State<Drower> {
             leading: Icon(Icons.notifications),
             title: Text("Job Alerts"),
             onTap: () {
-              if (getCurrentUserUid() != 'null') {}
+              if (currentUser != 'null') {}
             },
           ),
           Divider(),
@@ -92,12 +127,12 @@ class _DrowerState extends State<Drower> {
             leading: Icon(Icons.settings),
             title: Text("Settings"),
             onTap: () {
-              if (getCurrentUserUid() != 'null') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Settings()),
-                );
-              }
+              // if (currentUser != 'null') {
+              //   Navigator.push(
+              //     context,
+              //     MaterialPageRoute(builder: (context) => Settings()),
+              //   );
+              // }
             },
           ),
           ListTile(

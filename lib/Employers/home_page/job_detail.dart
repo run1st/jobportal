@@ -333,14 +333,15 @@ class _Job_detailState extends State<Job_detail> {
           height: 10,
         ),
         Container(
-          margin: EdgeInsets.symmetric(horizontal: 20),
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Text(randomText),
-        ),
+            margin: EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text('${widget.job.get('description')}')
+            // Text(randomText),
+            ),
         SizedBox(
           height: 25,
         ),
@@ -359,7 +360,7 @@ class _Job_detailState extends State<Job_detail> {
               child: TextButton(
                   onPressed: () {
                     _handleApplyButtonTap(widget.job);
-                    style:
+
                     ElevatedButton.styleFrom(
                       onSurface: Colors.brown,
                     );

@@ -9,6 +9,7 @@ import 'package:project1/job_seeker_home_page/filter.dart';
 
 import '../Employers/home_page/detail_page.dart';
 import 'package:rxdart/rxdart.dart';
+import 'dart:math';
 
 class JobsList extends StatefulWidget {
   @override
@@ -671,6 +672,17 @@ class _JobsListState extends State<JobsList> {
                     }
                   });
                 }
+                //random color selector
+                List<Color> colorsList = [
+                  Color.fromRGBO(136, 223, 230, 0.808),
+                  Color.fromARGB(206, 243, 208, 231),
+                  Color.fromARGB(206, 241, 214, 205)
+                ];
+
+                Color colorMaker() {
+                  final int colorIndex = Random().nextInt(2);
+                  return colorsList[colorIndex];
+                }
 
                 return SafeArea(
                   child: SingleChildScrollView(
@@ -701,67 +713,75 @@ class _JobsListState extends State<JobsList> {
                                 ),
                               );
                             },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  // side:
-                                  //     BorderSide(color: Colors.black, width: 1),
-                                  // borderRadius: BorderRadius.circular(15),
-                                  borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(20.0),
-                                topRight: Radius.circular(20.0),
-                              )),
-                              elevation: 5,
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 10),
-                              child: ListTile(
-                                style: ListTileStyle.drawer,
-                                leading: CircleAvatar(
-                                  child: Icon(Icons.person),
-                                ),
-                                title: Text(document['title']),
-                                subtitle: Row(
-                                  children: [
-                                    Chip(
-                                      label: Text(document['employment type']),
-                                    ),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                    Chip(
-                                      label: Container(
-                                          width: 40,
-                                          child: Text(
-                                              document['experience level'])),
-                                    ),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                    Chip(
-                                      label: Container(
-                                          width: 50,
-                                          child: Text(
-                                              document['company']['city'])),
-                                    ),
-                                  ],
-                                ),
-                                trailing: Flexible(
-                                  fit: FlexFit.loose,
-                                  child: Container(
-                                    height: 20,
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 5.0,
-                                      horizontal: 5.0,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue,
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                    child: Text(
-                                      getPostedTime(document['posted time']),
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.bold,
+                            child: Container(
+                              height: MediaQuery.of(context).size.height - 600,
+                              child: Card(
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                    // side:
+                                    //     BorderSide(color: Colors.black, width: 1),
+                                    // borderRadius: BorderRadius.circular(15),
+                                    borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(20.0),
+                                  topRight: Radius.circular(20.0),
+                                  bottomRight: Radius.circular(20.0),
+                                  topLeft: Radius.circular(20.0),
+                                )),
+                                elevation: 5,
+                                margin: EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 10),
+                                child: ListTile(
+                                  style: ListTileStyle.drawer,
+                                  leading: CircleAvatar(
+                                    child: Icon(Icons.person),
+                                  ),
+                                  title: Text(document['title']),
+                                  subtitle: Wrap(
+                                    children: [
+                                      Chip(
+                                        label:
+                                            Text(document['employment type']),
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Chip(
+                                        label: Container(
+                                            width: 40,
+                                            child: Text(
+                                                document['experience level'])),
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Chip(
+                                        label: Container(
+                                            width: 50,
+                                            child: Text(
+                                                document['company']['city'])),
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Flexible(
+                                    fit: FlexFit.tight,
+                                    child: Container(
+                                      height: 40,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 5.0,
+                                        horizontal: 5.0,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      child: Text(
+                                        getPostedTime(document['posted time']),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),

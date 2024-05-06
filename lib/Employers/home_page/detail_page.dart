@@ -48,42 +48,42 @@ class _JobDetailPageState extends State<JobDetailPage> {
     return Scaffold(
       // backgroundColor: Theme.of(context).backgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints.expand(
-                height: MediaQuery.of(context).size.height * 3 / 2 + 200,
-                width: MediaQuery.of(context).size.width),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 159, 196, 226),
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(15.0),
-                      bottomRight: Radius.circular(15.0))),
-              width: MediaQuery.of(context).size.width,
-              // height: ,
-              //  color: Theme.of(context).backgroundColor,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: double.infinity),
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 159, 196, 226),
+            ),
+            width: MediaQuery.of(context).size.width,
+            // height: ,
+            //  color: Theme.of(context).backgroundColor,
 
-              child: Stack(
-                children: [
-                  IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(Icons.arrow_back_ios_new_sharp)),
-                  Positioned(
-                    top: 150,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      // height: MediaQuery.of(context).size.height - 200,
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        elevation: 4.0,
-                        // margin:
-                        //     EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Stack(
+              children: [
+                IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(Icons.arrow_back_ios_new_sharp)),
+                Positioned(
+                  top: 150,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    //   width: MediaQuery.of(context).size.width,
+                    // height: MediaQuery.of(context).size.height - 200,
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            topRight: Radius.circular(30)),
+                      ),
+                      elevation: 4.0,
+                      // margin:
+                      //     EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                      child: SingleChildScrollView(
                         child: Column(
                           children: [
                             SizedBox(
@@ -155,36 +155,36 @@ class _JobDetailPageState extends State<JobDetailPage> {
                                 : company_detail(),
                           ],
                         ),
-                        //button1 == true ? Job_detail() : company_detail(),
+                      ),
+                      //button1 == true ? Job_detail() : company_detail(),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 110,
+                  left: 20,
+                  right: 20,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    // decoration: BoxDecoration(
+                    //   color: Colors.grey[200],
+                    //   borderRadius: BorderRadius.circular(10),
+                    // ),
+                    alignment: Alignment.topCenter,
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        child: Icon(Icons.person),
                       ),
                     ),
                   ),
-                  Positioned(
-                    top: 110,
-                    left: 20,
-                    right: 20,
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      // decoration: BoxDecoration(
-                      //   color: Colors.grey[200],
-                      //   borderRadius: BorderRadius.circular(10),
-                      // ),
-                      alignment: Alignment.topCenter,
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                        child: Container(
-                          width: 100,
-                          height: 100,
-                          child: Icon(Icons.person),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

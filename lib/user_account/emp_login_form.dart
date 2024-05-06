@@ -21,36 +21,23 @@ class _EmpLoginFormState extends State<EmpLoginForm> {
   final passwordController2 = TextEditingController();
   void initState() {
     super.initState();
-    // FirebaseAuth.instance.authStateChanges().listen((user) async {
-    //   if (user != null) {
-    //     await checkUserRole(user.uid);
-    //     if (isEmployer) {
-    //       Navigator.pushNamed(context, EmpHomePage.routeName);
-    //     } else {
-    //       EmpUtils.showSnackBar('Employer  not found', Colors.red);
-    //       // FirebaseAuth.instance.signOut();
-    //     }
-    //   }
-    // });
   }
 
   bool isEmployer = false;
   Future<void> checkUserRole(String uid) async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      return;
-    }
-
-    DocumentSnapshot userData = await FirebaseFirestore.instance
-        .collection('employer')
-        .doc(user.uid)
-        .get();
+    // User? user = FirebaseAuth.instance.currentUser;
+    // if (user == null) {
+    //   return;
+    // }
+    DocumentSnapshot userData =
+        await FirebaseFirestore.instance.collection('employer').doc(uid).get();
     if (userData.exists) {
       String role = userData.get('role');
       setState(() {
         isEmployer = role == 'employer';
       });
     }
+
     //return isJobSeeker;
   }
 
@@ -62,81 +49,34 @@ class _EmpLoginFormState extends State<EmpLoginForm> {
   }
 
   bool _showProgressIndicator = false;
-  // Future signIn() async {
-  //   setState(() {
-  //     _showProgressIndicator = true;
-  //   });
-  //   Visibility(
-  //     visible: _showProgressIndicator,
-  //     child: Center(
-  //       child: CircularProgressIndicator(),
-  //     ),
-  //   );
-  //   // showDialog(
-  //   //     context: context,
-  //   //     barrierDismissible: false,
-  //   //     builder: (context) => Center(
-  //   //           child: CircularProgressIndicator(),
-  //   //         ));
-  //   try {
-  //     await FirebaseAuth.instance
-  //         .signInWithEmailAndPassword(
-  //             email: emailController.text.trim(),
-  //             password: passwordController1.text.trim())
-  //         .then((value) {
-  //       checkUserRole(value.toString());
-  //     });
-  //     if (isEmployer) {
-  //       Navigator.pushNamed(context, VerifyEmpEmail.routeName);
-  //     } else {
-  //       EmpUtils.showSnackBar('Job seeker not found', Colors.red);
-  //       //   FirebaseAuth.instance.signOut();
-  //     }
 
-  //     // await checkUserRole();
-  //     // if (isJobSeeker) {
-  //     //   Navigator.pushNamed(context, home.routeName);
-  //     //   //  Navigator.of(context).pop();
-  //     //   // Utils.showSnackBar('Job seeker not found', Colors.red);
-  //     //   // FirebaseAuth.instance.signOut();
-  //     // } else {
-  //     //   Utils.showSnackBar('Job seeker not found', Colors.red);
-  //     //   FirebaseAuth.instance.signOut();
-  //     //   //  Navigator.of(context).pop();
-  //     // }
-  //   } on FirebaseAuthException catch (e) {
-  //     EmpUtils.showSnackBar(e.message, Colors.red);
-  //     print(e.message);
-  //   }
-  //   setState(() {
-  //     _showProgressIndicator = false;
-  //   });
-  //   // if (mounted) {
-  //   //   Navigator.of(context).pop();
-  //   // }
-  // }
   Future<void> signIn() async {
     setState(() {
       _showProgressIndicator = true; // Show progress indicator
     });
-    Visibility(
-      visible: _showProgressIndicator,
-      child: const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
+
     try {
       final UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
               email: emailController.text.trim(),
               password: passwordController1.text.trim());
 
-      // Check if sign-in was successful
       if (userCredential.user != null) {
         // Authentication successful, check user role
-        checkUserRole(userCredential.user!.uid);
+        await checkUserRole(userCredential.user!.uid);
+        print('riched here');
         if (isEmployer) {
+          // User is an employer
           Navigator.pushNamed(context, VerifyEmpEmail.routeName);
+        } else {
+          // User is not recognized as an employer
+          //  EmpUtils.showSnackBar('Account Not Found', Colors.red);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Employer Not Found'),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       } else {
         // Authentication failed (user is null)

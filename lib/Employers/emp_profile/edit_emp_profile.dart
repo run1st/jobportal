@@ -32,6 +32,7 @@ class _EditEmployerProfileState extends State<EditEmployerProfile> {
   String? currentUser;
   Future<String> getCurrentUserUid() async {
     User? user = await FirebaseAuth.instance.currentUser;
+
     if (user != null) {
       print('Curent user id ${user}');
       return user.uid;
