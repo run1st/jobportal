@@ -165,12 +165,8 @@ class _Applied_jobs_listState extends State<Applied_jobs_list> {
                                     ),
                                   ],
                                 ),
-                                subtitle: Row(
+                                subtitle: Wrap(
                                   children: [
-                                    // Text(
-                                    //   document['jobTitle'],
-                                    //   style: TextStyle(fontSize: 16.0),
-                                    // ),
                                     Chip(label: Text(document['job category'])),
                                     SizedBox(
                                       width: 5,
@@ -184,7 +180,7 @@ class _Applied_jobs_listState extends State<Applied_jobs_list> {
                                 ),
                                 trailing: IconButton(
                                   onPressed: () {
-                                    deleteApplication(document['id']);
+                                    deleteApplication(document['job id']);
                                   },
                                   icon: Icon(
                                     Icons.delete,

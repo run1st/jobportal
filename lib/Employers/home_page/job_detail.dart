@@ -32,9 +32,9 @@ class _Job_detailState extends State<Job_detail> {
     } else {
       FirebaseFirestore.instance
           .collection('job-seeker')
-          .doc(getCurrentUserUid())
+          .doc(currentUser)
           .collection('favorite-jobs')
-          .doc(job['job id'])
+          .doc(job[widget.job.id])
           .delete();
     }
   }
@@ -44,10 +44,11 @@ class _Job_detailState extends State<Job_detail> {
     super.initState();
     _loadState(widget.job);
     _loadapplicationState(widget.job);
+    getUserUid();
   }
 
   Future<void> _loadState(DocumentSnapshot<Object?> job) async {
-    final state = await StatePersistence.getState(widget.job['job id']);
+    final state = await StatePersistence.getState(widget.job[widget.job.id]);
     setState(() {
       if (state != null) {
         favorite = state as bool;
@@ -57,7 +58,7 @@ class _Job_detailState extends State<Job_detail> {
 
   Future<void> _loadapplicationState(DocumentSnapshot<Object?> job) async {
     final state = await StatePersistence.getapplicationState(
-        job['job id'] + 'application');
+        job[widget.job.id] + 'application');
     setState(() {
       if (state != null) {
         isButtonDisabled = state as bool;
@@ -66,33 +67,50 @@ class _Job_detailState extends State<Job_detail> {
   }
 
   Future<void> _saveState(DocumentSnapshot<Object?> job) async {
-    await StatePersistence.saveState(job['job id'], favorite);
+    await StatePersistence.saveState(job[widget.job.id], favorite);
   }
 
   Future<void> _saveapplicationState(DocumentSnapshot<Object?> job) async {
     await StatePersistence.saveapplicatonState(
-        job['job id'] + 'application', isButtonDisabled);
+        job[widget.job.id] + 'application', isButtonDisabled);
   }
 
   bool isLoggedIn = false;
   String randomText =
       '   Porttitor eget dolor morbi non arcu risus. Eget arcu dictum varius duis at consectetur lorem. Velit sed ullamcorper morbi tincidunt ornare massa. At volutpat diam ut venenatis tellus. Tortor at auctor urna nunc id cursus metus aliquam eleifend. Amet commodo nulla facilisi nullam vehicula ipsum a. Vitae nunc sed velit dignissim sodales ut eu. Facilisis leo vel fringilla est ullamcorper. Faucibus scelerisque eleifend donec pretium vulputate sapien nec sagittis. Tempus egestas sed sed risus pretium quam vulputate dignissim suspendisse. Arcu non odio euismod lacinia at quis risus. Ante metus dictum at tempor commodo ullamcorper a lacus vestibulum. Ut placerat orci nulla pellentesque dignissim. Sed nisi lacus sed viverra tellus in. Posuere morbi leo urna molestie at elementum eu. Nibh sit amet commodo nulla facilisi nullam vehicula ipsum a. Non nisi est sit amet facilisis magna etiam tempor orci. Posuere sollicitudin aliquam ultrices sagittis orci a scelerisque purus semper. Mauris in aliquam sem fringilla ut morbi. Vitae nunc sed velit dignissim sodales ut eu. Dignissim diam quis enim lobortis scelerisque fermentum dui faucibus. Urna molestie at elementum eu facilisis sed odio morbi quis. Odio ut sem nulla pharetra diam. Nam libero justo laoreet sit amet. Mauris in aliquam sem fringilla ut morbi. Massa tincidunt nunc pulvinar sapien et. A lacus vestibulum sed arcu non odio euismod lacinia. Maecenas volutpat blandit aliquam etiam. Nunc sed id semper risus. Vel pharetra vel turpis nunc eget lorem dolor. Tellus rutrum tellus pellentesque eu tincidunt. Cum sociis natoque penatibus et. Sapien nec sagittis aliquam malesuada bibendum. Nulla posuere sollicitudin aliquam ultrices sagittis orci a. Massa vitae tortor condimentum lacinia quis. Odio tempor orci dapibus ultrices in iaculis nunc. Eu augue ut lectus arcu bibendum. Eu consequat ac felis donec et odio. Auctor neque vitae tempus quam pellentesque nec nam. Venenatis lectus magna fringilla urna porttitor rhoncus dolor purus. Lorem ipsum dolor sit amet consectetur adipiscing. Justo eget magna fermentum iaculis eu non diam phasellus vestibulum. Egestas integer eget aliquet nibh. Est ullamcorper eget nulla facilisi etiam dignissim. Feugiat in ante metus dictum.';
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      setState(() {
-        isLoggedIn = true;
-        print('the login status is ${isLoggedIn}');
-      });
-      return user.uid;
-    } else {
-      return '';
+  // String currentUser {
+  //   User? user = FirebaseAuth.instance.currentUser;
+  //   if (user != null) {
+  //     setState(() {
+  //       isLoggedIn = true;
+  //       print('the login status is ${isLoggedIn}');
+  //     });
+  //     return user.uid;
+  //   } else {
+  //     return '';
+  //   }
+  // }
+
+  String? currentUser;
+  Future<void> getUserUid() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUser = user.uid;
+          isLoggedIn = true;
+          print('the login status is ${isLoggedIn}');
+        });
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
     }
   }
 
   void checkSignInStatus() {
-    String user = getCurrentUserUid();
-    if (user != null) {
+    getUserUid();
+
+    if (currentUser != null) {
       // User is signed in.
       print('User is signed in.');
     } else {
@@ -113,9 +131,9 @@ class _Job_detailState extends State<Job_detail> {
     //print(job_post.deadline);
     final DocumentReference favoritesCollection = FirebaseFirestore.instance
         .collection('job-seeker')
-        .doc(getCurrentUserUid())
+        .doc(currentUser)
         .collection('favorite-jobs')
-        .doc(doc['job id']);
+        .doc(doc[widget.job.id]);
     favoritesCollection.set({
       'title': doc['title'],
       'jobTitle': doc['description'],
@@ -126,7 +144,7 @@ class _Job_detailState extends State<Job_detail> {
       'education level': doc['education level'],
       'job category': doc['job category'],
       // 'posted time': doc['posted time'],
-      'id': doc['job id'],
+      'job id': doc[widget.job.id],
       'requirements': doc['requirements'],
       'experience leve': doc['experience level'],
       // Add other job details as needed
@@ -145,7 +163,7 @@ class _Job_detailState extends State<Job_detail> {
   bool isButtonDisabled = false;
 
   void _handleApplyButtonTap(DocumentSnapshot<Object?> doc) {
-    getCurrentUserUid();
+    currentUser;
     if (isLoggedIn) {
       if (!isButtonDisabled) {
         saveApplication(doc);
@@ -160,7 +178,7 @@ class _Job_detailState extends State<Job_detail> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Error'),
+              title: Text('Ooops !'),
               content: Text('You already applied.'),
               actions: [
                 TextButton(
@@ -181,7 +199,7 @@ class _Job_detailState extends State<Job_detail> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text(
-              'Error',
+              'Notice',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -222,9 +240,9 @@ class _Job_detailState extends State<Job_detail> {
     final DocumentReference applicationDocumentReference = FirebaseFirestore
         .instance
         .collection('job-seeker')
-        .doc(getCurrentUserUid())
+        .doc(currentUser)
         .collection('jobs-applied')
-        .doc(doc['job id']);
+        .doc(doc[widget.job.id]);
     try {
       applicationDocumentReference.set({
         'title': doc['title'],
@@ -236,7 +254,7 @@ class _Job_detailState extends State<Job_detail> {
         'education level': doc['education level'],
         'job category': doc['job category'],
         // 'posted time': doc['posted time'],
-        'id': doc['job id'],
+        'job id': doc[widget.job.id],
         'requirements': doc['requirements'],
         'experience leve': doc['experience level'],
         // Add other job details as needed
@@ -246,7 +264,10 @@ class _Job_detailState extends State<Job_detail> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Application Submitted'),
+            title: Text(
+              'Application Submitted',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             content: Text('Your application has been submitted successfully.'),
             actions: [
               TextButton(
@@ -268,7 +289,7 @@ class _Job_detailState extends State<Job_detail> {
     final DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
         await FirebaseFirestore.instance
             .collection('job-seeker')
-            .doc(getCurrentUserUid())
+            .doc(currentUser)
             .collection('jobseeker-profile')
             .doc('profile')
             .get();
@@ -277,9 +298,9 @@ class _Job_detailState extends State<Job_detail> {
             .collection('employers-job-postings')
             .doc('post-id')
             .collection('job posting')
-            .doc(doc['job id'])
+            .doc(doc[widget.job.id])
             .collection("Applicants")
-            .doc(getCurrentUserUid());
+            .doc(currentUser);
     applicant_Collection_Reference.set(documentSnapshot.data());
   }
 
@@ -293,7 +314,7 @@ class _Job_detailState extends State<Job_detail> {
     // _loadState();
     // print('this is the index of listile ${widget.index}');
     // print(widget.job.data());
-    // getCurrentUserUid();
+    // currentUser;
     print('${isLoggedIn}');
     return Column(
       children: [

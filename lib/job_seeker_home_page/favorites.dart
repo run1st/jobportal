@@ -15,27 +15,47 @@ class Favorite extends StatefulWidget {
 }
 
 class _FavoriteState extends State<Favorite> {
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return user.uid;
-    } else {
-      return '';
+  // String currentUser {
+  //   User? user = FirebaseAuth.instance.currentUser;
+  //   if (user != null) {
+  //     return user.uid;
+  //   } else {
+  //     return '';
+  //   }
+  // }
+
+  String? currentUser;
+  Future<void> getUserUid() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUser = user.uid;
+        });
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
     }
   }
 
   void deleteFavorite(String id) {
     FirebaseFirestore.instance
         .collection('job-seeker')
-        .doc(getCurrentUserUid())
+        .doc(currentUser)
         .collection('favorite-jobs')
         .doc(id)
         .delete();
   }
 
   @override
+  void initState() {
+    super.initState();
+    getUserUid();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (getCurrentUserUid().isEmpty) {
+    if (currentUser!.isEmpty) {
       // User not logged in, show a placeholder widget
       return Center(
         child: Text('Please log in to save jobs.'),
@@ -44,14 +64,14 @@ class _FavoriteState extends State<Favorite> {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('job-seeker')
-          .doc(getCurrentUserUid())
+          .doc(currentUser)
           .collection('favorite-jobs')
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
+        if (snapshot.hasError) return Text('Error: ${snapshot.error}');
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
-            return new Text('Loading...');
+            return const Text('Loading...');
           default:
             // Update the postedJobs list with document snapshots
             List<DocumentSnapshot> postedJobs = snapshot.data!.docs.toList();
@@ -74,11 +94,12 @@ class _FavoriteState extends State<Favorite> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => JobDetailPage(
-                                      index: index,
-                                      job: document,
-                                    ), //pass any arguments
-                                settings: RouteSettings(name: "vendorScreen")),
+                              builder: (context) => JobDetailPage(
+                                index: index,
+                                job: document,
+                              ), //pass any arguments
+                              settings: RouteSettings(name: "vendorScreen"),
+                            ),
                           );
                         },
                         child: Card(
@@ -114,13 +135,8 @@ class _FavoriteState extends State<Favorite> {
                                 ),
                               ],
                             ),
-                            subtitle: Row(
-                              // mainAxisAlignment: MainAxisAlignment.start,
+                            subtitle: Wrap(
                               children: [
-                                // Text(
-                                //   document['jobTitle'],
-                                //   style: TextStyle(fontSize: 16.0),
-                                // ),
                                 Chip(label: Text(document['job category'])),
                                 SizedBox(
                                   width: 5,
@@ -136,7 +152,7 @@ class _FavoriteState extends State<Favorite> {
                             ),
                             trailing: IconButton(
                               onPressed: () {
-                                deleteFavorite(document['id']);
+                                deleteFavorite(document['job id']);
                               },
                               icon: Icon(
                                 Icons.delete,

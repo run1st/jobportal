@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project1/Employers/Employers_account/empUtils.dart';
+import 'package:project1/Employers/Employers_account/emp_forgote_account.dart';
 import 'package:project1/Employers/Employers_account/emp_verify.dart';
 import 'package:project1/Employers/home_page/emp_home_page.dart';
 
@@ -188,6 +189,21 @@ class _EmpLoginFormState extends State<EmpLoginForm> {
             ),
             const SizedBox(
               height: 24,
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            GestureDetector(
+                child: Text(
+                  'forgote password',
+                  style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      color: Color.fromARGB(255, 255, 7, 172)),
+                ),
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ForgotePassword()))),
+            SizedBox(
+              height: 10,
             ),
           ],
         ),

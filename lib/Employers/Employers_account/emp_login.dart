@@ -229,11 +229,11 @@ class _EmpLoginWidgetState extends State<EmpLoginWidget> {
                       onPressed: signIn,
                       icon: Icon(Icons.login),
                       label: Text('Sign in')),
-                  SizedBox(
+                  const SizedBox(
                     height: 24,
                   ),
                   GestureDetector(
-                      child: Text(
+                      child: const Text(
                         'forgote password',
                         style: TextStyle(
                             decoration: TextDecoration.underline,

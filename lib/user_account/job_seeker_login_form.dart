@@ -3,6 +3,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:project1/Employers/Employers_account/emp_forgote_account.dart';
 import 'package:project1/user_account/utils.dart';
 import 'package:project1/user_account/verify_email.dart';
 import 'package:project1/job_seeker_home_page/jobSeekerHome.dart';
@@ -249,6 +250,21 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
                   label: const Text('Login')),
               const SizedBox(
                 height: 24,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              GestureDetector(
+                  child: Text(
+                    'forgote password',
+                    style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        color: Color.fromARGB(255, 255, 7, 172)),
+                  ),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ForgotePassword()))),
+              SizedBox(
+                height: 10,
               ),
             ],
           ),
