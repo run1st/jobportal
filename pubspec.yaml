@@ -92,6 +92,9 @@ flutter:
     - assets/images/splash9.jpg
     - assets/images/splash11.jpeg
     - assets/images/splash12.jpeg
+    - assets/images/noData3.jpg
+    - assets/images/noData2.jpg
+    - assets/images/noNotification.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

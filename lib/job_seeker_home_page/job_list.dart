@@ -17,6 +17,13 @@ class JobsList extends StatefulWidget {
 }
 
 class _JobsListState extends State<JobsList> {
+  Map<String, dynamic>? otherData;
+  Map<String, dynamic>? personalInfo;
+  Map<String, dynamic>? skills;
+  Map<String, dynamic>? education;
+  DocumentSnapshot? profileData;
+  DocumentSnapshot<Object?>? profileSnapshot;
+  QuerySnapshot<Object?>? jobPostings;
   List<DocumentSnapshot<Object?>> filtered_Jobs = [];
   List<DocumentSnapshot<Object?>> postedJobs = [];
   List filteredJobsByCategory = [];
@@ -182,7 +189,7 @@ class _JobsListState extends State<JobsList> {
   Widget build(BuildContext context) {
     print('selected value is :${selectedValue}');
     print('selected category value is :${selectedCategory}');
-    image = ModalRoute.of(context)?.settings.arguments as File?;
+    //  image = ModalRoute.of(context)?.settings.arguments as File?;
     //  print(image?.path);
     return Scaffold(
       body: SingleChildScrollView(
@@ -292,6 +299,7 @@ class _JobsListState extends State<JobsList> {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         // color: Colors.blue,
+
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -441,38 +449,32 @@ class _JobsListState extends State<JobsList> {
                   AsyncSnapshot<List<dynamic>> snapshot) {
                 if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
                   return const Text('Loading...');
+                } else if (snapshot.data![0] == null &&
+                    snapshot.data![1] == null) {
+                  return Center(child: const Text('No data available'));
+                } else if (snapshot.data![1] == null) {
+                  return Center(child: const Text('No job postings available'));
+                } else if (snapshot.data![0] != null) {
+                  // return const Text('No job postings available');
+                  profileSnapshot =
+                      snapshot.data![0] as DocumentSnapshot<Object?>?;
                 }
-                DocumentSnapshot profileData =
-                    snapshot.data?[0]; // Get the profile data
-                Map<String, dynamic>? otherData =
-                    (profileData.data() as Map<String, dynamic>)['other-data']
-                        as Map<String, dynamic>?;
-                //   print('other data is ${otherData}');
-                // Map<String, dynamic>? otherData = snapshot.data?[0]
-                //     .data()!['other-data'] as Map<String, dynamic>?;
-                Map<String, dynamic>? personalInfo = snapshot.data?[0]!
-                    .data()?['personal-info'] as Map<String, dynamic>?;
-                // print('personal info is ${personalInfo}');
-                Map<String, dynamic>? skills = snapshot.data?[0]!
-                    .data()?['skills'] as Map<String, dynamic>?;
-                // final List<dynamic> languageSkills =
-                //     snapshot.data?[0]!.data()?['skills']['language skills'] ??
-                //         [];
-                // final List<dynamic> personalSkills =
-                //     snapshot.data?[0]!.data()?['skills']['personal skills'] ??
-                //         [];
-                // final List<dynamic> professionalSkills = snapshot.data?[0]!
-                //         .data()?['skills']['professional skills'] ??
-                //     [];
-                // Map<String, dynamic>? experience =
-                //     snapshot.data?[0]!.data()?['experiences']['experience']
-                //         as Map<String, dynamic>?;
+                if (profileSnapshot != null) {
+                  profileData = snapshot.data![0];
+                  personalInfo = snapshot.data![0]!.data()?['personal-info']
+                      as Map<String, dynamic>?;
+                  // print('personal info is ${personalInfo}');
+                  skills = snapshot.data![0]!.data()?['skills']
+                      as Map<String, dynamic>?;
+                  education = snapshot.data![0]!.data()?['education']
+                      as Map<String, dynamic>?;
+                  otherData = snapshot.data![0].data()!['other-data']
+                      as Map<String, dynamic>?;
+                }
 
-                Map<String, dynamic>? education = snapshot.data?[0]!
-                    .data()?['education'] as Map<String, dynamic>?;
                 QuerySnapshot jobPostings = snapshot.data?[1];
                 if (jobPostings != null && jobPostings.docs.isNotEmpty) {
                   // Access the job postings documents
@@ -511,71 +513,81 @@ class _JobsListState extends State<JobsList> {
                   // }
                 }
                 // List<QueryDocumentSnapshot> postedJobs = jobPostingsSnapshot.docs;
-                List<QueryDocumentSnapshot> recommendedJobs = [];
-                if (selectRecommended) {
+                //     List<QueryDocumentSnapshot> recommendedJobs = [];
+                if (selectRecommended &&
+                    snapshot.data != null &&
+                    snapshot.data!.isNotEmpty) {
                   List<QueryDocumentSnapshot> AllpostedJobs =
                       jobPostings.docs.toList();
-                  postedJobs = AllpostedJobs.where((doc) {
-                    String jobTitle =
-                        doc['title'].toString().toLowerCase().trim();
-                    String location =
-                        doc['location'].toString().toLowerCase().trim();
-                    String educationLevel =
-                        doc['education level'].toString().toLowerCase();
+                  if (profileSnapshot != null) {
+                    postedJobs = AllpostedJobs.where((doc) {
+                      String jobTitle =
+                          doc['title'].toString().toLowerCase().trim();
+                      String location =
+                          doc['location'].toString().toLowerCase().trim();
+                      String educationLevel =
+                          doc['education level'].toString().toLowerCase();
 
-                    String experienceLevel =
-                        doc['experience level'].toString().toLowerCase();
-                    print(
-                        'education level required is: ${otherData?['Experience level'].toString().toLowerCase()}');
-                    print('education level required is: ${experienceLevel}');
-                    print('education level required is: ${jobTitle}');
-                    print(
-                        'education level required is: ${otherData?['preferred job'].toString().toLowerCase()}');
-                    String salary = doc['salary'].toString().toLowerCase();
-                    //  String category =
-                    //     doc['job category'].toString().toLowerCase().trim();
-                    print(
-                        'boolian value is : ${jobTitle == otherData?['preferred job'].toString().toLowerCase() && experienceLevel == otherData?['Experience level'].toString().toLowerCase()}');
-                    bool isMatching = (jobTitle ==
-                            otherData?['preferred job']
-                                ?.toString()
-                                .toLowerCase()) &&
-                        (experienceLevel ==
-                            otherData?['experience level']
-                                ?.toString()
-                                .toLowerCase());
+                      String experienceLevel =
+                          doc['experience level'].toString().toLowerCase();
+                      // print(
+                      //     'education level required is: ${otherData?['Experience level'].toString().toLowerCase()}');
+                      print('education level required is: ${experienceLevel}');
+                      print('education level required is: ${jobTitle}');
+                      print(
+                          'education level required is: ${otherData?['preferred job'].toString().toLowerCase()}');
+                      String salary = doc['salary'].toString().toLowerCase();
+                      //  String category =
+                      //     doc['job category'].toString().toLowerCase().trim();
 
-                    print('boolean value is: $isMatching');
-                    String lowercaseQuery = searchQuery.toLowerCase();
-                    return jobTitle ==
-                                otherData?['preferred job']
-                                    .toString()
-                                    .toLowerCase()
-                                    .replaceAll(' ', '') &&
-                            location ==
-                                personalInfo?['city']
-                                    .toString()
-                                    .toLowerCase()
-                                    .replaceAll(' ', '') ||
-                        jobTitle ==
-                                otherData?['preferred job']
-                                    .toString()
-                                    .toLowerCase() &&
-                            educationLevel == education?['levelOfEducation'] ||
-                        jobTitle ==
-                                otherData?['preferred job']
-                                    .toString()
-                                    .toLowerCase() &&
-                            experienceLevel == otherData?['Experience level'] ||
-                        //if all are matched
-                        jobTitle == otherData?['preferred job'] &&
-                            salary == otherData?['Expected salary'] ||
-                        jobTitle == otherData?['preferred job'] &&
-                            location == personalInfo?['city'] &&
-                            educationLevel == education?['levelOfEducation'] &&
-                            experienceLevel == otherData?['Experience level'] &&
-                            salary == otherData?['Expected salary'];
-                  }).toList();
+                      print(
+                          'boolian value is : ${jobTitle == otherData?['preferred job'].toString().toLowerCase() && experienceLevel == otherData?['Experience level'].toString().toLowerCase()}');
+                      bool isMatching = (jobTitle ==
+                              otherData?['preferred job']
+                                  ?.toString()
+                                  .toLowerCase()) &&
+                          (experienceLevel ==
+                              otherData?['experience level']
+                                  ?.toString()
+                                  .toLowerCase());
+
+                      print('boolean value is: $isMatching');
+                      String lowercaseQuery = searchQuery.toLowerCase();
+
+                      return jobTitle ==
+                                  otherData?['preferred job']
+                                      .toString()
+                                      .toLowerCase()
+                                      .replaceAll(' ', '') &&
+                              location ==
+                                  personalInfo?['city']
+                                      .toString()
+                                      .toLowerCase()
+                                      .replaceAll(' ', '') ||
+                          jobTitle ==
+                                  otherData?['preferred job']
+                                      .toString()
+                                      .toLowerCase() &&
+                              educationLevel ==
+                                  education?['levelOfEducation'] ||
+                          jobTitle ==
+                                  otherData?['preferred job']
+                                      .toString()
+                                      .toLowerCase() &&
+                              experienceLevel ==
+                                  otherData?['Experience level'] ||
+                          //if all are matched
+                          jobTitle == otherData?['preferred job'] &&
+                              salary == otherData?['Expected salary'] ||
+                          jobTitle == otherData?['preferred job'] &&
+                              location == personalInfo?['city'] &&
+                              educationLevel ==
+                                  education?['levelOfEducation'] &&
+                              experienceLevel ==
+                                  otherData?['Experience level'] &&
+                              salary == otherData?['Expected salary'];
+                    }).toList();
+                  }
                 }
                 print('this is posted jobs data : ${postedJobs}');
                 if (selectedCategory == 'City') {
@@ -642,37 +654,7 @@ class _JobsListState extends State<JobsList> {
                     return company_name == selectedValue.toLowerCase();
                   }).toList();
                 }
-                if (selectRecommended) {
-                  Stream<DocumentSnapshot<Map<String, dynamic>>> abc =
-                      FirebaseFirestore.instance
-                          .collection('job-seeker')
-                          .doc(getCurrentUserUid())
-                          .collection('jobseeker-profile')
-                          .doc('profile')
-                          .snapshots();
 
-                  abc.listen((DocumentSnapshot<Map<String, dynamic>> snapshot) {
-                    if (snapshot.exists) {
-                      Map<String, dynamic> data = snapshot.data()!;
-
-                      // Accessing individual fields
-                      String name = data['name'];
-                      String email = data['email'];
-                      int age = data['age'];
-                      List<String> skills = List<String>.from(data['skills']);
-
-                      // Do something with the fields
-                      print('Name: $name');
-                      print('Email: $email');
-                      print('Age: $age');
-                      print('Skills: $skills');
-
-                      // You can also pass the data to your recommendation function
-                      //  recommendJob(data);
-                    }
-                  });
-                }
-                //random color selector
                 List<Color> colorsList = [
                   Color.fromRGBO(136, 223, 230, 0.808),
                   Color.fromARGB(206, 243, 208, 231),

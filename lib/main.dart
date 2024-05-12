@@ -18,7 +18,9 @@ import 'package:project1/job_seeker_home_page/applied_jobs.dart';
 import 'package:project1/profile/personal_info.dart';
 import 'package:project1/splashScreen/splash2.dart';
 import 'package:project1/start_page.dart';
+import 'package:project1/user_account/emp_sign_up_form.dart';
 import 'package:project1/user_account/login_page.dart';
+import 'package:project1/user_account/seeker_sign_up_form.dart';
 //import 'package:project1/user_account/login.dart';
 import 'package:project1/user_account/utils.dart';
 import 'package:project1/user_account/verify_email.dart';
@@ -127,6 +129,8 @@ class MyApp extends StatelessWidget {
         Applied_jobs_list.routeName: (context) => const Applied_jobs_list(),
         VerifyEmpEmail.routeName: (context) => const VerifyEmpEmail(),
         VerifyEmail.routeName: (context) => VerifyEmail(),
+        JobSeekerSignUPForm.routeName: ((context) => JobSeekerSignUPForm()),
+        EmpSignUpForm.routeName: ((context) => EmpSignUpForm())
         //  LoginPage.routeName: (context) => LoginPage(onclickedSignIn: () {}),
         // JobDetailPage.routName: (context) => JobDetailPage(),
         //   ProfilePageView.routeName: ((context) => ProfilePageView())

@@ -37,77 +37,82 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Hulu',
-              style: TextStyle(
-                  color: Colors.blue,
-                  fontFamily: 'Montserrat',
-                  fontSize: 34,
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                TextButton(
-                    onPressed: () => button1Clicked(),
-                    child: Text(
-                      'Job Seeker',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: button2 ? Colors.black : Colors.blue,
-                      ),
-                    )),
-                TextButton(
-                    onPressed: () => button2Clicked(),
-                    child: Text(
-                      'Company',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: button2 ? Colors.blue : Colors.black,
-                      ),
-                    )),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Divider(
-                  color: button2 ? Colors.black : Colors.blue,
-                  thickness: 3,
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width / 2 - 50,
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                  height: 1,
-                  color: button2 ? Colors.black : Colors.blue,
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width / 2 - 50,
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                  height: 1,
-                  color: button2 ? Colors.blue : Colors.black,
-                ),
-              ],
-            ),
-            button1 == true ? JobSeekerLoginForm() : EmpLoginForm(),
-            Text("Doesn't have account ?"),
-            TextButton(
-                onPressed: () {
-                  widget.onclickedSignIn;
-                },
-                child: const Text('CREATE ACCOUNT')),
-            ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('back'))
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 30,
+              ),
+              Text(
+                'Hulu',
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontFamily: 'Montserrat',
+                    fontSize: 34,
+                    fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  TextButton(
+                      onPressed: () => button1Clicked(),
+                      child: Text(
+                        'Job Seeker',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: button2 ? Colors.black : Colors.blue,
+                        ),
+                      )),
+                  TextButton(
+                      onPressed: () => button2Clicked(),
+                      child: Text(
+                        'Company',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: button2 ? Colors.blue : Colors.black,
+                        ),
+                      )),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Divider(
+                    color: button2 ? Colors.black : Colors.blue,
+                    thickness: 3,
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width / 2 - 50,
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    height: 1,
+                    color: button2 ? Colors.black : Colors.blue,
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width / 2 - 50,
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    height: 1,
+                    color: button2 ? Colors.blue : Colors.black,
+                  ),
+                ],
+              ),
+              button1 == true ? JobSeekerLoginForm() : EmpLoginForm(),
+              Text("Doesn't have account ?"),
+              TextButton(
+                  onPressed: () {
+                    widget.onclickedSignIn;
+                  },
+                  child: const Text('CREATE ACCOUNT')),
+              ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('back'))
+            ],
+          ),
         ),
       ),
     );

@@ -96,6 +96,7 @@ class _homeState extends State<home> {
         return false;
       },
       child: Scaffold(
+        backgroundColor: Colors.white,
         key: _scaffoldKey,
         resizeToAvoidBottomInset: false,
         drawer: SizedBox(

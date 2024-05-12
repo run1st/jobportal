@@ -16,15 +16,27 @@ class HomePage extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           FirebaseAuth.instance.signOut();
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AuthPage(
-                isLogin: true,
-              ),
-            ),
-          );
-          // Navigator.of(context).
+          // Navigator.pushNamed(context, AuthPage.routName,
+          //     arguments: AuthPage(isLogin: false));
+          Navigator.pop(context);
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) {
+          //       if (AuthPage != null) {
+          //         return AuthPage(
+          //           isLogin: true,
+          //         );
+          //       } else {
+          //         return Scaffold(
+          //           body: Center(
+          //             child: Text('AuthPage not available'),
+          //           ),
+          //         );
+          //       }
+          //     },
+          //   ),
+          // );
         },
         label: Text('Logout out'),
         icon: Icon(Icons.logout_rounded),

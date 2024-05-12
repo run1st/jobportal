@@ -7,6 +7,7 @@ import 'package:project1/user_account/utils.dart';
 import 'package:project1/user_account/verify_email.dart';
 
 class JobSeekerSignUPForm extends StatefulWidget {
+  static const routeName = 'JobSeekerSignUPForm';
   const JobSeekerSignUPForm({super.key});
 
   @override
@@ -18,37 +19,89 @@ class _JobSeekerSignUPFormState extends State<JobSeekerSignUPForm> {
   final emailController = TextEditingController();
   final passwordController1 = TextEditingController();
   final passwordController2 = TextEditingController();
-
-  Future signUp() async {
+  bool _isSigningUp = false;
+  // Future signUp() async {
+  //   final isValid = formKey.currentState!.validate();
+  //   if (!isValid) return;
+  //   showDialog(
+  //       context: context,
+  //       barrierDismissible: false,
+  //       builder: (context) => Center(
+  //             child: CircularProgressIndicator(),
+  //           ));
+  //   try {
+  //     await FirebaseAuth.instance
+  //         .createUserWithEmailAndPassword(
+  //             email: emailController.text.trim(),
+  //             password: passwordController1.text.trim())
+  //         .then((result) {
+  //       FirebaseFirestore.instance
+  //           .collection('job-seeker')
+  //           .doc(result.user!.uid)
+  //           .set({
+  //         'email': emailController.text,
+  //         'role': 'jobseeker', // or 'jobseeker'
+  //       });
+  //     });
+  //     Navigator.of(context).pop();
+  //     // const VerifyEmail();
+  //     Navigator.pushNamed(context, VerifyEmail.routeName);
+  //   } on FirebaseAuthException catch (e) {
+  //     print(e);
+  //     Utils.showSnackBar(e.message, Colors.red);
+  //   }
+  //   // Navigator.of(context).pop();
+  // }
+  Future<void> signUp() async {
     final isValid = formKey.currentState!.validate();
     if (!isValid) return;
-    // showDialog(
-    //     context: context,
-    //     barrierDismissible: false,
-    //     builder: (context) => Center(
-    //           child: CircularProgressIndicator(),
-    //         ));
-    try {
-      await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-              email: emailController.text.trim(),
-              password: passwordController1.text.trim())
-          .then((result) {
-        FirebaseFirestore.instance
-            .collection('job-seeker')
-            .doc(result.user!.uid)
-            .set({
-          'email': emailController.text,
-          'role': 'jobseeker', // or 'jobseeker'
-        });
-      });
 
-      const VerifyEmail();
+    setState(() {
+      _isSigningUp = true; // Set flag to true when signing up
+    });
+
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController1.text.trim(),
+      );
+
+      // Create user document in Firestore
+      await FirebaseFirestore.instance
+          .collection('job-seeker')
+          .doc(userCredential.user!.uid)
+          .set({
+        'email': emailController.text,
+        'role': 'jobseeker', // Set user role
+      });
     } on FirebaseAuthException catch (e) {
-      print(e);
-      Utils.showSnackBar(e.message, Colors.red);
+      // Handle FirebaseAuthException
+      print('FirebaseAuthException: ${e.code}');
+      // Show error message using SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message ?? 'An error occurred.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {
+      // Handle other errors
+      print('Error: $e');
+      // Show generic error message using SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSigningUp = false; // Reset flag after sign-up completes
+      });
+      // Navigate to VerifyEmail screen
+      Navigator.pushNamed(context, VerifyEmail.routeName);
     }
-    // Navigator.of(context).pop();
   }
 
   @override
@@ -154,25 +207,30 @@ class _JobSeekerSignUPFormState extends State<JobSeekerSignUPForm> {
                 height: 20,
               ),
               ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      minimumSize: Size.fromHeight(
-                          MediaQuery.of(context).size.height - 670)),
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      formKey.currentState?.save();
-                      signUp();
-                    }
-                  },
-                  icon: Icon(
-                    Icons.person_add,
-                    size: 30.0,
-                  ),
-                  label: Text('Sign up')),
-              const SizedBox(
-                height: 24,
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    minimumSize: Size.fromHeight(
+                        MediaQuery.of(context).size.height - 670)),
+                onPressed: () {
+                  if (formKey.currentState!.validate()) {
+                    formKey.currentState?.save();
+                    //signUp();
+                    _isSigningUp ? null : signUp();
+                  }
+                },
+                icon: Icon(
+                  Icons.person_add,
+                  size: 30.0,
+                ),
+                label: _isSigningUp
+                    ? CircularProgressIndicator(
+                        color: Colors.amber,
+                      ) // Show progress indicator
+                    : Text('Sign Up'),
+                // const SizedBox(
+                //   height: 24,
               ),
             ],
           ),

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class EmpSignUpForm extends StatefulWidget {
+  static const routeName = 'EmpSignUpForm';
   const EmpSignUpForm({super.key});
 
   @override

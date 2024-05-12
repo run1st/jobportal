@@ -27,6 +27,7 @@ class _EmpsignUpState extends State<EmpsignUp> {
   final emailController = TextEditingController();
   final passwordController1 = TextEditingController();
   final passwordController2 = TextEditingController();
+  bool _isSigningUp = false;
   void dispose() {
     emailController.dispose();
     passwordController1.dispose();
@@ -34,36 +35,88 @@ class _EmpsignUpState extends State<EmpsignUp> {
     super.dispose();
   }
 
-  Future EmpsignUp() async {
+  // Future EmpsignUp() async {
+  //   final isValid = formKey.currentState!.validate();
+  //   if (!isValid) return;
+  //   showDialog(
+  //       context: context,
+  //       barrierDismissible: false,
+  //       builder: (context) => Center(
+  //             child: CircularProgressIndicator(),
+  //           ));
+  //   try {
+  //     await FirebaseAuth.instance
+  //         .createUserWithEmailAndPassword(
+  //             email: emailController.text.trim(),
+  //             password: passwordController1.text.trim())
+  //         .then((result) {
+  //       FirebaseFirestore.instance
+  //           .collection('employer')
+  //           .doc(result.user!.uid)
+  //           .set({
+  //         'email': emailController.text,
+  //         'role': 'employer', // or 'jobseeker'
+  //       });
+  //     });
+
+  //     VerifyEmpEmail();
+  //   } on FirebaseAuthException catch (e) {
+  //     print(e);
+  //     Utils.showSnackBar(e.message, Colors.red);
+  //   }
+  //   Navigator.of(context).pop();
+  // }
+
+  Future<void> EmpsignUp() async {
     final isValid = formKey.currentState!.validate();
     if (!isValid) return;
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-              child: CircularProgressIndicator(),
-            ));
-    try {
-      await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-              email: emailController.text.trim(),
-              password: passwordController1.text.trim())
-          .then((result) {
-        FirebaseFirestore.instance
-            .collection('employer')
-            .doc(result.user!.uid)
-            .set({
-          'email': emailController.text,
-          'role': 'employer', // or 'jobseeker'
-        });
-      });
 
-      VerifyEmpEmail();
+    setState(() {
+      _isSigningUp = true; // Set flag to true when signing up
+    });
+
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController1.text.trim(),
+      );
+
+      // Create user document in Firestore
+      await FirebaseFirestore.instance
+          .collection('job-seeker')
+          .doc(userCredential.user!.uid)
+          .set({
+        'email': emailController.text,
+        'role': 'jobseeker', // Set user role
+      });
     } on FirebaseAuthException catch (e) {
-      print(e);
-      Utils.showSnackBar(e.message, Colors.red);
+      // Handle FirebaseAuthException
+      print('FirebaseAuthException: ${e.code}');
+      // Show error message using SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message ?? 'An error occurred.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {
+      // Handle other errors
+      print('Error: $e');
+      // Show generic error message using SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSigningUp = false; // Reset flag after sign-up completes
+      });
+      // Navigate to VerifyEmail screen
+      Navigator.pushNamed(context, VerifyEmpEmail.routeName);
     }
-    Navigator.of(context).pop();
   }
 
   @override
@@ -189,33 +242,39 @@ class _EmpsignUpState extends State<EmpsignUp> {
                   height: 10,
                 ),
                 ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                        minimumSize: Size.fromHeight(50)),
-                    onPressed: () {
-                      if (formKey.currentState!.validate()) {
-                        formKey.currentState?.save();
-                        EmpsignUp();
-                      }
-                    },
-                    icon: Icon(Icons.person_add),
-                    label: Text('Sign up')),
-                SizedBox(
-                  height: 24,
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: Size.fromHeight(50)),
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      formKey.currentState?.save();
+                      //EmpsignUp();
+                      _isSigningUp ? null : EmpsignUp();
+                    }
+                  },
+                  icon: Icon(Icons.person_add),
+                  label: _isSigningUp
+                      ? CircularProgressIndicator(
+                          color: Colors.amber,
+                        ) // Show progress indicator
+                      : Text('Sign Up'),
+                  // SizedBox(
+                  //   height: 24,
+                  // ),
+                  //  RichText(
+                  // text: TextSpan(
+                  //     style: TextStyle(color: Colors.black),
+                  //     text: 'already have accont ?  ',
+                  //     children: [
+                  //   TextSpan(
+                  //       recognizer: TapGestureRecognizer()
+                  //         ..onTap = widget.onclickedEmpSignUp,
+                  //       text: 'Sign in',
+                  //       style: TextStyle(
+                  //           // fontWeight: FontWeight.bold,
+                  //           color: Colors.blue,
+                  //           decoration: TextDecoration.underline)),
+                  // ])),
                 ),
-                //  RichText(
-                // text: TextSpan(
-                //     style: TextStyle(color: Colors.black),
-                //     text: 'already have accont ?  ',
-                //     children: [
-                //   TextSpan(
-                //       recognizer: TapGestureRecognizer()
-                //         ..onTap = widget.onclickedEmpSignUp,
-                //       text: 'Sign in',
-                //       style: TextStyle(
-                //           // fontWeight: FontWeight.bold,
-                //           color: Colors.blue,
-                //           decoration: TextDecoration.underline)),
-                // ])),
               ],
             ),
           ),

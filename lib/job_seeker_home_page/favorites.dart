@@ -62,113 +62,169 @@ class _FavoriteState extends State<Favorite> {
       );
     }
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('job-seeker')
-          .doc(currentUser)
-          .collection('favorite-jobs')
-          .snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
+        stream: FirebaseFirestore.instance
+            .collection('job-seeker')
+            .doc(currentUser)
+            .collection('favorite-jobs')
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Text('Loading...');
-          default:
-            // Update the postedJobs list with document snapshots
-            List<DocumentSnapshot> postedJobs = snapshot.data!.docs.toList();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+              List<DocumentSnapshot> postedJobs = snapshot.data!.docs.toList();
 
-            return SafeArea(
-              child: SingleChildScrollView(
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                    itemCount: postedJobs.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      DocumentSnapshot document = postedJobs[index];
-                      return GestureDetector(
-                        onTap: () {
-                          // Navigator.pushNamed(
-                          //     context, JobDetailPage.routName,
-                          //     arguments: document);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => JobDetailPage(
-                                index: index,
-                                job: document,
-                              ), //pass any arguments
-                              settings: RouteSettings(name: "vendorScreen"),
-                            ),
-                          );
-                        },
-                        child: Card(
-                          margin:
-                              EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                          elevation: 2, // Add elevation for a shadow effect
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: ListTile(
+              return SafeArea(
+                child: SingleChildScrollView(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                      itemCount: postedJobs.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        DocumentSnapshot document = postedJobs[index];
+                        return GestureDetector(
+                          onTap: () {
+                            // Navigator.pushNamed(
+                            //     context, JobDetailPage.routName,
+                            //     arguments: document);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => JobDetailPage(
+                                  index: index,
+                                  job: document,
+                                ), //pass any arguments
+                                settings: RouteSettings(name: "vendorScreen"),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 10),
+                            elevation: 2, // Add elevation for a shadow effect
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            contentPadding: EdgeInsets.all(10),
-                            // leading: CircleAvatar(
-                            //   backgroundColor: Colors
-                            //       .blue, // Set a background color for the avatar
-                            //   child: Icon(Icons.person, color: Colors.white),
-                            // ),
-                            title: Row(
-                              children: [
-                                Icon(
-                                  Icons.title,
-                                  color: Colors.blue,
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  document['title'],
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
+                            child: ListTile(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              contentPadding: EdgeInsets.all(10),
+                              // leading: CircleAvatar(
+                              //   backgroundColor: Colors
+                              //       .blue, // Set a background color for the avatar
+                              //   child: Icon(Icons.person, color: Colors.white),
+                              // ),
+                              title: Row(
+                                children: [
+                                  Icon(
+                                    Icons.title,
+                                    color: Colors.blue,
                                   ),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    document['title'],
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              subtitle: Wrap(
+                                children: [
+                                  Chip(label: Text(document['job category'])),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Chip(label: Text(document['location'])),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Chip(
+                                      label: Text(
+                                          '${document['employment type']} ')),
+                                ],
+                              ),
+                              trailing: IconButton(
+                                onPressed: () {
+                                  deleteFavorite(document['job id']);
+                                },
+                                icon: Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
                                 ),
-                              ],
-                            ),
-                            subtitle: Wrap(
-                              children: [
-                                Chip(label: Text(document['job category'])),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Chip(label: Text(document['location'])),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Chip(
-                                    label: Text(
-                                        '${document['employment type']} ')),
-                              ],
-                            ),
-                            trailing: IconButton(
-                              onPressed: () {
-                                deleteFavorite(document['job id']);
-                              },
-                              icon: Icon(
-                                Icons.delete,
-                                color: Colors.red,
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
+              );
+            } else {
+              return Center(
+                child: ImageCard(
+                  imagePath: 'assets/images/noData2.jpg',
+                  imageCaption: "No Favorites saved ",
+                ),
+              );
+            }
+          }
+        });
+  }
+}
+
+class ImageCard extends StatelessWidget {
+  final String imagePath;
+  final String imageCaption;
+
+  const ImageCard({
+    required this.imagePath,
+    required this.imageCaption,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      //  elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Image.asset(
+              imagePath,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: 300, // Set desired image height
+            ),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(8),
+              //    color: Colors.black.withOpacity(0.6),
+              child: Text(
+                imageCaption,
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
               ),
-            );
-        }
-      },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

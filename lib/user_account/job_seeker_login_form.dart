@@ -123,12 +123,12 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
     setState(() {
       _showProgressIndicator = true; // Show progress indicator
     });
-    Visibility(
-      visible: _showProgressIndicator,
-      child: const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
+    // Visibility(
+    //   visible: _showProgressIndicator,
+    //   child: const Center(
+    //     child: CircularProgressIndicator(),
+    //   ),
+    // );
     try {
       final UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
@@ -139,9 +139,7 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
       if (userCredential.user != null) {
         // Authentication successful, check user role
         checkUserRole(userCredential.user!.uid);
-        if (isJobSeeker) {
-          Navigator.pushNamed(context, VerifyEmail.routeName);
-        }
+        if (isJobSeeker) {}
       } else {
         // Authentication failed (user is null)
         Utils.showSnackBar('Sign-in failed', Colors.red);
@@ -154,11 +152,13 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
       // Handle other errors
       Utils.showSnackBar('Sign-in failed: $e', Colors.red);
       print('Error: $e');
+    } finally {
+      setState(() {
+        _showProgressIndicator = false;
+      });
+      // Navigate to VerifyEmail screen
+      Navigator.pushNamed(context, VerifyEmail.routeName);
     }
-
-    setState(() {
-      _showProgressIndicator = false; // Hide progress indicator
-    });
   }
 
   @override
@@ -177,6 +177,8 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Color.fromARGB(255, 252, 234, 240),
+                  // fillColor: Color.fromARGB(100, 242, 242, 242),
+                  //    fillColor: Color.fromARGB(123, 255, 255, 255),
                   label: Text('Email'),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
@@ -231,23 +233,28 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
                 height: 20,
               ),
               ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      minimumSize: Size.fromHeight(
-                          MediaQuery.of(context).size.height - 670)),
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      formKey.currentState?.save();
-                      signIn();
-                    }
-                  },
-                  icon: const Icon(
-                    Icons.person_add,
-                    size: 30.0,
-                  ),
-                  label: const Text('Login')),
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    minimumSize: Size.fromHeight(
+                        MediaQuery.of(context).size.height - 670)),
+                onPressed: () {
+                  if (formKey.currentState!.validate()) {
+                    formKey.currentState?.save();
+                    signIn();
+                  }
+                },
+                icon: const Icon(
+                  Icons.person_add,
+                  size: 30.0,
+                ),
+                label: _showProgressIndicator
+                    ? CircularProgressIndicator(
+                        color: Colors.amber,
+                      ) // Show progress indicator
+                    : Text('Sign Up'),
+              ),
               const SizedBox(
                 height: 24,
               ),

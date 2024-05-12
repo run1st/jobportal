@@ -9,6 +9,8 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:project1/Employers/emp_profile/emp_form.dart';
 //import 'package:project1/Employers/home_page/emp_home_page.dart';
 import 'package:project1/Employers/home_page/tabs_screen.dart';
+import 'package:project1/user_account/emp_sign_up_form.dart';
+import 'package:project1/user_account/seeker_sign_up_form.dart';
 
 class Emp_home extends StatefulWidget {
   static const routeName = '/Emp_home';
@@ -25,6 +27,7 @@ class _Emp_homeState extends State<Emp_home> {
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             FirebaseAuth.instance.signOut();
+            Navigator.pushNamed(context, EmpSignUpForm.routeName);
           },
           label: Text('Logout out'),
           icon: Icon(Icons.logout_rounded),
