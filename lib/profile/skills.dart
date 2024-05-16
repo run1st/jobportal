@@ -678,9 +678,9 @@ class _SkillSetState extends State<SkillSet> {
                       print('my beautifull city is called :${abc}');
                       // writeJobSeekerProfile(profile);
                       Utils.showSnackBar(
-                          'Profile successfuly saved', Colors.green);
+                          context, 'Profile successfuly saved', Colors.green);
                     } catch (e) {
-                      Utils.showSnackBar(e.toString(), Colors.red);
+                      Utils.showSnackBar(context, toString(), Colors.red);
                       print(e.toString());
                     }
                   }

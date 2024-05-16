@@ -95,6 +95,7 @@ flutter:
     - assets/images/noData3.jpg
     - assets/images/noData2.jpg
     - assets/images/noNotification.jpg
+    - assets/images/empty.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -18,7 +18,7 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as AuthPage;
+    final args = ModalRoute.of(context)?.settings.arguments as AuthPage;
     bool isLogin = args.isLogin;
     void toggle() {
       setState(() {

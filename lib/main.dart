@@ -259,21 +259,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     borderRadius: BorderRadius.circular(20)),
               ),
             ),
-            // Container(
-            //   width: MediaQuery.of(context).size.width - 50,
-            //   margin: EdgeInsets.all(20),
-            //   child: FloatingActionButton(
-            //     heroTag: "btn2",
-            //     onPressed: () =>
-            //         Navigator.pushNamed(context, EmpRegister.routeName),
-            //     child: Text('RECRUITER'),
-            //     // textColor: Colors.white,
-            //     // color: Colors.deepPurple,
-            //     // padding: EdgeInsets.all(20),
-            //     shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(20)),
-            //   ),
-            // ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

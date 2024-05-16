@@ -72,10 +72,10 @@ class _Applied_jobs_listState extends State<Applied_jobs_list> {
                       .collection('job posting')
                       .doc(id)
                       .delete();
-                  Utils.showSnackBar(
+                  Utils.showSnackBar(context,
                       'Your application deleted sucessfuly', Colors.blue);
                 } on FirebaseException catch (e) {
-                  Utils.showSnackBar(e.message, Colors.blue);
+                  Utils.showSnackBar(context, e.message, Colors.blue);
                 }
               },
             ),

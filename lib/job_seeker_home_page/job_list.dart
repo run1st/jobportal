@@ -5,7 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project1/Employers/models/jobs_model.dart';
+import 'package:project1/job_seeker_home_page/favorites.dart';
 import 'package:project1/job_seeker_home_page/filter.dart';
+import 'package:project1/job_seeker_home_page/image_card.dart';
 
 import '../Employers/home_page/detail_page.dart';
 import 'package:rxdart/rxdart.dart';
@@ -77,7 +79,7 @@ class _JobsListState extends State<JobsList> {
     );
   }
 
-  final List<String> recentJobs = [
+  final List<String> jobCategory = [
     "Engineering",
     "Agriculture",
     "Technology",
@@ -279,7 +281,7 @@ class _JobsListState extends State<JobsList> {
               child: GridView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 scrollDirection: Axis.horizontal,
-                itemCount: recentJobs.length,
+                itemCount: jobCategory.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 1,
                   mainAxisSpacing: 16.0,
@@ -291,7 +293,7 @@ class _JobsListState extends State<JobsList> {
                     onTap: () {
                       setState(() {
                         seleceByCategory = true;
-                        category = recentJobs[index];
+                        category = jobCategory[index];
                       });
                     },
                     child: Container(
@@ -319,7 +321,7 @@ class _JobsListState extends State<JobsList> {
                         ],
                       ),
                       child: Text(
-                        recentJobs[index],
+                        jobCategory[index],
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15.0,
@@ -421,6 +423,7 @@ class _JobsListState extends State<JobsList> {
                           //     .snapshots();
                           setState(() {
                             selectRecommended = true;
+                            postedJobs = [];
                           });
                         },
                         child: Text('Recommended')),
@@ -452,26 +455,26 @@ class _JobsListState extends State<JobsList> {
                 } else if (snapshot.connectionState ==
                     ConnectionState.waiting) {
                   return const Text('Loading...');
-                } else if (snapshot.data![0] == null &&
-                    snapshot.data![1] == null) {
+                } else if (snapshot.data?[0] == null &&
+                    snapshot.data?[1] == null) {
                   return Center(child: const Text('No data available'));
-                } else if (snapshot.data![1] == null) {
+                } else if (snapshot.data?[1] == null) {
                   return Center(child: const Text('No job postings available'));
-                } else if (snapshot.data![0] != null) {
+                } else if (snapshot.data?[0] != null) {
                   // return const Text('No job postings available');
                   profileSnapshot =
-                      snapshot.data![0] as DocumentSnapshot<Object?>?;
+                      snapshot.data?[0] as DocumentSnapshot<Object?>?;
                 }
                 if (profileSnapshot != null) {
-                  profileData = snapshot.data![0];
-                  personalInfo = snapshot.data![0]!.data()?['personal-info']
+                  profileData = snapshot.data?[0];
+                  personalInfo = snapshot.data?[0]?.data()?['personal-info']
                       as Map<String, dynamic>?;
                   // print('personal info is ${personalInfo}');
-                  skills = snapshot.data![0]!.data()?['skills']
+                  skills = snapshot.data?[0]?.data()?['skills']
                       as Map<String, dynamic>?;
-                  education = snapshot.data![0]!.data()?['education']
+                  education = snapshot.data?[0]?.data()?['education']
                       as Map<String, dynamic>?;
-                  otherData = snapshot.data![0].data()!['other-data']
+                  otherData = snapshot.data?[0].data()?['other-data']
                       as Map<String, dynamic>?;
                 }
 
@@ -514,6 +517,7 @@ class _JobsListState extends State<JobsList> {
                 }
                 // List<QueryDocumentSnapshot> postedJobs = jobPostingsSnapshot.docs;
                 //     List<QueryDocumentSnapshot> recommendedJobs = [];
+
                 if (selectRecommended &&
                     snapshot.data != null &&
                     snapshot.data!.isNotEmpty) {
@@ -587,9 +591,13 @@ class _JobsListState extends State<JobsList> {
                                   otherData?['Experience level'] &&
                               salary == otherData?['Expected salary'];
                     }).toList();
+                  } else {
+                    postedJobs = [];
                   }
                 }
                 print('this is posted jobs data : ${postedJobs}');
+                print(
+                    'this is profile snapshot data : ${profileSnapshot?.data()}');
                 if (selectedCategory == 'City') {
                   List<QueryDocumentSnapshot> AllpostedJobs =
                       jobPostings.docs.toList();
@@ -666,116 +674,127 @@ class _JobsListState extends State<JobsList> {
                   return colorsList[colorIndex];
                 }
 
-                return SafeArea(
-                  child: SingleChildScrollView(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height - 400,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                        itemCount: postedJobs.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          DocumentSnapshot document = postedJobs[index];
+                if (selectRecommended && postedJobs.isEmpty) {
+                  return SafeArea(
+                    child: Center(
+                      child: ImageCard(
+                          imagePath: 'assets/images/empty.png',
+                          imageCaption: 'Nothing Recommended'),
+                    ),
+                  );
+                } else
+                  return SafeArea(
+                    child: SingleChildScrollView(
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height - 400,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                          itemCount: postedJobs.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            DocumentSnapshot document = postedJobs[index];
 
-                          return GestureDetector(
-                            onTap: () {
-                              // Navigator.pushNamed(
-                              //     context, JobDetailPage.routName,
-                              //     arguments: document);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => JobDetailPage(
-                                    index: index,
-                                    job: document,
+                            return GestureDetector(
+                              onTap: () {
+                                // Navigator.pushNamed(
+                                //     context, JobDetailPage.routName,
+                                //     arguments: document);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => JobDetailPage(
+                                      index: index,
+                                      job: document,
+                                    ),
+                                    settings:
+                                        RouteSettings(name: "jobDetailRoute"),
                                   ),
-                                  settings:
-                                      RouteSettings(name: "jobDetailRoute"),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              height: MediaQuery.of(context).size.height - 600,
-                              child: Card(
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                    // side:
-                                    //     BorderSide(color: Colors.black, width: 1),
-                                    // borderRadius: BorderRadius.circular(15),
-                                    borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(20.0),
-                                  topRight: Radius.circular(20.0),
-                                  bottomRight: Radius.circular(20.0),
-                                  topLeft: Radius.circular(20.0),
-                                )),
-                                elevation: 5,
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 10),
-                                child: ListTile(
-                                  style: ListTileStyle.drawer,
-                                  leading: CircleAvatar(
-                                    child: Icon(Icons.person),
-                                  ),
-                                  title: Text(document['title']),
-                                  subtitle: Wrap(
-                                    children: [
-                                      Chip(
-                                        label:
-                                            Text(document['employment type']),
-                                      ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Chip(
-                                        label: Container(
-                                            width: 40,
-                                            child: Text(
-                                                document['experience level'])),
-                                      ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Chip(
-                                        label: Container(
-                                            width: 50,
-                                            child: Text(
-                                                document['company']['city'])),
-                                      ),
-                                    ],
-                                  ),
-                                  trailing: Flexible(
-                                    fit: FlexFit.tight,
-                                    child: Container(
-                                      height: 40,
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 5.0,
-                                        horizontal: 5.0,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue,
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      child: Text(
-                                        getPostedTime(document['posted time']),
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12.0,
-                                          fontWeight: FontWeight.bold,
+                                );
+                              },
+                              child: Container(
+                                height:
+                                    MediaQuery.of(context).size.height - 600,
+                                child: Card(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      // side:
+                                      //     BorderSide(color: Colors.black, width: 1),
+                                      // borderRadius: BorderRadius.circular(15),
+                                      borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(20.0),
+                                    topRight: Radius.circular(20.0),
+                                    bottomRight: Radius.circular(20.0),
+                                    topLeft: Radius.circular(20.0),
+                                  )),
+                                  elevation: 5,
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 5, vertical: 10),
+                                  child: ListTile(
+                                    style: ListTileStyle.drawer,
+                                    leading: CircleAvatar(
+                                      child: Icon(Icons.person),
+                                    ),
+                                    title: Text(document['title']),
+                                    subtitle: Wrap(
+                                      children: [
+                                        Chip(
+                                          label:
+                                              Text(document['employment type']),
+                                        ),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Chip(
+                                          label: Container(
+                                              width: 40,
+                                              child: Text(document[
+                                                  'experience level'])),
+                                        ),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Chip(
+                                          label: Container(
+                                              width: 50,
+                                              child: Text(
+                                                  document['company']['city'])),
+                                        ),
+                                      ],
+                                    ),
+                                    trailing: Flexible(
+                                      fit: FlexFit.tight,
+                                      child: Container(
+                                        height: 40,
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 5.0,
+                                          horizontal: 5.0,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        child: Text(
+                                          getPostedTime(
+                                              document['posted time']),
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                );
+                  );
               },
             ),
           ],

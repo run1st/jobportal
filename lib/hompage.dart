@@ -15,10 +15,10 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          FirebaseAuth.instance.signOut();
+          // FirebaseAuth.instance.signOut();
           // Navigator.pushNamed(context, AuthPage.routName,
           //     arguments: AuthPage(isLogin: false));
-          Navigator.pop(context);
+
           // Navigator.pushReplacement(
           //   context,
           //   MaterialPageRoute(

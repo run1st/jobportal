@@ -61,7 +61,7 @@ class _signUpState extends State<signUp> {
       const VerifyEmail();
     } on FirebaseAuthException catch (e) {
       print(e);
-      Utils.showSnackBar(e.message, Colors.red);
+      Utils.showSnackBar(context, e.message, Colors.red);
     }
     // Navigator.of(context).pop();
   }

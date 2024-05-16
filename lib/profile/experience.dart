@@ -275,9 +275,10 @@ class _ExperienceState extends State<Experience> {
 
                             //saveExperienceInfo(experienceInfo);
                             Utils.showSnackBar(
-                                'sucessfully saved', Colors.green);
+                                context, 'sucessfully saved', Colors.green);
                           } catch (e) {
-                            Utils.showSnackBar(e.toString(), Colors.red);
+                            Utils.showSnackBar(
+                                context, e.toString(), Colors.red);
                           }
                         }
 

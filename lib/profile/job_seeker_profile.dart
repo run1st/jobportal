@@ -14,7 +14,10 @@ import 'package:intl/intl.dart';
 import 'package:project1/Employers/home_page/pdf.dart';
 import 'package:project1/Employers/home_page/tabs_screen.dart';
 import 'package:project1/jobSeekerModel/job_seeker_profile_model.dart';
+import 'package:project1/job_seeker_home_page/favorites.dart';
+import 'package:project1/job_seeker_home_page/image_card.dart';
 import 'package:project1/job_seeker_home_page/jobSeekerHome.dart';
+import 'package:project1/profile/personal_info.dart';
 import 'package:project1/profile/updateProfile.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -102,16 +105,49 @@ class _ProfilePageState extends State<ProfilePage> {
                     return Text('Error: ${snapshot.error}');
                   } else if (snapshot.connectionState ==
                       ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   } else if (!snapshot.hasData || !snapshot.data!.exists) {
                     if (getCurrentUserUid() == null) {
-                      return Text('User is not logged in');
+                      return const Text('User is not logged in');
                     } else {
-                      return Center(
-                        child: ImageCard(
-                          imagePath: 'assets/images/noData3.jpg',
-                          imageCaption: "You haven't tell as about you",
-                        ),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Text.rich(
+                            TextSpan(children: [
+                              TextSpan(text: 'There is no'),
+                              TextSpan(
+                                  text: '  Profile Data ',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue))
+                            ]),
+                          ),
+                          const Center(
+                            child: ImageCard(
+                              imagePath: 'assets/images/noData3.jpg',
+                              imageCaption: "You haven't tell as about you",
+                            ),
+                          ),
+                          Container(
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width - 200,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                      context, personal_info.routeName);
+                                },
+                                child: const Text('Add Profile'),
+                                style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side: BorderSide.none),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
                       );
                     }
                   }
@@ -617,69 +653,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 }),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class ImageCard extends StatelessWidget {
-  final String imagePath;
-  final String imageCaption;
-
-  const ImageCard({
-    required this.imagePath,
-    required this.imageCaption,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: 300,
-        height: 300,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 3,
-              blurRadius: 7,
-              offset: Offset(0, 3), // changes position of shadow
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Stack(
-            children: [
-              Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  color: Colors.black.withOpacity(0.5),
-                  child: Center(
-                    child: Text(
-                      imageCaption,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

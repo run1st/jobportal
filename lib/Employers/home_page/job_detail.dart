@@ -34,7 +34,7 @@ class _Job_detailState extends State<Job_detail> {
           .collection('job-seeker')
           .doc(currentUser)
           .collection('favorite-jobs')
-          .doc(job[widget.job.id])
+          .doc(job['job id'])
           .delete();
     }
   }
@@ -48,7 +48,7 @@ class _Job_detailState extends State<Job_detail> {
   }
 
   Future<void> _loadState(DocumentSnapshot<Object?> job) async {
-    final state = await StatePersistence.getState(widget.job[widget.job.id]);
+    final state = await StatePersistence.getState(widget.job['JobId']);
     setState(() {
       if (state != null) {
         favorite = state as bool;
@@ -58,7 +58,7 @@ class _Job_detailState extends State<Job_detail> {
 
   Future<void> _loadapplicationState(DocumentSnapshot<Object?> job) async {
     final state = await StatePersistence.getapplicationState(
-        job[widget.job.id] + 'application');
+        job['JobId'] + 'application');
     setState(() {
       if (state != null) {
         isButtonDisabled = state as bool;
@@ -67,12 +67,12 @@ class _Job_detailState extends State<Job_detail> {
   }
 
   Future<void> _saveState(DocumentSnapshot<Object?> job) async {
-    await StatePersistence.saveState(job[widget.job.id], favorite);
+    await StatePersistence.saveState(job['JobId'], favorite);
   }
 
   Future<void> _saveapplicationState(DocumentSnapshot<Object?> job) async {
     await StatePersistence.saveapplicatonState(
-        job[widget.job.id] + 'application', isButtonDisabled);
+        job['JobId'] + 'application', isButtonDisabled);
   }
 
   bool isLoggedIn = false;
@@ -129,36 +129,24 @@ class _Job_detailState extends State<Job_detail> {
     Map<String, dynamic> jobData = doc.data() as Map<String, dynamic>;
     //  JobPost job_post = JobPost.fromJson(jobData);
     //print(job_post.deadline);
+    // JobPost postedJob = widget.job as JobPost;
     final DocumentReference favoritesCollection = FirebaseFirestore.instance
         .collection('job-seeker')
         .doc(currentUser)
         .collection('favorite-jobs')
-        .doc(doc[widget.job.id]);
-    favoritesCollection.set({
-      'title': doc['title'],
-      'jobTitle': doc['description'],
-      'salary': doc['salary'],
-      'location': doc['location'],
-      'company': doc['company'],
-      'employment type': doc['employment type'],
-      'education level': doc['education level'],
-      'job category': doc['job category'],
-      // 'posted time': doc['posted time'],
-      'job id': doc[widget.job.id],
-      'requirements': doc['requirements'],
-      'experience leve': doc['experience level'],
-      // Add other job details as needed
-    });
+        .doc(doc['job id']);
+
+    // Map<String, dynamic> json = postedJob.toJson();
+    favoritesCollection.set(doc.data());
+    // .then((docRef) {
+    //   print('Job added to favorites: ${docRef.id}');
+    // }).catchError((error) {
+    //   // Error occurred while adding the document
+    //   print('Failed to add job to favorites: $error');
+    // });
     // _saveState(doc);
   }
 
-// ).then((docRef) {
-//
-//       print('Job added to favorites: ${docRef.id}');
-//     }).catchError((error) {
-//       // Error occurred while adding the document
-//       print('Failed to add job to favorites: $error');
-//     }
 // Inside the _Job_detailState class
   bool isButtonDisabled = false;
 
@@ -242,23 +230,9 @@ class _Job_detailState extends State<Job_detail> {
         .collection('job-seeker')
         .doc(currentUser)
         .collection('jobs-applied')
-        .doc(doc[widget.job.id]);
+        .doc(doc['job id']);
     try {
-      applicationDocumentReference.set({
-        'title': doc['title'],
-        'jobTitle': doc['description'],
-        'salary': doc['salary'],
-        'location': doc['location'],
-        'company': doc['company'],
-        'employment type': doc['employment type'],
-        'education level': doc['education level'],
-        'job category': doc['job category'],
-        // 'posted time': doc['posted time'],
-        'job id': doc[widget.job.id],
-        'requirements': doc['requirements'],
-        'experience leve': doc['experience level'],
-        // Add other job details as needed
-      });
+      applicationDocumentReference.set(doc.data());
       getData(doc);
       showDialog(
         context: context,
@@ -281,7 +255,7 @@ class _Job_detailState extends State<Job_detail> {
         },
       );
     } catch (e) {
-      Utils.showSnackBar(e.toString(), Colors.red);
+      Utils.showSnackBar(context, e.toString(), Colors.red);
     }
   }
 
@@ -298,7 +272,7 @@ class _Job_detailState extends State<Job_detail> {
             .collection('employers-job-postings')
             .doc('post-id')
             .collection('job posting')
-            .doc(doc[widget.job.id])
+            .doc(doc['JobId'])
             .collection("Applicants")
             .doc(currentUser);
     applicant_Collection_Reference.set(documentSnapshot.data());

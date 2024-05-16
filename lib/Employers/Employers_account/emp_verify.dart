@@ -47,7 +47,7 @@ class _VerifyEmpEmailState extends State<VerifyEmpEmail> {
         (Timer) => chekEmailVerified(),
       );
     } catch (e) {
-      Utils.showSnackBar(e.toString(), Colors.red);
+      Utils.showSnackBar(context, e.toString(), Colors.red);
     }
   }
 

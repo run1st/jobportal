@@ -283,9 +283,10 @@ class _EducationFormState extends State<EducationForm> {
                               EducationProvider provider = EducationProvider();
                               provider.education = educationInfo;
                               Utils.showSnackBar(
-                                  'sucessfully saved', Colors.green);
+                                  context, 'sucessfully saved', Colors.green);
                             } on FirebaseException catch (e) {
-                              Utils.showSnackBar(e.message, Colors.red);
+                              Utils.showSnackBar(
+                                  context, e.message, Colors.red);
                             }
                           }
 

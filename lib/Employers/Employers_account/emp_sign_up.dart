@@ -247,8 +247,8 @@ class _EmpsignUpState extends State<EmpsignUp> {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       formKey.currentState?.save();
-                      //EmpsignUp();
-                      _isSigningUp ? null : EmpsignUp();
+                      EmpsignUp();
+                      // _isSigningUp ? null : EmpsignUp();
                     }
                   },
                   icon: Icon(Icons.person_add),

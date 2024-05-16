@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 class Utils {
   static final messangerKey = GlobalKey<ScaffoldMessengerState>();
 
-  static showSnackBar(String? text, Color _color) {
+  static showSnackBar(BuildContext context, text, Color _color) {
     if (text == null) return;
     final snackBar = SnackBar(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       content: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [

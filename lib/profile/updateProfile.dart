@@ -59,9 +59,9 @@ class _UpdateAboutMeDialogState extends State<UpdateAboutMeDialog> {
             String updatedAboutMe = aboutMeController.text;
             try {
               updateField(updatedAboutMe);
-              Utils.showSnackBar('Sucessfuly Updated', Colors.green);
+              Utils.showSnackBar(context, 'Sucessfuly Updated', Colors.green);
             } catch (e) {
-              Utils.showSnackBar(e.toString(), Colors.red);
+              Utils.showSnackBar(context, e.toString(), Colors.red);
             }
 
             Navigator.of(context).pop();
@@ -132,9 +132,9 @@ class _UpdateSkillsDialogState extends State<UpdateSkillsDialog> {
             String skillAdded = aboutMeController.text;
             try {
               updateField(widget.skill_Type, skillAdded);
-              Utils.showSnackBar('Sucessfuly Updated', Colors.green);
+              Utils.showSnackBar(context, 'Sucessfuly Updated', Colors.green);
             } catch (e) {
-              Utils.showSnackBar(e.toString(), Colors.red);
+              Utils.showSnackBar(context, e.toString(), Colors.red);
             }
 
             Navigator.of(context).pop();
@@ -271,9 +271,9 @@ class _UpdateExperienceDialogState extends State<UpdateExperienceDialog> {
             String updatedAboutMe = aboutMeController.text;
             try {
               updateField(updatedAboutMe);
-              Utils.showSnackBar('Sucessfuly Updated', Colors.green);
+              Utils.showSnackBar(context, 'Sucessfuly Updated', Colors.green);
             } catch (e) {
-              Utils.showSnackBar(e.toString(), Colors.red);
+              Utils.showSnackBar(context, e.toString(), Colors.red);
             }
 
             Navigator.of(context).pop();
@@ -404,9 +404,9 @@ class _UpdateEducationDialogState extends State<UpdateEducationDialog> {
             String updatedAboutMe = aboutMeController.text;
             try {
               updateField(updatedAboutMe);
-              Utils.showSnackBar('Sucessfuly Updated', Colors.green);
+              Utils.showSnackBar(context, 'Sucessfuly Updated', Colors.green);
             } catch (e) {
-              Utils.showSnackBar(e.toString(), Colors.red);
+              Utils.showSnackBar(context, e.toString(), Colors.red);
             }
 
             Navigator.of(context).pop();

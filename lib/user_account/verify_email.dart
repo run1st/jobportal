@@ -51,7 +51,8 @@ class _VerifyEmailState extends State<VerifyEmail> {
       // Print out the error message
       print("Error sending verification email: $e");
       // Show a snackbar with the error message
-      Utils.showSnackBar("Error sending verification email", Colors.red);
+      Utils.showSnackBar(
+          context, "Error sending verification email", Colors.red);
     }
   }
 

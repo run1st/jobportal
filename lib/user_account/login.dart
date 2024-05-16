@@ -35,7 +35,7 @@ class _LoginWidgetState extends State<LoginWidget> {
         if (isJobSeeker) {
           Navigator.pushNamed(context, home.routeName);
         } else {
-          Utils.showSnackBar('Job seeker not found', Colors.red);
+          Utils.showSnackBar(context, 'Job seeker not found', Colors.red);
           FirebaseAuth.instance.signOut();
         }
       }
@@ -109,7 +109,7 @@ class _LoginWidgetState extends State<LoginWidget> {
       //   //  Navigator.of(context).pop();
       // }
     } on FirebaseAuthException catch (e) {
-      Utils.showSnackBar(e.message, Colors.red);
+      Utils.showSnackBar(context, e.message, Colors.red);
       print(e.message);
     }
     setState(() {

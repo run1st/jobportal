@@ -123,12 +123,7 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
     setState(() {
       _showProgressIndicator = true; // Show progress indicator
     });
-    // Visibility(
-    //   visible: _showProgressIndicator,
-    //   child: const Center(
-    //     child: CircularProgressIndicator(),
-    //   ),
-    // );
+
     try {
       final UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
@@ -142,15 +137,15 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
         if (isJobSeeker) {}
       } else {
         // Authentication failed (user is null)
-        Utils.showSnackBar('Sign-in failed', Colors.red);
+        Utils.showSnackBar(context, 'Sign-in failed', Colors.red);
       }
     } on FirebaseAuthException catch (e) {
       // Handle FirebaseAuthException errors
-      Utils.showSnackBar('Sign-in failed: ${e.message}', Colors.red);
+      Utils.showSnackBar(context, 'Sign-in failed: ${e.message}', Colors.red);
       print('FirebaseAuthException: ${e.message}');
     } catch (e) {
       // Handle other errors
-      Utils.showSnackBar('Sign-in failed: $e', Colors.red);
+      Utils.showSnackBar(context, 'Sign-in failed: $e', Colors.red);
       print('Error: $e');
     } finally {
       setState(() {
@@ -253,7 +248,7 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
                     ? CircularProgressIndicator(
                         color: Colors.amber,
                       ) // Show progress indicator
-                    : Text('Sign Up'),
+                    : Text('Sign In'),
               ),
               const SizedBox(
                 height: 24,

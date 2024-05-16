@@ -19,6 +19,12 @@ class personal_info extends StatefulWidget {
 
 class _personal_infoState extends State<personal_info> {
   final _formKey = GlobalKey<FormState>();
+  final emailRegex = RegExp(
+      r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
+  bool validateEmail(String email) {
+    return emailRegex.matchAsPrefix(email) != null;
+  }
+
   String? currentUser;
   Future<void> getUserUid() async {
     try {
@@ -63,6 +69,7 @@ class _personal_infoState extends State<personal_info> {
   bool isCountrySelected = false;
   bool isCitySelected = false;
   bool isRegionSelected = false;
+  bool progressComplete = false;
   //List countries = ['Ethiopia', 'america', 'england', 'Germany'];
   //List regions = ['amhara', 'oromia', 'south', 'somali'];
   //List towns = ['Ethiopia', 'america', 'england', 'Germany'];
@@ -79,6 +86,7 @@ class _personal_infoState extends State<personal_info> {
   String countryChoosed = '';
   String genderChoosed = '';
   String regionChoosed = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +96,7 @@ class _personal_infoState extends State<personal_info> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            CircularProgress(value: 0.25),
+            CircularProgress(value: progressComplete ? 0.25 : 0),
             SizedBox(
               height: 10,
             ),
@@ -130,7 +138,7 @@ class _personal_infoState extends State<personal_info> {
                             decoration: InputDecoration(
                               labelText: 'First name',
                               labelStyle: TextStyle(
-                                color: Colors.grey[800],
+                                color: Color.fromARGB(255, 218, 214, 214),
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -167,7 +175,7 @@ class _personal_infoState extends State<personal_info> {
                             decoration: InputDecoration(
                               labelText: 'Last name',
                               labelStyle: TextStyle(
-                                color: Colors.grey[800],
+                                color: Color.fromARGB(255, 218, 214, 214),
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -195,10 +203,12 @@ class _personal_infoState extends State<personal_info> {
                           ),
                         ),
                         SizedBox(height: 16.0),
-                        Text(
-                          'Gender:',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
+                        Center(
+                          child: Text(
+                            'Gender:',
+                            style: TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(
@@ -247,7 +257,7 @@ class _personal_infoState extends State<personal_info> {
                             decoration: InputDecoration(
                               labelText: 'Country',
                               labelStyle: TextStyle(
-                                color: Colors.grey[800],
+                                color: Color.fromARGB(255, 218, 214, 214),
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -282,7 +292,7 @@ class _personal_infoState extends State<personal_info> {
                             decoration: InputDecoration(
                               labelText: 'Region',
                               labelStyle: TextStyle(
-                                color: Colors.grey[800],
+                                color: Color.fromARGB(255, 218, 214, 214),
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -320,7 +330,7 @@ class _personal_infoState extends State<personal_info> {
                             decoration: InputDecoration(
                               labelText: 'city name',
                               labelStyle: TextStyle(
-                                color: Colors.grey[800],
+                                color: Color.fromARGB(255, 218, 214, 214),
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -365,8 +375,7 @@ class _personal_infoState extends State<personal_info> {
                             validator: (value) {
                               if (value == null) {
                                 return 'Please enter your email';
-                              }
-                              if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                              } else if (!validateEmail(value)) {
                                 return 'Please enter a valid email address';
                               }
                               return null;
@@ -385,9 +394,9 @@ class _personal_infoState extends State<personal_info> {
                           child: TextFormField(
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                              labelText: 'phone number',
+                              labelText: '09xxxxxxxx',
                               labelStyle: TextStyle(
-                                color: Colors.grey[800],
+                                color: Color.fromARGB(255, 218, 214, 214),
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -402,13 +411,15 @@ class _personal_infoState extends State<personal_info> {
                               ),
                             ),
                             style: TextStyle(
-                              color: Colors.grey[800],
+                              color: Color.fromARGB(255, 218, 214, 214),
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                             validator: (value) {
                               if (value == null) {
                                 return 'Please enter your phone number';
+                              } else if (value.length < 10) {
+                                return 'Please enter a valid phone number';
                               }
                               return null;
                             },
@@ -439,14 +450,30 @@ class _personal_infoState extends State<personal_info> {
                                       region: regionChoosed,
                                       email: email,
                                       phoneNumber: phoneNumber);
-                                  PersonalInfoProvider provider =
-                                      PersonalInfoProvider();
-                                  provider.personalInfo = personal_info;
+                                  // PersonalInfoProvider provider =
+                                  //     PersonalInfoProvider();
+                                  // provider.personalInfo = personal_info;
                                   //savePesonalInfo(personal_info);
-                                  Utils.showSnackBar(
-                                      'sucessfully saved', Colors.green);
+
+                                  // Utils.showSnackBar(context,
+                                  //     'sucessfully saved', Colors.green);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Row(
+                                        children: [
+                                          Text('sucessfully saved.'),
+                                          Icon(
+                                            Icons.check,
+                                            color: Colors.white,
+                                          )
+                                        ],
+                                      ),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
                                 } on FirebaseException catch (e) {
-                                  Utils.showSnackBar(e.message, Colors.red);
+                                  Utils.showSnackBar(
+                                      context, e.message, Colors.red);
                                 }
                               }
 
