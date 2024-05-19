@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:project1/Employers/Employers_account/emp_verify.dart';
 
 class EmpSignUpForm extends StatefulWidget {
   static const routeName = 'EmpSignUpForm';
@@ -15,6 +18,59 @@ class _EmpSignUpFormState extends State<EmpSignUpForm> {
   final emailController = TextEditingController();
   final passwordController1 = TextEditingController();
   final passwordController2 = TextEditingController();
+  bool _isSigningUp = false;
+  Future<void> EmpsignUp() async {
+    final isValid = formKey.currentState!.validate();
+    if (!isValid) return;
+
+    setState(() {
+      _isSigningUp = true; // Set flag to true when signing up
+    });
+
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController1.text.trim(),
+      );
+
+      // Create user document in Firestore
+      await FirebaseFirestore.instance
+          .collection('employer')
+          .doc(userCredential.user!.uid)
+          .set({
+        'email': emailController.text,
+        'role': 'employer', // Set user role
+      });
+    } on FirebaseAuthException catch (e) {
+      // Handle FirebaseAuthException
+      print('FirebaseAuthException: ${e.code}');
+      // Show error message using SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message ?? 'An error occurred.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {
+      // Handle other errors
+      print('Error: $e');
+      // Show generic error message using SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSigningUp = false; // Reset flag after sign-up completes
+      });
+      // Navigate to VerifyEmail screen
+      Navigator.pushNamed(context, VerifyEmpEmail.routeName);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -22,7 +78,7 @@ class _EmpSignUpFormState extends State<EmpSignUpForm> {
       child: Center(
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             TextFormField(
@@ -30,19 +86,19 @@ class _EmpSignUpFormState extends State<EmpSignUpForm> {
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Color.fromARGB(255, 252, 234, 240),
-                label: Text('Email'),
+                fillColor: const Color.fromARGB(255, 252, 234, 240),
+                label: const Text('Email'),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: const Color.fromARGB(255, 252, 234, 240)),
+                  borderSide: const BorderSide(
+                      color: Color.fromARGB(255, 252, 234, 240)),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
+                  borderSide: const BorderSide(color: Colors.blueAccent),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
+                  borderSide: const BorderSide(color: Colors.red),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -52,7 +108,7 @@ class _EmpSignUpFormState extends State<EmpSignUpForm> {
                       ? 'Enter a valid email'
                       : null,
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             TextFormField(
@@ -61,9 +117,9 @@ class _EmpSignUpFormState extends State<EmpSignUpForm> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Color.fromARGB(255, 252, 234, 240),
-                label: Text('password'),
+                label: const Text('password'),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                       color: const Color.fromARGB(255, 252, 234, 240)),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -72,7 +128,7 @@ class _EmpSignUpFormState extends State<EmpSignUpForm> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
+                  borderSide: const BorderSide(color: Colors.red),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -81,7 +137,7 @@ class _EmpSignUpFormState extends State<EmpSignUpForm> {
                   ? 'Enter at least 6 characters'
                   : null,
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             TextFormField(
@@ -92,16 +148,16 @@ class _EmpSignUpFormState extends State<EmpSignUpForm> {
                   fillColor: Color.fromARGB(255, 252, 234, 240),
                   label: Text('Verify password'),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                         color: const Color.fromARGB(255, 252, 234, 240)),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blueAccent),
+                    borderSide: const BorderSide(color: Colors.blueAccent),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   errorBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.red),
+                    borderSide: const BorderSide(color: Colors.red),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -114,12 +170,12 @@ class _EmpSignUpFormState extends State<EmpSignUpForm> {
                     return 'Password is not match';
                   }
                 }),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
@@ -131,9 +187,15 @@ class _EmpSignUpFormState extends State<EmpSignUpForm> {
                   if (formKey.currentState!.validate()) {
                     formKey.currentState?.save();
                     //  signUp();
+                    _isSigningUp ? null : EmpsignUp();
                   }
                 },
-                child: Text('Sign UP'),
+                icon: const Icon(Icons.person_add),
+                label: _isSigningUp
+                    ? const CircularProgressIndicator(
+                        color: Colors.amber,
+                      ) // Show progress indicator
+                    : const Text('Sign Up'),
               ),
             ),
             const SizedBox(

@@ -21,26 +21,42 @@ class Experience extends StatefulWidget {
 }
 
 class _ExperienceState extends State<Experience> {
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return user.uid;
-    } else {
-      return '';
+  String? currentUser;
+
+  Future<void> getUserUid() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUser = user.uid;
+        });
+      } else {
+        print('No user is signed in.');
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
     }
   }
 
   Future saveExperienceInfo(ExperienceModel experienceInfo) async {
-    final personal_info_doc_ref = FirebaseFirestore.instance
-        .collection('job-seeker')
-        .doc(getCurrentUserUid());
-    final json = experienceInfo.toJson();
-    await personal_info_doc_ref
-        .collection('jobseeker-profile')
-        .doc('profile')
-        .set({
-      'experiences': {'experience': json}
-    }, SetOptions(merge: true));
+    try {
+      final personal_info_doc_ref =
+          FirebaseFirestore.instance.collection('job-seeker').doc(currentUser);
+      final json = experienceInfo.toJson();
+      await personal_info_doc_ref
+          .collection('jobseeker-profile')
+          .doc('profile')
+          .set({
+        'experiences': {'experience': json}
+      }, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      print('Error saving personal info: ${e.message}');
+      Utils.showSnackBar(context, e.message, Colors.red);
+      rethrow;
+    } catch (e) {
+      print('Error saving personal info: $e');
+      rethrow;
+    }
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -64,9 +80,16 @@ class _ExperienceState extends State<Experience> {
     endDate = selectedDate;
   }
 
-  List State = ['Amhara', 'AA', 'Hareri', 'Somali'];
+  List State = ['Amhara', 'AA', 'Hareri', 'Somali', 'Hawassa'];
   var stateSelected;
   //List towns = ['Ethiopia', 'america', 'england', 'Germany'];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserUid();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -253,36 +276,34 @@ class _ExperienceState extends State<Experience> {
                     ),
                     //  Text('projects worked on'),
                     ElevatedButton.icon(
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState?.save();
-                          try {
-                            final experienceInfo = ExperienceModel(
-                                title: jobTitle,
-                                company: company,
-                                startDate: startDate,
-                                endDate: endDate,
-                                city: city,
-                                region: region);
-                            print(experienceInfo.city);
-                            print(experienceInfo.company);
-                            print(experienceInfo.region);
-                            print(experienceInfo.startDate);
-                            ExperienceProvider provider = ExperienceProvider();
-                            provider.experience = experienceInfo;
-                            final getData = provider.experience;
-                            print(getData.city);
 
-                            //saveExperienceInfo(experienceInfo);
+                          final experienceInfo = ExperienceModel(
+                              title: jobTitle,
+                              company: company,
+                              startDate: startDate,
+                              endDate: endDate,
+                              city: city,
+                              region: region);
+                          print(experienceInfo.city);
+                          print(experienceInfo.company);
+                          print(experienceInfo.region);
+                          print(experienceInfo.startDate);
+
+                          try {
+                            await saveExperienceInfo(experienceInfo);
                             Utils.showSnackBar(
                                 context, 'sucessfully saved', Colors.green);
+                            Navigator.of(context).pop();
                           } catch (e) {
                             Utils.showSnackBar(
                                 context, e.toString(), Colors.red);
                           }
                         }
 
-                        Navigator.pushNamed(context, SkillSet.routeName);
+                        // Navigator.pushNamed(context, SkillSet.routeName);
                       },
                       icon: Icon(Icons.forward),
                       label: Text('Save and Continue'),

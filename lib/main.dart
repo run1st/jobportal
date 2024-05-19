@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
 import 'package:project1/Employers/Employers_account/emp_register.dart';
 import 'package:project1/Employers/Employers_account/emp_verify.dart';
 import 'package:project1/Employers/bridgeTOemp_home_page.dart';
@@ -130,7 +131,8 @@ class MyApp extends StatelessWidget {
         VerifyEmpEmail.routeName: (context) => const VerifyEmpEmail(),
         VerifyEmail.routeName: (context) => VerifyEmail(),
         JobSeekerSignUPForm.routeName: ((context) => JobSeekerSignUPForm()),
-        EmpSignUpForm.routeName: ((context) => EmpSignUpForm())
+        EmpSignUpForm.routeName: ((context) => EmpSignUpForm()),
+        MyHomePage.routeName: (context) => MyHomePage(),
         //  LoginPage.routeName: (context) => LoginPage(onclickedSignIn: () {}),
         // JobDetailPage.routName: (context) => JobDetailPage(),
         //   ProfilePageView.routeName: ((context) => ProfilePageView())
@@ -141,7 +143,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   // const MyHomePage({Key? key, required this.title}) : super(key: key);
-
+  static const routeName = '/MyHomePage';
   //final String title = '';
 
   @override
@@ -149,6 +151,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Future<bool> _onWillPop() async {
+    await SystemNavigator.pop();
+
+    return false;
+  }
+
   int currentPage = 0;
   List<int> xx = [1, 2, 3, 4, 5];
   PageController _pageController = PageController(initialPage: 0);
@@ -165,155 +173,160 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Hulu Jobs'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              height: 30,
-            ),
-            SizedBox(
-              height: 200,
-              width: double.infinity,
-              child: PageView(
-                onPageChanged: (value) {
-                  setState(() {
-                    currentPage = value;
-                  });
-                },
-                physics: BouncingScrollPhysics(),
-                controller: _pageController,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      elevation: 10,
-                      color: const Color.fromARGB(255, 18, 211, 224),
-                      child: const Center(
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Hulu Jobs'),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                height: 30,
+              ),
+              SizedBox(
+                height: 200,
+                width: double.infinity,
+                child: PageView(
+                  onPageChanged: (value) {
+                    setState(() {
+                      currentPage = value;
+                    });
+                  },
+                  physics: BouncingScrollPhysics(),
+                  controller: _pageController,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
+                        elevation: 10,
+                        color: const Color.fromARGB(255, 18, 211, 224),
+                        child: const Center(
+                            child: Image(
+                          image: AssetImage('assets/images/search.jpg'),
+                        )),
+                      ),
+                    ),
+                    //assets/images/post2.jpeg
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
+                        color: const Color.fromARGB(255, 18, 211, 224),
+                        child: const Center(
                           child: Image(
-                        image: AssetImage('assets/images/search.jpg'),
-                      )),
-                    ),
-                  ),
-                  //assets/images/post2.jpeg
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      color: const Color.fromARGB(255, 18, 211, 224),
-                      child: const Center(
-                        child: Image(
-                          image: AssetImage('assets/images/post2.jpeg'),
+                            image: AssetImage('assets/images/post2.jpeg'),
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      color: const Color.fromARGB(255, 18, 211, 224),
-                      child: const Center(
-                        child: Text(
-                          'All through Hullu Jobs',
-                          style: TextStyle(fontSize: 25),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
+                        color: const Color.fromARGB(255, 18, 211, 224),
+                        child: const Center(
+                          child: Text(
+                            'All through Hullu Jobs',
+                            style: TextStyle(fontSize: 25),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[for (int i = 0; i < 3; i++) dotIndicator(i)],
-            ),
-            const Text(
-              'Register As',
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width - 50,
-              margin: EdgeInsets.all(20),
-              child: FloatingActionButton(
-                heroTag: "btn1",
-                // clipBehavior: Clip.hardEdge,
-                onPressed: () => Navigator.pushNamed(context, AuthPage.routName,
-                    arguments: AuthPage(isLogin: false)),
-                child: Text('Register'),
-                // textColor: Colors.white,
-                // color: Colors.deepPurple,
-                // padding: EdgeInsets.all(20),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  child: Text('Have an account?'),
+                  ],
                 ),
-                Container(
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                    child: Column(
-                      children: [
-                        OutlinedButton(
-                            clipBehavior: Clip.antiAliasWithSaveLayer,
-                            // shape: RoundedRectangleBorder(
-                            //     borderRadius: BorderRadius.circular(50)),
-                            onPressed: () => Navigator.pushNamed(
-                                context, AuthPage.routName,
-                                arguments: AuthPage(isLogin: true)),
-
-                            //  context, loginOption.routeName),
-                            child: const Text(
-                              ' Login',
-                              style: TextStyle(color: Colors.blue),
-                            )),
-                        // OutlinedButton(
-                        //     // shape: RoundedRectangleBorder(
-                        //     //     borderRadius: BorderRadius.circular(50)),
-                        //     onPressed: () => Navigator.pushNamed(
-                        //         context, EmpAuthPage.routName),
-                        //     child: Text(
-                        //       'Employer Login',
-                        //       style: TextStyle(color: Colors.blue),
-                        //     )),
-                      ],
-                    )),
-              ],
-            ),
-            SizedBox(
-              height: 25,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 100),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[for (int i = 0; i < 3; i++) dotIndicator(i)],
+              ),
+              const Text(
+                'Register As',
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width - 50,
+                margin: EdgeInsets.all(20),
+                child: FloatingActionButton(
+                  heroTag: "btn1",
+                  // clipBehavior: Clip.hardEdge,
+                  onPressed: () => Navigator.pushNamed(
+                      context, AuthPage.routName,
+                      arguments: AuthPage(isLogin: false)),
+                  child: Text('Register'),
+                  // textColor: Colors.white,
+                  // color: Colors.deepPurple,
+                  // padding: EdgeInsets.all(20),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // TextButton.icon(
-                  //     onPressed: () {
-                  //       Navigator.popAndPushNamed(context, home.routeName);
-                  //     },
-                  //     icon: Icon(Icons.skip_next),
-                  //     label: Text('Skip')),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    child: Text('Have an account?'),
+                  ),
+                  Container(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                      child: Column(
+                        children: [
+                          OutlinedButton(
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              // shape: RoundedRectangleBorder(
+                              //     borderRadius: BorderRadius.circular(50)),
+                              onPressed: () => Navigator.pushNamed(
+                                  context, AuthPage.routName,
+                                  arguments: AuthPage(isLogin: true)),
+
+                              //  context, loginOption.routeName),
+                              child: const Text(
+                                ' Login',
+                                style: TextStyle(color: Colors.blue),
+                              )),
+                          // OutlinedButton(
+                          //     // shape: RoundedRectangleBorder(
+                          //     //     borderRadius: BorderRadius.circular(50)),
+                          //     onPressed: () => Navigator.pushNamed(
+                          //         context, EmpAuthPage.routName),
+                          //     child: Text(
+                          //       'Employer Login',
+                          //       style: TextStyle(color: Colors.blue),
+                          //     )),
+                        ],
+                      )),
                 ],
               ),
-            )
-          ],
+              SizedBox(
+                height: 25,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 100),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // TextButton.icon(
+                    //     onPressed: () {
+                    //       Navigator.popAndPushNamed(context, home.routeName);
+                    //     },
+                    //     icon: Icon(Icons.skip_next),
+                    //     label: Text('Skip')),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

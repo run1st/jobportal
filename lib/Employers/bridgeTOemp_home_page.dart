@@ -24,14 +24,15 @@ class _Emp_homeState extends State<Emp_home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            FirebaseAuth.instance.signOut();
-            Navigator.pushNamed(context, EmpSignUpForm.routeName);
-          },
-          label: Text('Logout out'),
-          icon: Icon(Icons.logout_rounded),
-        ),
+        backgroundColor: Colors.white,
+        // floatingActionButton: FloatingActionButton.extended(
+        //   onPressed: () {
+        //     FirebaseAuth.instance.signOut();
+        //     Navigator.pushNamed(context, EmpSignUpForm.routeName);
+        //   },
+        //   label: Text('Logout out'),
+        //   icon: Icon(Icons.logout_rounded),
+        // ),
         appBar: AppBar(
           title: Text('Hulu Jobs'),
         ),
@@ -39,6 +40,7 @@ class _Emp_homeState extends State<Emp_home> {
           child: Card(
             elevation: 10,
             shape: RoundedRectangleBorder(
+              side: BorderSide.none,
               borderRadius: BorderRadius.circular(15.0),
             ),
             child: Container(
@@ -58,12 +60,43 @@ class _Emp_homeState extends State<Emp_home> {
                   //   ' Fill your company information',
                   //   style: TextStyle(fontWeight: FontWeight.bold),
                   // ),
-                  Divider(),
+                  const Divider(),
+                  const Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      children: [
+                        Text(
+                          'Tell as Some thing ',
+                          style: TextStyle(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'Roboto',
+                              color: Colors.black54),
+                        ),
+                        Text(
+                          ' about your company',
+                          style: TextStyle(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'Roboto',
+                              color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  const Divider(),
                   Container(
-                    width: MediaQuery.of(context).size.width / 2,
+                    width: MediaQuery.of(context).size.width * 3 / 4,
                     child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                            minimumSize: Size.fromHeight(50)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          minimumSize: const Size.fromHeight(80),
+                        ),
                         onPressed: () => Navigator.of(context)
                             .pushNamed(EmployerRegistrationForm.routeName),
                         icon: Icon(Icons.book),
@@ -73,34 +106,36 @@ class _Emp_homeState extends State<Emp_home> {
                     height: 20,
                   ),
                   Divider(),
-                  Container(
-                    width: MediaQuery.of(context).size.width / 2,
-                    child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                            minimumSize: Size.fromHeight(50)),
-                        onPressed: () => Navigator.of(context)
-                            .pushNamed(EmployerRegistrationForm.routeName),
-                        icon: Icon(Icons.book),
-                        label: Text('Update your company Profile')),
-                  ),
-                  Divider(),
+                  // Container(
+                  //   width: MediaQuery.of(context).size.width / 2,
+                  //   child: ElevatedButton.icon(
+                  //       style: ElevatedButton.styleFrom(
+                  //           minimumSize: Size.fromHeight(50)),
+                  //       onPressed: () => Navigator.of(context)
+                  //           .pushNamed(EmployerRegistrationForm.routeName),
+                  //       icon: Icon(Icons.book),
+                  //       label: Text('Update your company Profile')),
+                  // ),
+                  // Divider(),
                   SizedBox(
                     height: 20,
                   ),
-                  Container(
-                    width: (MediaQuery.of(context).size.width) * 1 / 2,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                          minimumSize: Size.fromHeight(50)),
-                      onPressed: () =>
-                          Navigator.of(context).pushNamed(TabsScreen.routeName),
-                      icon: Icon(
-                        Icons.home,
-                        size: 36,
-                      ),
-                      label: Text('Go Home'),
-                    ),
-                  ),
+                  // Container(
+                  //   width: (MediaQuery.of(context).size.width) * 1 / 2,
+                  //   child: ElevatedButton.icon(
+                  //     style: ElevatedButton.styleFrom(
+                  //         shape: RoundedRectangleBorder(
+                  //             borderRadius: BorderRadius.circular(10)),
+                  //         minimumSize: Size.fromHeight(50)),
+                  //     onPressed: () =>
+                  //         Navigator.of(context).pushNamed(TabsScreen.routeName),
+                  //     icon: Icon(
+                  //       Icons.home,
+                  //       size: 36,
+                  //     ),
+                  //     label: Text('Go Home'),
+                  //   ),
+                  // ),
                   Divider(),
                 ],
               ),

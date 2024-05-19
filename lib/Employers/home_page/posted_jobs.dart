@@ -56,7 +56,7 @@ class _Posted_jobsState extends State<Posted_jobs> {
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-          if (!snapshot.hasData) {
+          if (!snapshot.hasData || snapshot.data == null) {
             return const Text('OOPS there is no posted jobs');
           }
 

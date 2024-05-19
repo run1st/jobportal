@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:project1/profile/progress_indicator.dart';
 import 'package:provider/provider.dart';
 import './skills.dart';
@@ -20,25 +21,53 @@ class EducationForm extends StatefulWidget {
 
 class _EducationFormState extends State<EducationForm> {
   final _formKey = GlobalKey<FormState>();
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return user.uid;
-    } else {
-      return '';
+  String saveDateAsString(DateTime selectedDate) {
+    if (selectedDate == null) return "";
+
+    // Define your desired format (e.g., YYYY-MM-DD)
+    final formatter = DateFormat('yyyy-MM-dd');
+
+    // Convert DateTime object to String
+    final formattedDate = formatter.format(selectedDate);
+    return formattedDate;
+  }
+
+//SAVES CUURENT USER
+  String? currentUser;
+
+  Future<void> getUserUid() async {
+    try {
+      User? user = await FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUser = user.uid;
+        });
+      } else {
+        print('No user is signed in.');
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
     }
   }
 
   Future saveEducationInfo(Education educationinfo) async {
-    final personal_info_doc_ref = FirebaseFirestore.instance
-        .collection('job-seeker')
-        .doc(getCurrentUserUid());
-    final json = educationinfo.toJson();
-    // final <Map<Map>> tt = {'education', json};
-    await personal_info_doc_ref
-        .collection('jobseeker-profile')
-        .doc('profile')
-        .set({'education': json}, SetOptions(merge: true));
+    try {
+      final personalInfoDoc =
+          FirebaseFirestore.instance.collection('job-seeker').doc(currentUser);
+      final json = educationinfo.toJson();
+      // final <Map<Map>> tt = {'education', json};
+      await personalInfoDoc
+          .collection('jobseeker-profile')
+          .doc('profile')
+          .set({'education': json}, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      print('Error saving personal info: ${e.message}');
+      Utils.showSnackBar(context, e.message, Colors.red);
+      rethrow;
+    } catch (e) {
+      print('Error saving personal info: $e');
+      rethrow;
+    }
   }
 
   final collageNameController = TextEditingController();
@@ -56,8 +85,17 @@ class _EducationFormState extends State<EducationForm> {
   String? institution;
   var eduLevelChoosed;
   var fieldOfStudyChoosed;
-  String startDateSelected = DateTime.now().toString();
-  String endDateSelected = DateTime.now().toString();
+  DateTime startDateSelected = DateTime.now();
+  DateTime endDateSelected = DateTime.now();
+  String stringEndDate = '';
+  String stringStartDate = '';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserUid();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -222,6 +260,9 @@ class _EducationFormState extends State<EducationForm> {
                           label: 'end Date',
                           initialDate: DateTime.now(),
                           onDateSelected: (date) {
+                            startDateSelected = date;
+                            stringStartDate =
+                                saveDateAsString(startDateSelected);
                             // do something with the selected date
                           },
                         ),
@@ -253,7 +294,7 @@ class _EducationFormState extends State<EducationForm> {
                           ),
                           validator: (value) {
                             if (value == null) {
-                              return 'Please enter Your name';
+                              return 'Please enter Your CGPA';
                             }
                             return null;
                           },
@@ -266,31 +307,48 @@ class _EducationFormState extends State<EducationForm> {
                         height: 15,
                       ),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState?.save();
+                            if (currentUser == null) {
+                              print('Error: currentUser is null');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error: No user signed in.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              return;
+                            }
+                            final educationInfo = Education(
+                                GPA: Cgpa,
+                                levelOfEducation: eduLevelChoosed,
+                                institution: collageNameController.text,
+                                fieldOfStudy: fieldOfStudyChoosed,
+                                startDate: 'startDateSelected',
+                                endDate: 'endDateSelected');
+
                             try {
-                              final educationInfo = Education(
-                                  GPA: Cgpa,
-                                  levelOfEducation: eduLevelChoosed,
-                                  institution: collageNameController.text,
-                                  fieldOfStudy: fieldOfStudyChoosed,
-                                  startDate: startDateSelected,
-                                  endDate: endDateSelected);
-                              print(
-                                  ' the educational info is ${educationInfo.GPA}');
-                              //saveEducationInfo(educationInfo);
-                              EducationProvider provider = EducationProvider();
-                              provider.education = educationInfo;
-                              Utils.showSnackBar(
-                                  context, 'sucessfully saved', Colors.green);
-                            } on FirebaseException catch (e) {
-                              Utils.showSnackBar(
-                                  context, e.message, Colors.red);
+                              await saveEducationInfo(educationInfo);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Successfully saved'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              Navigator.pop(context);
+                            } catch (e) {
+                              print('Error during saving: $e');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Error saving information. Please try again.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
                             }
                           }
-
-                          Navigator.pushNamed(context, Experience.routeName);
                         },
                         child: Text(
                           'SAVE & CONTINUE',

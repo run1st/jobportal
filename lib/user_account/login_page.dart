@@ -1,6 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project1/Employers/Employers_account/emp_forgote_account.dart';
+import 'package:project1/main.dart';
+import 'package:project1/user_account/auth_page.dart';
 import 'package:project1/user_account/emp_login_form.dart';
 import 'package:project1/user_account/emp_sign_up_form.dart';
 import 'package:project1/user_account/job_seeker_login_form.dart';
@@ -36,7 +39,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<bool> _onWillPop() async {
-    await SystemNavigator.pop();
+    //await SystemNavigator.pop();
+    Navigator.pushNamed(context, MyHomePage.routeName);
     return false;
   }
 
@@ -52,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  height: 30,
+                  height: 100,
                 ),
                 Text(
                   'Hulu',
@@ -110,15 +114,22 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 button1 == true ? JobSeekerLoginForm() : EmpLoginForm(),
-                Text("Doesn't have account ?"),
-                TextButton(
-                    onPressed: () {
-                      widget.onclickedSignIn;
-                    },
-                    child: const Text('CREATE ACCOUNT')),
-                ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text('back'))
+                RichText(
+                    text: TextSpan(
+                        style: TextStyle(color: Colors.black),
+                        text: 'No accont ?  ',
+                        children: [
+                      TextSpan(
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = widget.onclickedSignIn,
+                          text: 'Sign up',
+                          style: TextStyle(
+                              color: Colors.blue,
+                              decoration: TextDecoration.underline))
+                    ])),
+                // ElevatedButton(
+                //     onPressed: () => Navigator.of(context).pop(),
+                //     child: Text('back'))
               ],
             ),
           ),

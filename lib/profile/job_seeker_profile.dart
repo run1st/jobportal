@@ -1,24 +1,13 @@
-//import 'dart:html';
-
-import 'dart:convert';
-//import 'dart:html';
-//import 'dart:ui';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
-import 'package:project1/Employers/home_page/pdf.dart';
-import 'package:project1/Employers/home_page/tabs_screen.dart';
-import 'package:project1/jobSeekerModel/job_seeker_profile_model.dart';
-import 'package:project1/job_seeker_home_page/favorites.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project1/job_seeker_home_page/image_card.dart';
-import 'package:project1/job_seeker_home_page/jobSeekerHome.dart';
-import 'package:project1/profile/personal_info.dart';
+import 'package:project1/profile/tim_line_wraper.dart';
 import 'package:project1/profile/updateProfile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {
   static const routeName = '/user_profile';
@@ -29,71 +18,78 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  bool personalInfoSection = false;
+  bool educationSection = false;
+  bool experienceSection = false;
+  bool skillSection = false;
   File? _image;
   List<Map<String, dynamic>> profData = [];
-  // Stream<Education> fetchEducationDataStream(DocumentReference docRef) {
-  //   return docRef.snapshots().map((snapshot) =>
-  //       Education.fromMap(snapshot.data()! as Map<String, dynamic>));
-  // }
+  bool addProfile = false;
+  String? currentUser;
 
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return user.uid;
-    } else {
-      return '';
+  Future<void> getUserUid() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUser = user.uid;
+        });
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
     }
+    await isSectionCompleted(currentUser, '');
   }
 
   String formatTimestamp(Timestamp timestamp) {
     DateTime dateTime = timestamp.toDate();
-
     return DateFormat("yyyy-MM-dd").format(dateTime);
   }
 
-  List<Map<String, dynamic>> dataList = [];
+  Future<void> isSectionCompleted(String? id, String section) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (id == null) return;
 
-  List<Map<String, dynamic>> education = [];
-  List<Map<String, dynamic>> skill = [];
-  List<Map<String, dynamic>> other = [];
-  List<Map<String, dynamic>> p_info = [];
-
-  List<dynamic> myData = [];
-
-  Stream<List<dynamic>> getProfiles() {
-    return FirebaseFirestore.instance
-        .collection('job-seeker')
-        .doc(getCurrentUserUid())
-        .collection('profile')
-        .snapshots()
-        .map((querySnapshot) => querySnapshot.docs
-            .map((doc) => Education.fromMap(doc.data()))
-            .toList());
+    final state = await getFavState("Personal_$id");
+    setState(() {
+      personalInfoSection = state ?? false; // Provide a default value if null
+      educationSection = prefs.containsKey('Education_$id');
+      experienceSection = prefs.containsKey('Experience_$id');
+      skillSection = prefs.containsKey('Skills_$id');
+    });
   }
 
-  List allSkills = ['ccnn', 'sdsdf', 'retryt', 'erwtyu', 'olkjkl', 'qwwqsqasw'];
+  static Future<dynamic> getFavState(String key) async {
+    final SharedPreferences prefs2 = await SharedPreferences.getInstance();
+    return prefs2.get(key) ?? false; // Provide a default value if null
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUserUid();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // print('education data is ${education}');
     return Scaffold(
       backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   title: Text('aaaaa'),
-      // ),
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          }),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SingleChildScrollView(
-            child: StreamBuilder(
-                stream: getCurrentUserUid() != null
+        child: Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              StreamBuilder(
+                stream: currentUser != null
                     ? FirebaseFirestore.instance
                         .collection('job-seeker')
-                        .doc(getCurrentUserUid())
+                        .doc(currentUser)
                         .collection('jobseeker-profile')
                         .doc('profile')
                         .snapshots()
@@ -107,333 +103,472 @@ class _ProfilePageState extends State<ProfilePage> {
                       ConnectionState.waiting) {
                     return const CircularProgressIndicator();
                   } else if (!snapshot.hasData || !snapshot.data!.exists) {
-                    if (getCurrentUserUid() == null) {
-                      return const Text('User is not logged in');
+                    if (currentUser == null) {
+                      return const Center(child: Text('User is not logged in'));
                     } else {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Text.rich(
-                            TextSpan(children: [
-                              TextSpan(text: 'There is no'),
-                              TextSpan(
-                                  text: '  Profile Data ',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blue))
-                            ]),
-                          ),
-                          const Center(
-                            child: ImageCard(
-                              imagePath: 'assets/images/noData3.jpg',
-                              imageCaption: "You haven't tell as about you",
-                            ),
-                          ),
-                          Container(
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width - 200,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pushNamed(
-                                      context, personal_info.routeName);
-                                },
-                                child: const Text('Add Profile'),
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      side: BorderSide.none),
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      );
-                    }
-                  }
-                  Map<String, dynamic>? otherData = snapshot.data!
-                      .data()?['other-data'] as Map<String, dynamic>?;
-                  Map<String, dynamic>? personalInfo = snapshot.data!
-                      .data()?['personal-info'] as Map<String, dynamic>?;
-                  Map<String, dynamic>? skills =
-                      snapshot.data!.data()?['skills'] as Map<String, dynamic>?;
-                  final List<dynamic> languageSkills =
-                      snapshot.data!.data()?['skills']['language skills'] ?? [];
-                  final List<dynamic> personalSkills =
-                      snapshot.data!.data()?['skills']['personal skills'] ?? [];
-                  final List<dynamic> professionalSkills =
-                      snapshot.data!.data()?['skills']['professional skills'] ??
-                          [];
-                  Map<String, dynamic>? experience =
-                      snapshot.data!.data()?['experiences']['experience']
-                          as Map<String, dynamic>?;
-                  Map<String, dynamic>? education = snapshot.data!
-                      .data()?['education'] as Map<String, dynamic>?;
-
-                  String startDate = formatTimestamp(experience?['startDte']);
-                  String finalDate = formatTimestamp(experience?['End date']);
-
-                  // print(otherData);
-                  // String formattedDate = DateFormat('yyyy-MM-dd-kk:mm')
-                  //     .format(experience?['End date']);
-                  return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        SizedBox(
-                          height: 50,
-                        ),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                              child: CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                    otherData?['profile image'] ??
-                                        'assets/images/post2.jpeg'),
-                                radius: 50,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          child: Text(
-                            '  ${personalInfo?['first name']} ${personalInfo?['last name']}',
-                            style: TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 4),
-                              child: Text('${education?['institution']}'),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: Colors.grey,
-                                ))
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 4),
-                              child: Text(
-                                  '${education?['levelOfEducation']} in ${education?['fieldOfStudy']}'),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: Colors.grey,
-                                ))
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            TextButton(onPressed: () {}, child: Text('Edit')),
-                            //  DownloadCv(),
-                          ],
-                        ),
-                        // Container(
-                        //   height: 300,
-                        //   width: 350,
-                        // decoration:
-                        //     BoxDecoration(border: Border.all(color: Colors.blueAccent)),
-                        //  child:
-
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: 20),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                      return SizedBox(
+                        height: MediaQuery.of(context).size.height - 50,
+                        child: SingleChildScrollView(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'About me',
+                              const Text.rich(
+                                TextSpan(children: [
+                                  TextSpan(text: 'There is no'),
+                                  TextSpan(
+                                    text: '  Profile Data ',
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
+                                      color: Colors.blue,
                                     ),
                                   ),
-                                  IconButton(
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) =>
-                                              UpdateAboutMeDialog(),
-                                        );
-                                      },
-                                      icon: Icon(
-                                        Icons.edit,
-                                        color: Colors.grey,
-                                      ))
-                                ],
+                                ]),
                               ),
-                              Text(
-                                otherData?['about me'],
-                                style: TextStyle(fontSize: 17),
+                              const Center(
+                                child: ImageCard(
+                                  imagePath: 'assets/images/noData3.jpg',
+                                  imageCaption: "You haven't tell us about you",
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(top: 20),
+                                width: MediaQuery.of(context).size.width - 200,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      addProfile = !addProfile;
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side: BorderSide.none,
+                                    ),
+                                  ),
+                                  child: const Text('Profile Completeness'),
+                                ),
+                              ),
+                              Container(
+                                height: addProfile ? 500 : 0,
+                                width: MediaQuery.of(context).size.width - 40,
+                                color: Colors.white,
+                                child: Visibility(
+                                  child: MyTimeLineWrapper(
+                                    personal: personalInfoSection,
+                                    education: educationSection,
+                                    experience: experienceSection,
+                                    skills: skillSection,
+                                  ),
+                                  visible: addProfile,
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        Center(
-                          child: Text(
-                            'Skills',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 25),
+                      );
+                    }
+                  }
+
+                  Map<String, dynamic>? otherData = snapshot.data!
+                      .data()?['other-data'] as Map<String, dynamic>?;
+                  Map<String, dynamic>? personalInfo = snapshot.data!
+                      .data()?['personal-info'] as Map<String, dynamic>?;
+
+                  Map<String, dynamic>? skills =
+                      snapshot.data!.data()?['skills'] as Map<String, dynamic>?;
+                  final List<dynamic>? languageSkills =
+                      snapshot.data!.data()?['skills'] ??
+                          {}['language skills'] ??
+                          [];
+                  final List<dynamic>? personalSkills =
+                      snapshot.data!.data()?['skills'] ??
+                          {}['personal skills'] ??
+                          [];
+                  final List<dynamic>? professionalSkills =
+                      snapshot.data!.data()?['skills'] ??
+                          {}['professional skills'] ??
+                          [];
+                  Map<String, dynamic>? experience =
+                      snapshot.data!.data()?['experiences'] ??
+                          {}['experience'] as Map<String, dynamic>?;
+                  Map<String, dynamic>? education = snapshot.data!
+                      .data()?['education'] as Map<String, dynamic>?;
+
+                  String startDate = experience?['startDte'] != null
+                      ? formatTimestamp(experience?['startDte'])
+                      : 'No start date';
+                  String finalDate = experience?['End date'] != null
+                      ? formatTimestamp(experience?['End date'])
+                      : 'No end date';
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      SizedBox(height: 50),
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            child: CircleAvatar(
+                              backgroundImage: otherData?['profile image'] !=
+                                      null
+                                  ? NetworkImage(otherData!['profile image'])
+                                  : AssetImage('assets/images/logo.jpeg')
+                                      as ImageProvider,
+                              radius: 50,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        child: Text(
+                          '  ${personalInfo?['first name'] ?? ''} ${personalInfo?['last name'] ?? ''}',
+                          style: TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      education?['institution']?.isEmpty ?? true
+                          ? SizedBox()
+                          : Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 4),
+                                  child: Text(
+                                      '${education?['institution'] ?? ''}'),
+                                ),
+                                SizedBox(width: 10),
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(Icons.edit, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 4),
+                            child: Text(
+                                '${education?['levelOfEducation'] ?? ''} in ${education?['fieldOfStudy'] ?? ''}'),
+                          ),
+                          SizedBox(width: 10),
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.edit, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          TextButton(onPressed: () {}, child: Text('Edit')),
+                          //  DownloadCv(),
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 20),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Experience',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(Icons.add),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            ListTile(
+                              title: Text(experience?['job title'] ?? ''),
+                              subtitle: Text(
+                                  '${experience?['company'] ?? ''}, $startDate - $finalDate'),
+                              trailing: IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.edit),
+                              ),
+                            ),
+                            Divider(),
+                            ListTile(
+                              title: Text('Front-end Developer'),
+                              subtitle: Text('XYZ Inc., Sep 2018 - Dec 2019'),
+                              trailing: Icon(Icons.edit),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 20),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Education',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) =>
+                                              UpdateEducationDialog(),
+                                        );
+                                      },
+                                      icon: Icon(Icons.edit),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) =>
+                                              UpdateEducationDialog(),
+                                        );
+                                      },
+                                      icon: Icon(Icons.add),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            ListTile(
+                              title: Text(
+                                  'Bachelor in ${education?['fieldOfStudy'] ?? ''}'),
+                              subtitle: Text(
+                                  'University of ABC, Sep 2014 - May 2018'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 15),
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'Professional skills',
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text('Add'),
+                                        IconButton(
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) =>
+                                                  UpdateSkillsDialog(
+                                                      skill_Type:
+                                                          'professional skills'),
+                                            );
+                                          },
+                                          icon: Icon(Icons.add,
+                                              color: Colors.amber),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                professionalSkills!.isEmpty
+                                    ? SizedBox()
+                                    : Wrap(
+                                        spacing: 8.0,
+                                        runSpacing: 4.0,
+                                        children: [
+                                          ...professionalSkills.map(
+                                            (skill) => Chip(
+                                              labelStyle: TextStyle(
+                                                  color: Colors.white),
+                                              backgroundColor: Color.fromARGB(
+                                                  255, 22, 125, 209),
+                                              deleteIconColor: Colors.yellow,
+                                              label: Text(skill),
+                                              onDeleted: () {},
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                              ],
+                            ),
                           ),
                         ),
-
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: 15),
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'professional skills',
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold),
+                      ),
+                      Column(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: 15),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 10),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Personal skills',
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                         ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text('Add'),
-                                          IconButton(
-                                            onPressed: () {
-                                              showDialog(
+                                        Row(
+                                          children: [
+                                            Text('Add'),
+                                            IconButton(
+                                              onPressed: () {
+                                                showDialog(
                                                   context: context,
                                                   builder: (BuildContext
                                                           context) =>
                                                       UpdateSkillsDialog(
                                                           skill_Type:
-                                                              'professional skills'));
-                                            },
-                                            icon: Icon(
-                                              Icons.add,
-                                              color: Colors.amber,
+                                                              'personal skills'),
+                                                );
+                                              },
+                                              icon: Icon(Icons.add,
+                                                  color: Colors.amber),
                                             ),
-                                          )
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Wrap(
-                                    spacing: 8.0,
-                                    runSpacing: 4.0,
-                                    children: [
-                                      ...professionalSkills.map(
-                                        (skill) => Chip(
-                                          labelStyle:
-                                              TextStyle(color: Colors.white),
-                                          backgroundColor:
-                                              Color.fromARGB(255, 22, 125, 209),
-                                          deleteIconColor: Colors.yellow,
-                                          label: Text(skill),
-                                          onDeleted: () {},
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                    personalSkills!.isEmpty
+                                        ? SizedBox()
+                                        : Wrap(
+                                            spacing: 8.0,
+                                            runSpacing: 4.0,
+                                            children: [
+                                              ...personalSkills.map(
+                                                (skill) => Chip(
+                                                  deleteIconColor: Colors.red,
+                                                  label: Text(skill),
+                                                  onDeleted: () {},
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-
-                        Column(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.symmetric(horizontal: 15),
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15, vertical: 10),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 15),
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 10),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'Language skills',
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      child: Row(
                                         children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              'Personal skills',
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text('Add'),
-                                              IconButton(
-                                                onPressed: () {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                              context) =>
-                                                          UpdateSkillsDialog(
-                                                              skill_Type:
-                                                                  'personal skills'));
-                                                },
-                                                icon: Icon(
-                                                  Icons.add,
-                                                  color: Colors.amber,
-                                                ),
-                                              )
-                                            ],
+                                          Text('Add'),
+                                          IconButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext
+                                                        context) =>
+                                                    UpdateSkillsDialog(
+                                                        skill_Type:
+                                                            'language skills'),
+                                              );
+                                            },
+                                            icon: Icon(Icons.add,
+                                                color: Colors.amber),
                                           ),
                                         ],
                                       ),
-                                      Wrap(
+                                    ),
+                                  ],
+                                ),
+                                languageSkills!.isEmpty
+                                    ? SizedBox()
+                                    : Wrap(
                                         spacing: 8.0,
                                         runSpacing: 4.0,
                                         children: [
-                                          ...personalSkills.map(
+                                          ...languageSkills.map(
                                             (skill) => Chip(
+                                              backgroundColor: Color.fromARGB(
+                                                  255, 48, 214, 226),
                                               deleteIconColor: Colors.red,
                                               label: Text(skill),
                                               onDeleted: () {},
@@ -441,219 +576,157 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: 15),
-                          // padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 10),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'Language skills',
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        child: Row(
-                                          children: [
-                                            Text('Add'),
-                                            IconButton(
-                                              onPressed: () {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext
-                                                            context) =>
-                                                        UpdateSkillsDialog(
-                                                            skill_Type:
-                                                                'language skills'));
-                                              },
-                                              icon: Icon(
-                                                Icons.add,
-                                                color: Colors.amber,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Wrap(
-                                    spacing: 8.0,
-                                    runSpacing: 4.0,
-                                    children: [
-                                      ...languageSkills.map(
-                                        (skill) => Chip(
-                                          backgroundColor:
-                                              Color.fromARGB(255, 48, 214, 226),
-                                          deleteIconColor: Colors.red,
-                                          label: Text(skill),
-                                          onDeleted: () {},
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                              ],
                             ),
                           ),
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
-
-                        SizedBox(height: 20),
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: 20),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Experience',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  IconButton(
-                                      onPressed: () {
-                                        // showDialog(
-                                        //     context: context,
-                                        //     builder: (BuildContext context) =>
-                                        //         UpdateExperienceDialog());
-                                      },
-                                      icon: Icon(Icons.add))
-                                ],
+                      ),
+                      SizedBox(height: 20),
+                      Center(
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 20),
+                          width: MediaQuery.of(context).size.width - 150,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                addProfile = !addProfile;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: BorderSide.none,
                               ),
-                              SizedBox(height: 10),
-                              ListTile(
-                                // leading: CircleAvatar(
-                                //   backgroundImage: AssetImage('assets/images/logo1.jpg'),
-                                // ),
-                                title: Text(experience?['job title']),
-                                subtitle: Text(
-                                    '${experience?['company']},${startDate} - ${startDate}'),
-                                trailing: IconButton(
-                                    onPressed: () {
-                                      // showDialog(
-                                      //     context: context,
-                                      //     builder: (BuildContext context) =>
-                                      //         UpdateExperienceDialog());
-                                    },
-                                    icon: Icon(Icons.edit)),
-                              ),
-                              Divider(),
-                              ListTile(
-                                // leading: CircleAvatar(
-                                //   backgroundImage:
-                                //       AssetImage('assets/images/logo2.jpg'),
-                                // ),
-                                title: Text('Front-end Developer'),
-                                subtitle: Text('XYZ Inc., Sep 2018 - Dec 2019'),
-                                trailing: Icon(Icons.edit),
-                              ),
-                            ],
+                            ),
+                            child: const Text('Profile Completeness'),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: 20),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10),
+                      ),
+                      Container(
+                        height: addProfile ? 500 : 0,
+                        width: MediaQuery.of(context).size.width - 40,
+                        color: Colors.white,
+                        child: Visibility(
+                          child: MyTimeLineWrapper(
+                            personal: personalInfoSection =
+                                personalInfo?.isNotEmpty ?? false,
+                            education: educationSection =
+                                education?.isNotEmpty ?? false,
+                            experience: experienceSection =
+                                experience?.isNotEmpty ?? false,
+                            skills: skillSection = skills?.isNotEmpty ?? false,
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Education',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                          onPressed: () {
-                                            showDialog(
-                                                context: context,
-                                                builder: (BuildContext
-                                                        context) =>
-                                                    UpdateEducationDialog());
-                                          },
-                                          icon: Icon(Icons.edit)),
-                                      IconButton(
-                                          onPressed: () {
-                                            showDialog(
-                                                context: context,
-                                                builder: (BuildContext
-                                                        context) =>
-                                                    UpdateEducationDialog());
-                                          },
-                                          icon: Icon(Icons.add)),
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(height: 10),
-                              ListTile(
-                                // leading: CircleAvatar(
-                                //   backgroundImage:
-                                //       AssetImage('assets/images/university_logo.jpg'),
-                                // ),
-                                title: Text(
-                                    'Bachelor in ${education?['fieldOfStudy']} '),
-                                subtitle: Text(
-                                    'University of ABC, Sep 2014 - May 2018'),
-                              ),
-                            ],
-                          ),
+                          visible: addProfile,
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                      ]);
-                }),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
+
+class ImageCard extends StatelessWidget {
+  final String imagePath;
+  final String imageCaption;
+
+  const ImageCard({
+    Key? key,
+    required this.imagePath,
+    required this.imageCaption,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Image.asset(
+          imagePath,
+          fit: BoxFit.cover,
+        ),
+        Text(
+          imageCaption,
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
+  }
+}
+
+class UpdateSkillsDialog extends StatelessWidget {
+  final String skill_Type;
+
+  const UpdateSkillsDialog({Key? key, required this.skill_Type})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Add $skill_Type'),
+      content: TextField(),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {},
+          child: Text('Add'),
+        ),
+      ],
+    );
+  }
+}
+
+class UpdateEducationDialog extends StatelessWidget {
+  const UpdateEducationDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Update Education'),
+      content: TextField(),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {},
+          child: Text('Update'),
+        ),
+      ],
+    );
+  }
+}
+
+// class MyTimeLineWrapper extends StatelessWidget {
+//   final bool personal;
+//   final bool education;
+//   final bool experience;
+//   final bool skills;
+
+//   const MyTimeLineWrapper({
+//     Key? key,
+//     required this.personal,
+//     required this.education,
+//     required this.experience,
+//     required this.skills,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       child: Text('Timeline goes here...'),
+//     );
+//   }
+// }

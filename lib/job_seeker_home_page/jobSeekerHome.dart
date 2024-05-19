@@ -11,6 +11,7 @@ import 'package:project1/profile/job_seeker_profile.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project1/user_account/auth_page.dart';
+import 'package:project1/user_account/login_page.dart';
 import 'package:project1/user_account/rgister.dart';
 
 import '../Employers/models/jobs_model.dart';
@@ -92,7 +93,7 @@ class _homeState extends State<home> {
     return WillPopScope(
       onWillPop: () async {
         Navigator.pushNamedAndRemoveUntil(
-            context, HomePage.routeName, (route) => false);
+            context, LoginPage.routeName, (route) => false);
         return false;
       },
       child: Scaffold(

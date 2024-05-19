@@ -42,13 +42,14 @@ class _Job_detailState extends State<Job_detail> {
   @override
   void initState() {
     super.initState();
-    _loadState(widget.job);
+    _loadFavState(widget.job);
     _loadapplicationState(widget.job);
     getUserUid();
   }
 
-  Future<void> _loadState(DocumentSnapshot<Object?> job) async {
-    final state = await StatePersistence.getState(widget.job['JobId']);
+  Future<void> _loadFavState(DocumentSnapshot<Object?> job) async {
+    final state =
+        await StatePersistence.getFavState("favorite_${job['job id']}");
     setState(() {
       if (state != null) {
         favorite = state as bool;
@@ -58,21 +59,24 @@ class _Job_detailState extends State<Job_detail> {
 
   Future<void> _loadapplicationState(DocumentSnapshot<Object?> job) async {
     final state = await StatePersistence.getapplicationState(
-        job['JobId'] + 'application');
+        "application_${job['job id']}");
     setState(() {
       if (state != null) {
-        isButtonDisabled = state as bool;
+        isJobApplied = state as bool;
       }
     });
   }
 
-  Future<void> _saveState(DocumentSnapshot<Object?> job) async {
-    await StatePersistence.saveState(job['JobId'], favorite);
+  Future<void> _saveFavState(DocumentSnapshot<Object?> job) async {
+    // await StatePersistence.favState(job['job id'], favorite);
+    await StatePersistence.favState("favorite_${job['job id']}", true);
   }
 
   Future<void> _saveapplicationState(DocumentSnapshot<Object?> job) async {
+    // await StatePersistence.saveapplicatonState(
+    //     job['job id'] + 'application', isJobApplied);
     await StatePersistence.saveapplicatonState(
-        job['JobId'] + 'application', isButtonDisabled);
+        "application_${job['job id']}", true);
   }
 
   bool isLoggedIn = false;
@@ -144,21 +148,21 @@ class _Job_detailState extends State<Job_detail> {
     //   // Error occurred while adding the document
     //   print('Failed to add job to favorites: $error');
     // });
-    // _saveState(doc);
+    // _saveFavState(doc);
   }
 
 // Inside the _Job_detailState class
-  bool isButtonDisabled = false;
+  bool isJobApplied = false;
 
   void _handleApplyButtonTap(DocumentSnapshot<Object?> doc) {
     currentUser;
     if (isLoggedIn) {
-      if (!isButtonDisabled) {
+      if (!isJobApplied) {
         saveApplication(doc);
 
         setState(() {
-          isButtonDisabled = true;
-          print('is button dissabled : ${isButtonDisabled}');
+          isJobApplied = true;
+          print('is button dissabled : ${isJobApplied}');
         });
       } else {
         // Button already disabled, handle accordingly
@@ -285,7 +289,7 @@ class _Job_detailState extends State<Job_detail> {
 
   @override
   Widget build(BuildContext context) {
-    // _loadState();
+    // _loadFavState();
     // print('this is the index of listile ${widget.index}');
     // print(widget.job.data());
     // currentUser;
@@ -346,11 +350,13 @@ class _Job_detailState extends State<Job_detail> {
             Container(
               width: MediaQuery.of(context).size.width / 2 - 20,
               decoration: BoxDecoration(
-                  color: isButtonDisabled ? Colors.grey : Colors.blue,
-                  border: Border.all(
-                    color: Colors.blue,
-                    width: 2,
-                  ),
+                  color: isJobApplied ? Colors.grey : Colors.blue,
+                  border: !isJobApplied
+                      ? Border.all(
+                          color: Colors.blue,
+                          width: 2,
+                        )
+                      : Border.all(width: 0),
                   borderRadius: BorderRadius.circular(15)),
               child: TextButton(
                   onPressed: () {
@@ -360,10 +366,15 @@ class _Job_detailState extends State<Job_detail> {
                       onSurface: Colors.brown,
                     );
                   },
-                  child: Text(
-                    'Apply',
-                    style: TextStyle(color: Colors.white),
-                  )),
+                  child: !isJobApplied
+                      ? Text(
+                          'Apply',
+                          style: TextStyle(color: Colors.white),
+                        )
+                      : Text(
+                          'Applied',
+                          style: TextStyle(color: Colors.white),
+                        )),
             ),
             Container(
               //width: MediaQuery.of(context).size.width / 2 - 20,
@@ -396,23 +407,23 @@ class _Job_detailState extends State<Job_detail> {
 
   @override
   void dispose() {
-    _saveState(widget.job);
+    _saveFavState(widget.job);
     _saveapplicationState(widget.job);
     super.dispose();
   }
 }
 
 class StatePersistence {
-  static Future<bool> saveState(String key, dynamic value) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+  static Future<bool> favState(String key, dynamic value) async {
+    final SharedPreferences prefs1 = await SharedPreferences.getInstance();
     if (value is String) {
-      return await prefs.setString(key, value);
+      return await prefs1.setString(key, value);
     } else if (value is int) {
-      return await prefs.setInt(key, value);
+      return await prefs1.setInt(key, value);
     } else if (value is double) {
-      return await prefs.setDouble(key, value);
+      return await prefs1.setDouble(key, value);
     } else if (value is bool) {
-      return await prefs.setBool(key, value);
+      return await prefs1.setBool(key, value);
     } else {
       return false;
     }
@@ -433,7 +444,7 @@ class StatePersistence {
     }
   }
 
-  static Future<dynamic> getState(String key) async {
+  static Future<dynamic> getFavState(String key) async {
     final SharedPreferences prefs2 = await SharedPreferences.getInstance();
     return prefs2.get(key);
   }

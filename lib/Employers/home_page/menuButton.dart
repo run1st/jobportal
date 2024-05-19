@@ -31,7 +31,8 @@ class _popUpMenuState extends State<popUpMenu> {
               if (value == menu.logout)
                 {
                   FirebaseAuth.instance.signOut(),
-                  Navigator.pushReplacementNamed(context, EmpAuthPage.routName),
+                  //  Navigator.pushReplacementNamed(context, EmpAuthPage.routName),
+                  Navigator.pop(context),
                 }
             },
         itemBuilder: (context) => [

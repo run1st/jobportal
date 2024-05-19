@@ -36,14 +36,14 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
 
   bool isJobSeeker = false;
   Future<void> checkUserRole(String uid) async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      return;
-    }
+    // User? user = FirebaseAuth.instance.currentUser;
+    // if (user == null) {
+    //   return;
+    // }
 
     DocumentSnapshot userData = await FirebaseFirestore.instance
         .collection('job-seeker')
-        .doc(user.uid)
+        .doc(uid)
         .get();
     if (userData.exists) {
       String role = userData.get('role');
@@ -66,59 +66,7 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
   }
 
   bool _showProgressIndicator = false;
-  // Future signIn() async {
-  //   setState(() {
-  //     _showProgressIndicator = true;
-  //   });
-  //   Visibility(
-  //     visible: _showProgressIndicator,
-  //     child: Center(
-  //       child: CircularProgressIndicator(),
-  //     ),
-  //   );
-  //   // showDialog(
-  //   //     context: context,
-  //   //     barrierDismissible: false,
-  //   //     builder: (context) => Center(
-  //   //           child: CircularProgressIndicator(),
-  //   //         ));
 
-  //   try {
-  //     await FirebaseAuth.instance
-  //         .signInWithEmailAndPassword(
-  //             email: emailController.text.trim(),
-  //             password: passwordController1.text.trim())
-  //         .then((value) {
-  //       checkUserRole(value.toString());
-  //     });
-  //     if (isJobSeeker) {
-  //       Navigator.pushNamed(context, VerifyEmail.routeName);
-  //     } else {
-  //       Utils.showSnackBar('Job seeker not found', Colors.red);
-  //       FirebaseAuth.instance.signOut();
-  //     }
-
-  //     // if (isJobSeeker) {
-  //     //   Navigator.pushNamed(context, home.routeName);
-  //     //   //  Navigator.of(context).pop();
-  //     //   // Utils.showSnackBar('Job seeker not found', Colors.red);
-  //     //   // FirebaseAuth.instance.signOut();
-  //     // } else {
-  //     //   Utils.showSnackBar('Job seeker not found', Colors.red);
-  //     //   FirebaseAuth.instance.signOut();
-  //     //   //  Navigator.of(context).pop();
-  //     // }
-  //   } on FirebaseAuthException catch (e) {
-  //     Utils.showSnackBar(e.message, Colors.red);
-  //     print(e.message);
-  //   }
-  //   setState(() {
-  //     _showProgressIndicator = false;
-  //   });
-  //   // if (mounted) {
-  //   //   Navigator.of(context).pop();
-  //   // }
-  // }
   Future<void> signIn() async {
     setState(() {
       _showProgressIndicator = true; // Show progress indicator
@@ -133,8 +81,14 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
       // Check if sign-in was successful
       if (userCredential.user != null) {
         // Authentication successful, check user role
-        checkUserRole(userCredential.user!.uid);
-        if (isJobSeeker) {}
+        await checkUserRole(userCredential.user!.uid);
+        if (isJobSeeker) {
+          Navigator.of(context).pushNamed(home.routeName);
+        } else {
+          FirebaseAuth.instance.signOut();
+          Utils.showSnackBar(context, 'Job seeker not found', Colors.red);
+          print('Job seeker not found');
+        }
       } else {
         // Authentication failed (user is null)
         Utils.showSnackBar(context, 'Sign-in failed', Colors.red);
@@ -145,6 +99,7 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
       print('FirebaseAuthException: ${e.message}');
     } catch (e) {
       // Handle other errors
+      FirebaseAuth.instance.signOut();
       Utils.showSnackBar(context, 'Sign-in failed: $e', Colors.red);
       print('Error: $e');
     } finally {
@@ -152,7 +107,6 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
         _showProgressIndicator = false;
       });
       // Navigate to VerifyEmail screen
-      Navigator.pushNamed(context, VerifyEmail.routeName);
     }
   }
 

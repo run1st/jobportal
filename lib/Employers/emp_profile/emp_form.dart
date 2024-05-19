@@ -92,10 +92,27 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
   String companySzeSelected = '';
   String? companyLogo;
 
-  List<String> _dropdownItems = [
-    'Option 1',
-    'Option 2',
-    'Option 3',
+  List<String> industryType = [
+    'Agriculture',
+    'Automotive',
+    'Banking and Finance',
+    'Construction',
+    'Education',
+    'Energy',
+    'Healthcare',
+    'Tourism',
+    'Information Technology',
+    'Manufacturing',
+    'Media and Entertainment',
+    'NGO'
+  ];
+  List<String> companySize = [
+    'Self-Employed',
+    'Small Business',
+    'Small-Medium Business',
+    'Medium Business',
+    'Medium-Large Business',
+    'Large Business' 'Enterprise'
   ];
   @override
   Widget build(BuildContext context) {
@@ -147,7 +164,7 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                         ),
                       ),
                       validator: (value) {
-                        if (value == null) {
+                        if (value!.isEmpty) {
                           return 'Please enter contact person name';
                         }
                         return null;
@@ -184,7 +201,7 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                         ),
                       ),
                       validator: (value) {
-                        if (value == null) {
+                        if (value!.isEmpty) {
                           return 'Please enter the company name';
                         }
                         return null;
@@ -358,7 +375,8 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                       validator: (value) {
                         if (value == null) {
                           return 'Please enter your phone number';
-                        }
+                        } else if (value.length < 10)
+                          return 'Please enter your phone number';
                         return null;
                       },
                       onSaved: (newValue) {
@@ -480,6 +498,13 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                           ),
                         ),
                       ),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter your company detail.';
+                        } else if (value.toString().split(' ').length < 50) {
+                          return 'Please enter at least 50 words.';
+                        }
+                      },
                       onSaved: (newValue) {
                         if (newValue != null) comapnyDesription = newValue;
                       },
@@ -513,7 +538,7 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                           }
                         }),
                         // value: _IndustryTypeselected,
-                        items: _dropdownItems.map((item) {
+                        items: industryType.map((item) {
                           return DropdownMenuItem(
                             child: Text(item),
                             value: item,
@@ -553,7 +578,7 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                           }
                         }),
                         // value: companySzeSelected,
-                        items: _dropdownItems.map((item) {
+                        items: companySize.map((item) {
                           return DropdownMenuItem(
                             child: Text(item),
                             value: item,
@@ -579,21 +604,12 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Container(
-                        width: MediaQuery.of(context).size.width / 3,
+                        width: MediaQuery.of(context).size.width * 3 / 4,
                         child: ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                                minimumSize: Size.fromHeight(50)),
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, Emp_home.routeName);
-                            },
-                            icon: Icon(Icons.arrow_back),
-                            label: Text('Back')),
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width / 3,
-                        child: ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide.none,
+                                    borderRadius: BorderRadius.circular(15)),
                                 minimumSize: Size.fromHeight(50)),
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
