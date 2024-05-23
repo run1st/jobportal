@@ -97,8 +97,8 @@ class _Emp_homeState extends State<Emp_home> {
                               borderRadius: BorderRadius.circular(10)),
                           minimumSize: const Size.fromHeight(80),
                         ),
-                        onPressed: () => Navigator.of(context)
-                            .pushNamed(EmployerRegistrationForm.routeName),
+                        onPressed: () => Navigator.pushNamed(
+                            context, EmployerRegistrationForm.routeName),
                         icon: Icon(Icons.book),
                         label: Text('Fill your company Profile')),
                   ),

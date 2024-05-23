@@ -69,20 +69,20 @@ class Company {
 
 //Job Post Model
 class JobPost {
-  DateTime timePosted;
+  String timePosted;
   String JobId;
   String title;
   String category;
   String description;
   List requirements;
 
-  String salary;
+  String? salary;
   String employmentType;
   String location;
   String experienceLevel;
   String educationLevel;
-  DateTime deadline;
-  var company;
+  String deadline;
+  Map<String, dynamic>? company;
   //bool isFavorite;
 
   JobPost({
@@ -111,8 +111,8 @@ class JobPost {
       requirements: json['requirements'],
       location: json['location'],
       salary: json['salary'],
-      deadline: DateTime.parse(json['deadline']),
-      company: Company.fromJson(json['company']),
+      deadline: json['deadline'],
+      company: json['company'],
       employmentType: json['employment type'],
       experienceLevel: json['experience level'],
       educationLevel: json['education level'],
@@ -129,7 +129,7 @@ class JobPost {
       'requirements': requirements,
       'location': location,
       'salary': salary,
-      'deadline': deadline.toIso8601String(),
+      'deadline': deadline,
       'company': company,
       'employment type': employmentType,
       'experience level': experienceLevel,

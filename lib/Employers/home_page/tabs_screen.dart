@@ -74,11 +74,11 @@ class _TabsScreenState extends State<TabsScreen> {
               child: Icon(Icons.post_add),
               label: 'job posts',
             ),
-            CurvedNavigationBarItem(
+            const CurvedNavigationBarItem(
                 //   backgroundColor: Colors.blue,
                 child: Icon(Icons.people),
                 label: 'candidates'),
-            CurvedNavigationBarItem(
+            const CurvedNavigationBarItem(
                 //  backgroundColor: Colors.blue,
                 child: Icon(Icons.notification_add),
                 label: 'not')

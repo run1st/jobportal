@@ -112,6 +112,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
+                              SizedBox(
+                                height: 20,
+                              ),
                               const Text.rich(
                                 TextSpan(children: [
                                   TextSpan(text: 'There is no'),
@@ -133,7 +136,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               Container(
                                 margin: const EdgeInsets.only(top: 20),
-                                width: MediaQuery.of(context).size.width - 200,
+                                width: MediaQuery.of(context).size.width - 100,
                                 child: ElevatedButton(
                                   onPressed: () {
                                     setState(() {
@@ -146,11 +149,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                       side: BorderSide.none,
                                     ),
                                   ),
-                                  child: const Text('Profile Completeness'),
+                                  child: const Text('ADD PROFILE'),
                                 ),
                               ),
                               Container(
-                                height: addProfile ? 500 : 0,
+                                height: addProfile ? 400 : 0,
                                 width: MediaQuery.of(context).size.width - 40,
                                 color: Colors.white,
                                 child: Visibility(
@@ -603,7 +606,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       Container(
-                        height: addProfile ? 500 : 0,
+                        height: addProfile ? 400 : 0,
                         width: MediaQuery.of(context).size.width - 40,
                         color: Colors.white,
                         child: Visibility(

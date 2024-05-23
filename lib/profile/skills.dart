@@ -27,12 +27,23 @@ class SkillSet extends StatefulWidget {
 }
 
 class _SkillSetState extends State<SkillSet> {
-  final List<String> salaryExpectation = [
-    '>2000',
-    '>3000',
-    '>5000',
-    '>10000',
-    '>20000'
+  String? selectedSalaryRange;
+
+  List<String> salaryExpectation = [
+    '1,000 - 5,000'
+        '5,000 - 10,000',
+    '10,000 - 20,000',
+    '20,000 - 30,000',
+    '30,000 - 40,000',
+    '40,000 - 50,000',
+    '50,000 - 60,000',
+    '60,000 - 70,000',
+    '70,000 - 80,000',
+    '80,000 - 90,000',
+    '90,000 - 100,000',
+    '100,000 - 110,000',
+    '110,000 - 120,000',
+    'Above 120,000',
   ];
   List experienceLevel = [
     'Fresh',
@@ -42,6 +53,42 @@ class _SkillSetState extends State<SkillSet> {
     '10 years',
     '> 10 years'
   ];
+  List<String> jobTitles = [
+    'Accountant',
+    'Architect',
+    'Business Analyst',
+    'Business Development Manager',
+    'Civil Engineer',
+    'Content Writer',
+    'Data Analyst',
+    'Data Scientist',
+    'Database Administrator',
+    'DevOps Engineer',
+    'Electrical Engineer',
+    'Flutter Developer',
+    'Full Stack Developer',
+    'Game Developer',
+    'Graphic Designer',
+    'Human Resources Manager',
+    'IT Project Coordinator',
+    'Lawyer',
+    'Marketing Manager',
+    'Mechanical Engineer',
+    'Network Engineer',
+    'Nurse',
+    'Pharmacist',
+    'Product Manager',
+    'Project Manager',
+    'Software Engineer',
+    'Software Tester',
+    'Solution Architect',
+    'System Administrator',
+    'Teacher',
+    'Doctor'
+        'UI/UX Designer',
+    'Web Developer' 'other'
+  ];
+
   var experienceLevelChoosed;
   var salaryLevelChoosed;
   String? _jobPreference;
@@ -211,7 +258,7 @@ class _SkillSetState extends State<SkillSet> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Skills'),
+        title: Text('Skills *'),
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -241,13 +288,22 @@ class _SkillSetState extends State<SkillSet> {
                   width: MediaQuery.of(context).size.width * 4 / 5,
                   child: TextFormField(
                     // onSubmitted: _addProffSkill,
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Add professional skill';
+                      } else {
+                        return null;
+                      }
+                    },
                     controller: profSkillController,
                     decoration: InputDecoration(
                       label: Text(' Professional skills'),
                       suffixIcon: IconButton(
                           onPressed: () {
-                            _addProffSkill(profSkillController.text);
-                            profSkillController.clear();
+                            if (profSkillController.text.isNotEmpty) {
+                              _addProffSkill(profSkillController.text);
+                              profSkillController.clear();
+                            }
                           },
                           icon: Icon(
                             Icons.add,
@@ -292,14 +348,23 @@ class _SkillSetState extends State<SkillSet> {
                   //     left: 60.0, right: 10.0, top: 10.0, bottom: 10.0),
                   width: MediaQuery.of(context).size.width * 4 / 5,
                   child: TextFormField(
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Add professional skill';
+                      } else {
+                        return null;
+                      }
+                    },
                     // onChanged: _addPersonalSkill,
                     controller: persSkillController,
                     decoration: InputDecoration(
                       label: Text(' personal skills'),
                       suffixIcon: IconButton(
                           onPressed: () {
-                            _addPersonalSkill(persSkillController.text);
-                            persSkillController.clear();
+                            if (profSkillController.text.isNotEmpty) {
+                              _addPersonalSkill(persSkillController.text);
+                              persSkillController.clear();
+                            }
                           },
                           icon: Icon(
                             Icons.add,
@@ -344,14 +409,23 @@ class _SkillSetState extends State<SkillSet> {
                   //     left: 60.0, right: 10.0, top: 10.0, bottom: 10.0),
                   width: MediaQuery.of(context).size.width * 4 / 5,
                   child: TextFormField(
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Add professional skill';
+                      } else {
+                        return null;
+                      }
+                    },
                     //onChanged: _addLanguageSkill,
                     controller: langSkillController,
                     decoration: InputDecoration(
                       label: Text(' Language skills'),
                       suffixIcon: IconButton(
                           onPressed: () {
-                            _addLanguageSkill(langSkillController.text);
-                            langSkillController.clear();
+                            if (profSkillController.text.isNotEmpty) {
+                              _addLanguageSkill(langSkillController.text);
+                              langSkillController.clear();
+                            }
                           },
                           icon: Icon(
                             Icons.add,
@@ -387,58 +461,15 @@ class _SkillSetState extends State<SkillSet> {
                   ],
                 ),
               ),
-              // Text('Achievements'),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: [
-              //     Container(
-              //       // padding: EdgeInsets.only(
-              //       //     left: 60.0, right: 10.0, top: 10.0, bottom: 10.0),
-              //       width: MediaQuery.of(context).size.width * 4 / 5,
-              //       child: TextFormField(
-              //         // onSubmitted: _addAchivSkill,
-              //         controller: achivSkillController,
-              //         decoration: InputDecoration(
-              //           label: Text(' achivement skills'),
-              //           suffixIcon: IconButton(
-              //               onPressed: () {
-              //                 _addAchivSkill(profSkillController.text);
-              //               },
-              //               icon: Icon(
-              //                 Icons.add,
-              //                 color: Colors.pink,
-              //               )),
-              //           border: OutlineInputBorder(
-              //             borderRadius: BorderRadius.circular(10.0),
-              //             borderSide: BorderSide(
-              //               color: Colors.grey,
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //     ),
-              //   ],
-              // ),
+
               SizedBox(
                 height: 10,
               ),
-              // Wrap(
-              //   spacing: 8.0,
-              //   runSpacing: 4.0,
-              //   children: [
-              //     ...achivSkill.map(
-              //       (skill) => Chip(
-              //         label: Text(skill),
-              //         onDeleted: () => _removeAchivSkill(skill),
-              //       ),
-              //     ),
-              //   ],
-              // ),
 
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                child: Text('Tell us about yourself'),
+                child: Text('Tell us about yourself *'),
               ),
               SizedBox(height: 16.0),
               Padding(
@@ -453,6 +484,15 @@ class _SkillSetState extends State<SkillSet> {
                       onSaved: (newValue) {
                         if (newValue != null) about = newValue;
                       },
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Say something about yourself.';
+                        } else if (value.toString().split(' ').length < 50) {
+                          return 'Please enter at least 50 words.';
+                        } else {
+                          return null;
+                        }
+                      },
                       maxLines: 10,
                       decoration: InputDecoration(
                         labelText: 'summary',
@@ -464,19 +504,19 @@ class _SkillSetState extends State<SkillSet> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Colors.blue,
                           ),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Colors.red,
                           ),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Colors.red,
                           ),
                         ),
@@ -485,48 +525,46 @@ class _SkillSetState extends State<SkillSet> {
                   ),
                 ),
               ),
-              Text('Preferred job'),
+              const Text('Preferred job '),
+
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Job Title',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                        color: Colors.grey,
+                child: DropdownButtonFormField(
+                    decoration: InputDecoration(
+                      // labelStyle: TextStyle(color: Colors.white),
+                      // filled: true,
+                      // fillColor: Colors.lightBlue,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.grey),
                       ),
+                      // filled: true,
+                      // fillColor: Colors.blue,
+                      hintText: 'Select an option',
+                      hintStyle: TextStyle(color: Colors.grey),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                        color: Colors.blue,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                        color: Colors.red,
-                      ),
-                    ),
-                    focusedErrorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter a job title';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _jobPreference = value;
-                  },
-                ),
+                    validator: ((value) {
+                      if (value == null) {
+                        return 'please select an option';
+                      } else {
+                        return null;
+                      }
+                    }),
+                    value: _jobPreference,
+                    items: jobTitles.map((item) {
+                      return DropdownMenuItem(
+                        child: Text(item),
+                        value: item,
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _jobPreference = value.toString();
+                      });
+                    }),
               ),
               SizedBox(height: 16.0),
               Text('Salary Expectation'),
@@ -549,9 +587,11 @@ class _SkillSetState extends State<SkillSet> {
                     validator: ((value) {
                       if (value == null) {
                         return 'please select an option';
+                      } else {
+                        return null;
                       }
                     }),
-                    value: salaryLevelChoosed,
+                    value: selectedSalaryRange,
                     items: salaryExpectation.map((item) {
                       return DropdownMenuItem(
                         child: Text(item),
@@ -560,7 +600,7 @@ class _SkillSetState extends State<SkillSet> {
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
-                        salaryLevelChoosed = value.toString();
+                        selectedSalaryRange = value.toString();
                       });
                     }),
               ),
@@ -584,6 +624,8 @@ class _SkillSetState extends State<SkillSet> {
                     validator: ((value) {
                       if (value == null) {
                         return 'please select an option';
+                      } else {
+                        return null;
                       }
                     }),
                     value: experienceLevelChoosed,
@@ -609,68 +651,71 @@ class _SkillSetState extends State<SkillSet> {
               SizedBox(
                 height: 15,
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState?.save();
-                    final skill_Set = Skill(
-                        languageSkills: languageSkill,
-                        personalSkills: personalSkill,
-                        professionalSkills: proffesionalSkill);
-                    //  _uploadFile(); //uploades image to firebase storage
-                    final other_info = Other(
-                        aboutMe: about,
-                        imageUrl: _imageUrl,
-                        preferredJob: _jobPreference,
-                        SalaryExpectation: salaryLevelChoosed,
-                        levelOfExperience: experienceLevelChoosed);
-                    try {
-                      await saveSkillInfo(skill_Set);
-                      await _uploadFile();
+              Container(
+                height: 45,
+                width: MediaQuery.of(context).size.width - 100,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState?.save();
+                      final skill_Set = Skill(
+                          languageSkills: languageSkill,
+                          personalSkills: personalSkill,
+                          professionalSkills: proffesionalSkill);
+                      //  _uploadFile(); //uploades image to firebase storage
+                      final other_info = Other(
+                          aboutMe: about,
+                          imageUrl: _imageUrl,
+                          preferredJob: _jobPreference,
+                          SalaryExpectation: salaryLevelChoosed,
+                          levelOfExperience: experienceLevelChoosed);
+                      try {
+                        await saveSkillInfo(skill_Set);
+                        await _uploadFile();
 
-                      await saveOtherInfo(other_info);
-                      // user_reference
-                      //     .doc(currentUser)
-                      //     .collection('profile')
-                      //     .doc('About')
-                      //     .set({'summary': about});
+                        await saveOtherInfo(other_info);
+                        // user_reference
+                        //     .doc(currentUser)
+                        //     .collection('profile')
+                        //     .doc('About')
+                        //     .set({'summary': about});
 
-                      // uploadImage();
-                      // addImageToFirestore();
-                      // uploadFile();
+                        // uploadImage();
+                        // addImageToFirestore();
+                        // uploadFile();
 
-                      Utils.showSnackBar(
-                          context, 'Profile successfuly saved', Colors.green);
-                      Navigator.of(context).pop();
-                    } catch (e) {
-                      print('Error during saving: $e');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                              'Error saving information. Please try again.'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                        Utils.showSnackBar(
+                            context, 'Profile successfuly saved', Colors.green);
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pushNamed(
+                          home.routeName,
+                        );
+                      } catch (e) {
+                        print('Error during saving: $e');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Error saving information. Please try again.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
-                  }
-
-                  Navigator.of(context).pushNamed(
-                    home.routeName,
-                  );
-                },
-                // icon: Icon(Icons.navigate_next),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size.fromHeight(50),
-                  maximumSize: Size.fromWidth(30),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                  },
+                  // icon: Icon(Icons.navigate_next),
+                  style: ElevatedButton.styleFrom(
+                    // minimumSize: Size.fromHeight(50),
+                    // maximumSize: Size.fromWidth(50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    // primary: Colors.blue[900],
+                    padding: EdgeInsets.all(10.0),
+                    elevation: 10.0,
                   ),
-                  // primary: Colors.blue[900],
-                  padding: EdgeInsets.all(10.0),
-                  elevation: 10.0,
+                  //ElevatedButton.styleFrom(minimumSize: Size.fromWidth(50)),
+                  child: Text('Finish'),
                 ),
-                //ElevatedButton.styleFrom(minimumSize: Size.fromWidth(50)),
-                child: Text('Finish'),
               ),
               SizedBox(
                 height: 15,

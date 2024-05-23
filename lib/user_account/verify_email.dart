@@ -39,7 +39,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
       setState(() {
         canResendEmail = false;
       });
-      await Future.delayed(Duration(seconds: 3));
+      await Future.delayed(Duration(seconds: 4));
       setState(() {
         canResendEmail = true;
       });

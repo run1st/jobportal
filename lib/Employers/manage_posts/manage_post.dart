@@ -145,7 +145,7 @@ class _Manage_postsState extends State<Manage_posts> {
                               dense: false,
                               leading: CircleAvatar(
                                 foregroundImage: NetworkImage(jobPosting[
-                                        'company']['logoUrl'] ??
+                                        'company']?['logoUrl'] ??
                                     'https://www.bing.com/images/search?view=detailV2&ccid=q182Q4Zy&id=D8C88B9D55DB76A095EADD6BDE4D4DF28EFD9B65&thid=OIP.q182Q4ZyCS-WUHuYGfac4QHaDt&mediaurl=https%3a%2f%2fhitechengineeringindia.com%2fimg%2fheader-img%2fprofile.jpg&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.ab5f36438672092f96507b9819f69ce1%3frik%3dZZv9jvJNTd5r3Q%26pid%3dImgRaw%26r%3d0&exph=834&expw=1666&q=image+for+company+profile+picture&simid=608015538228691274&FORM=IRPRST&ck=97AE052C55DA4BCF742295A439E9F6CE&selectedIndex=22'),
 
                                 // :child: Icon(Icons.person),

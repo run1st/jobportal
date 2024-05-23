@@ -57,7 +57,7 @@ class _JobSeekerSignUPFormState extends State<JobSeekerSignUPForm> {
     if (!isValid) return;
 
     setState(() {
-      _isSigningUp = true; // Set flag to true when signing up
+      _isSigningUp = true;
     });
 
     try {
@@ -80,8 +80,8 @@ class _JobSeekerSignUPFormState extends State<JobSeekerSignUPForm> {
       print('FirebaseAuthException: ${e.code}');
       // Show error message using SnackBar
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.message ?? 'An error occurred.'),
+        const SnackBar(
+          content: Text('Some problem occurred.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -201,6 +201,8 @@ class _JobSeekerSignUPFormState extends State<JobSeekerSignUPForm> {
                         : null;
                     if (passwordController2.text != passwordController1.text) {
                       return 'Password is not match';
+                    } else {
+                      return value;
                     }
                   }),
               SizedBox(
@@ -211,8 +213,7 @@ class _JobSeekerSignUPFormState extends State<JobSeekerSignUPForm> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    minimumSize: Size.fromHeight(
-                        MediaQuery.of(context).size.height - 670)),
+                    minimumSize: Size.fromHeight(60)),
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     formKey.currentState?.save();

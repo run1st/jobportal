@@ -31,12 +31,20 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
     });
   }
 
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return user.uid;
-    } else {
-      return '';
+  String? currentUser;
+
+  Future<void> getUserUid() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUser = user.uid;
+        });
+      } else {
+        print('No user is signed in.');
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
     }
   }
 
@@ -44,18 +52,32 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
     print('your image path is : ${_image}');
   }
 
-  Future saveEmployerInfo(Company companyInfonfo) async {
-    final emp_document_ref = FirebaseFirestore.instance
-        .collection('employer')
-        .doc(getCurrentUserUid());
-    final emp_profile_ref =
-        emp_document_ref.collection('company profile').doc('profile');
-    _companyId = emp_document_ref.id;
-    final json = companyInfonfo.toJson();
-    await emp_profile_ref
-        // .collection('Employer profile')
-        // .doc('personal_info')
-        .set(json);
+  Future<void> saveEmployerInfo(Company companyInfo) async {
+    try {
+      if (currentUser == null) {
+        throw Exception('currentUser is null');
+      }
+
+      final empDocRef =
+          FirebaseFirestore.instance.collection('employer').doc(currentUser);
+      final empProfileRef =
+          empDocRef.collection('company profile').doc('profile');
+      setState(() {
+        _companyId = empDocRef.id;
+      });
+
+      final json = companyInfo.toJson();
+
+      print('Saving company info: ${json}');
+      await empProfileRef.set(json);
+      print('Company info saved successfully.');
+    } on FirebaseException catch (e) {
+      print('Error saving company info: ${e.message}');
+      throw Exception('Error saving company info: ${e.message}');
+    } catch (e) {
+      print('Error saving company info: $e');
+      throw Exception('Error saving company info: $e');
+    }
   }
 
   String? _uploadedFileURL;
@@ -82,14 +104,14 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
   String _city = '';
   String _state = '';
   String _country = '';
-  String _zipCode = '';
+
   String companyName = '';
   String phoneNumber = '';
   String email = '';
   String companyWebsite = '';
   String comapnyDesription = '';
   String _IndustryTypeselected = '';
-  String companySzeSelected = '';
+  String companySzeSelected = 'Self-Employed';
   String? companyLogo;
 
   List<String> industryType = [
@@ -114,6 +136,13 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
     'Medium-Large Business',
     'Large Business' 'Enterprise'
   ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserUid();
+  }
+
   @override
   Widget build(BuildContext context) {
     // printImagePath();
@@ -159,9 +188,8 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blueAccent),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                            borderSide:
+                                BorderSide(color: Colors.blue, width: 2)),
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -196,9 +224,8 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blueAccent),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                            borderSide:
+                                BorderSide(color: Colors.blue, width: 2)),
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -232,6 +259,9 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                             width: 2.0,
                           ),
                         ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.blue, width: 2)),
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -265,6 +295,9 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                             width: 2.0,
                           ),
                         ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.blue, width: 2)),
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -297,6 +330,9 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                             width: 2.0,
                           ),
                         ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.blue, width: 2)),
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -329,15 +365,18 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                             width: 2.0,
                           ),
                         ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.blue, width: 2)),
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
-                          return 'Please enter a state';
+                          return 'Please enter a country';
                         }
                         return null;
                       },
                       onSaved: (value) {
-                        if (value != null) _state = value;
+                        if (value != null) _country = value;
                       },
                     ),
                   ),
@@ -363,9 +402,8 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blueAccent),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                            borderSide:
+                                BorderSide(color: Colors.blue, width: 2)),
                       ),
                       style: TextStyle(
                         color: Colors.grey[800],
@@ -403,6 +441,9 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                             width: 2.0,
                           ),
                         ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.blue, width: 2)),
                       ),
                       validator: (value) {
                         if (value == null) {
@@ -504,6 +545,7 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                         } else if (value.toString().split(' ').length < 50) {
                           return 'Please enter at least 50 words.';
                         }
+                        return null;
                       },
                       onSaved: (newValue) {
                         if (newValue != null) comapnyDesription = newValue;
@@ -520,35 +562,42 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 15.0, vertical: 10.0),
                     child: DropdownButtonFormField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.grey),
-                          ),
-                          filled: true,
-                          fillColor: Colors.blue[50],
-                          hintText: 'Select an option',
-                          // hintStyle: TextStyle(color: Colors.white),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.grey),
                         ),
-                        validator: ((value) {
-                          if (value == null) {
-                            return 'please select an option';
-                          }
-                        }),
-                        // value: _IndustryTypeselected,
-                        items: industryType.map((item) {
-                          return DropdownMenuItem(
-                            child: Text(item),
-                            value: item,
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _IndustryTypeselected = value.toString();
-                          });
-                        }),
+                        filled: true,
+                        fillColor: Colors.blue[50],
+                        hintText: 'Select an option',
+                        // hintStyle: TextStyle(color: Colors.white),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      ),
+                      validator: ((value) {
+                        if (value == null) {
+                          return 'please select an option';
+                        } else {
+                          return null;
+                        }
+                      }),
+                      // value: _IndustryTypeselected,
+                      items: industryType.map((item) {
+                        return DropdownMenuItem(
+                          child: Text(item),
+                          value: item,
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _IndustryTypeselected = value.toString();
+                        });
+                      },
+                      onSaved: (newValue) {
+                        if (newValue != null)
+                          _IndustryTypeselected = newValue.toString();
+                      },
+                    ),
                   ),
                   SizedBox(height: 16.0),
                   Text(
@@ -560,35 +609,42 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 15.0, vertical: 10.0),
                     child: DropdownButtonFormField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.grey),
-                          ),
-                          filled: true,
-                          fillColor: Colors.blue[50],
-                          hintText: 'Select an option',
-                          // hintStyle: TextStyle(color: Colors.white),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.grey),
                         ),
-                        validator: ((value) {
-                          if (value == null) {
-                            return 'please select an option';
-                          }
-                        }),
-                        // value: companySzeSelected,
-                        items: companySize.map((item) {
-                          return DropdownMenuItem(
-                            child: Text(item),
-                            value: item,
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            companySzeSelected = value.toString();
-                          });
-                        }),
+                        filled: true,
+                        fillColor: Colors.blue[50],
+                        hintText: 'Select an option',
+                        // hintStyle: TextStyle(color: Colors.white),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      ),
+                      validator: ((value) {
+                        if (value == null) {
+                          return 'please select an option';
+                        } else {
+                          return null;
+                        }
+                      }),
+                      value: companySzeSelected,
+                      items: companySize.map((item) {
+                        return DropdownMenuItem(
+                          child: Text(item),
+                          value: item,
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          companySzeSelected = value.toString();
+                        });
+                      },
+                      onSaved: (newValue) {
+                        if (newValue != null)
+                          companySzeSelected = newValue.toString();
+                      },
+                    ),
                   ),
                   // CompanyLogoPicker(onImageSelected: _onImageSelected),
                   Text(
@@ -605,53 +661,138 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                     children: [
                       Container(
                         width: MediaQuery.of(context).size.width * 3 / 4,
-                        child: ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                    side: BorderSide.none,
-                                    borderRadius: BorderRadius.circular(15)),
-                                minimumSize: Size.fromHeight(50)),
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                _formKey.currentState?.save();
-                                _uploadFile();
-                                final companyInfo = Company(
-                                    companyId: _companyId,
-                                    name: companyName,
-                                    address: _streetAddress,
-                                    city: _city,
-                                    state: _state,
-                                    country: _country,
-                                    phone: phoneNumber,
-                                    email: email,
-                                    website: companyWebsite,
-                                    description: comapnyDesription,
-                                    industry: _IndustryTypeselected,
-                                    companySize: companySzeSelected,
-                                    logoUrl: companyLogo as String);
-                                try {
-                                  saveEmployerInfo(companyInfo);
+                        // child: ElevatedButton.icon(
+                        //     style: ElevatedButton.styleFrom(
+                        //         shape: RoundedRectangleBorder(
+                        //             side: BorderSide.none,
+                        //             borderRadius: BorderRadius.circular(15)),
+                        //         minimumSize: Size.fromHeight(50)),
+                        //     onPressed: () async {
+                        //       if (_formKey.currentState!.validate()) {
+                        //         _formKey.currentState?.save();
+                        //         if (currentUser == null) {
+                        //           print('Error: currentUser is null');
+                        //           ScaffoldMessenger.of(context).showSnackBar(
+                        //             SnackBar(
+                        //               content:
+                        //                   Text('Error: No user signed in.'),
+                        //               backgroundColor: Colors.red,
+                        //             ),
+                        //           );
+                        //           return;
+                        //         }
+                        //         await _uploadFile();
+                        //         final companyInfo = Company(
+                        //             companyId: _companyId,
+                        //             name: companyName,
+                        //             address: _streetAddress,
+                        //             city: _city,
+                        //             state: _state,
+                        //             country: _country,
+                        //             phone: phoneNumber,
+                        //             email: email,
+                        //             website: companyWebsite,
+                        //             description: comapnyDesription,
+                        //             industry: _IndustryTypeselected,
+                        //             companySize: companySzeSelected,
+                        //             logoUrl: companyLogo as String);
+                        //         print('company info is ${companyInfo}');
+                        //         try {
+                        //           await saveEmployerInfo(companyInfo);
 
-                                  EmpUtils.showSnackBar(
-                                      'sucessfully saved', Colors.green);
-                                } on FirebaseException catch (e) {
-                                  EmpUtils.showSnackBar(e.message, Colors.red);
-                                }
-                                // Navigator.pushNamed(
-                                //   context,
-                                //   TabsScreen.routeName,
-                                // );
+                        //           // EmpUtils.showSnackBar(
+                        //           //     'sucessfully saved', Colors.green);
+                        //           ScaffoldMessenger.of(context).showSnackBar(
+                        //             const SnackBar(
+                        //               content: Text('Successfully saved'),
+                        //               backgroundColor: Colors.green,
+                        //             ),
+                        //           );
+                        //           Navigator.pushNamed(
+                        //               context, TabsScreen.routeName,
+                        //               arguments: companyInfo);
+                        //         } catch (e) {
+                        //           print('Error during saving: $e');
+                        //           ScaffoldMessenger.of(context).showSnackBar(
+                        //             const SnackBar(
+                        //               content: Text(
+                        //                   'Error saving information. Please try again.'),
+                        //               backgroundColor: Colors.red,
+                        //             ),
+                        //           );
+                        //         }
+                        //       }
+                        //     },
+                        //     icon: const Icon(Icons.arrow_forward),
+                        //     label: const Text('Save ')),
+
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(15)),
+                              minimumSize: Size.fromHeight(50)),
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState?.save();
+                              if (currentUser == null) {
+                                print('Error: currentUser is null');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Error: No user signed in.'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                                return;
+                              }
+                              await _uploadFile();
+                              final companyInfo = Company(
+                                  companyId: _companyId,
+                                  name: companyName,
+                                  address: _streetAddress,
+                                  city: _city,
+                                  state: _state,
+                                  country: _country,
+                                  phone: phoneNumber,
+                                  email: email,
+                                  website: companyWebsite,
+                                  description: comapnyDesription,
+                                  industry: _IndustryTypeselected,
+                                  companySize: companySzeSelected,
+                                  logoUrl: companyLogo as String);
+                              try {
+                                await saveEmployerInfo(companyInfo);
+                                print('Successfully saved company info.');
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Successfully saved'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+
                                 Navigator.pushNamed(
                                     context, TabsScreen.routeName,
                                     arguments: companyInfo);
+                              } catch (e) {
+                                print('Error during saving: $e');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Error saving information. Please try again.'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
                               }
-                            },
-                            icon: Icon(Icons.arrow_forward),
-                            label: Text('Save and Continue')),
+                            }
+                          },
+                          icon: const Icon(Icons.arrow_forward),
+                          label: const Text('Save'),
+                        ),
                       ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 15,
                   ),
                 ],

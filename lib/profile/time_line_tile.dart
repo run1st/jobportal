@@ -25,9 +25,9 @@ class MyTimeLine extends StatelessWidget {
         height: 100,
         child: TimelineTile(
           beforeLineStyle: LineStyle(
-              color: isPast ? Colors.blue : Colors.deepPurple.shade100),
+              color: isPast ? Colors.blue : Colors.deepPurple.shade50),
           indicatorStyle: IndicatorStyle(
-              color: isPast ? Colors.blue : Colors.deepPurple.shade100,
+              color: isPast ? Colors.blue : Colors.deepPurple.shade50,
               iconStyle: IconStyle(iconData: Icons.done, color: Colors.white)),
           endChild: GestureDetector(
             onTap: () {
@@ -44,6 +44,15 @@ class MyTimeLine extends StatelessWidget {
                   //         style: TextStyle(color: Colors.white),
                   //       )),
                   //     ));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'COMPLETED ! ',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: Colors.blue,
+                    ),
+                  );
                 } else {
                   Navigator.pushNamed(context, personal_info.routeName);
                 }
@@ -57,7 +66,7 @@ class MyTimeLine extends StatelessWidget {
                 } else {
                   Navigator.pushNamed(context, Experience.routeName);
                 }
-              } else if (section == 'Skills') {
+              } else if (section == 'Skills & other') {
                 if (isPast) {
                 } else {
                   Navigator.pushNamed(context, SkillSet.routeName);
@@ -68,12 +77,12 @@ class MyTimeLine extends StatelessWidget {
               padding: EdgeInsets.all(25),
               margin: EdgeInsets.all(5),
               decoration: BoxDecoration(
-                  color:
-                      isPast ? Colors.blue : Colors.deepOrangeAccent.shade100,
+                  color: isPast ? Colors.blue : Colors.deepOrange.shade50,
                   borderRadius: BorderRadius.circular(8)),
               child: Text(
                 section,
-                style: TextStyle(color: Colors.white),
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           ),

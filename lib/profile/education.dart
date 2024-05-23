@@ -24,7 +24,6 @@ class _EducationFormState extends State<EducationForm> {
   String saveDateAsString(DateTime selectedDate) {
     if (selectedDate == null) return "";
 
-    // Define your desired format (e.g., YYYY-MM-DD)
     final formatter = DateFormat('yyyy-MM-dd');
 
     // Convert DateTime object to String
@@ -249,7 +248,9 @@ class _EducationFormState extends State<EducationForm> {
                           label: 'Start Date',
                           initialDate: DateTime.now(),
                           onDateSelected: (date) {
-                            // do something with the selected date
+                            startDateSelected = date;
+                            stringStartDate =
+                                saveDateAsString(startDateSelected);
                           },
                         ),
                       ),
@@ -260,10 +261,8 @@ class _EducationFormState extends State<EducationForm> {
                           label: 'end Date',
                           initialDate: DateTime.now(),
                           onDateSelected: (date) {
-                            startDateSelected = date;
-                            stringStartDate =
-                                saveDateAsString(startDateSelected);
-                            // do something with the selected date
+                            endDateSelected = date;
+                            stringStartDate = saveDateAsString(endDateSelected);
                           },
                         ),
                       ),
@@ -325,8 +324,8 @@ class _EducationFormState extends State<EducationForm> {
                                 levelOfEducation: eduLevelChoosed,
                                 institution: collageNameController.text,
                                 fieldOfStudy: fieldOfStudyChoosed,
-                                startDate: 'startDateSelected',
-                                endDate: 'endDateSelected');
+                                startDate: stringStartDate,
+                                endDate: stringEndDate);
 
                             try {
                               await saveEducationInfo(educationInfo);

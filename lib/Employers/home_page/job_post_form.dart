@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:project1/profile/datepicker.dart';
 
 import '../Employers_account/empUtils.dart';
 import '../models/jobs_model.dart';
@@ -30,8 +32,35 @@ class _JobPostingFormState extends State<JobPostingForm> {
     });
   }
 
-  List jobCtegory = ['Technology', 'Agriculture', 'blabal'];
-  List employmentType = ['Partime', 'Full time'];
+  //List jobCategory = ['Technology', 'Agriculture', 'blabal'];
+  // job_categories.dart
+
+  List<String> jobCategory = [
+    'Accounting & Finance',
+    'Agriculture',
+    'Administrative & Office Support',
+    'Advertising & Marketing',
+    'Arts & Entertainment',
+    'Construction & Maintenance',
+    'Customer Service',
+    'Education & Training',
+    'Engineering',
+    'Healthcare & Medical',
+    'Hospitality & Tourism',
+    'Human Resources',
+    'Technology',
+    'Legal',
+    'Manufacturing & Production',
+    'Media & Communication',
+    'Non-Profit & Volunteer',
+    'Real Estate',
+    'Retail & Sales',
+    'Science & Research',
+    'Transportation & Logistics',
+    'Other'
+  ];
+
+  List employmentType = ['Partime', 'Full time', 'Remote', 'Onsite'];
   List experienceLevel = [
     'Fresh',
     '2 years',
@@ -46,118 +75,132 @@ class _JobPostingFormState extends State<JobPostingForm> {
   String employmentTypeSelected = '';
   String experienceLevelSelected = '';
   String educatonLelSeleceted = '';
-  DateTime _selectedDate = DateTime.now();
+
   String salary = '';
   String jobTitle = '';
   String jobLocation = '';
   List requirement = [];
   String jobId = '';
+  DateTime deadLine = DateTime.now();
   DateTime postedTime = DateTime.now();
-  var companyData;
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate != null ? _selectedDate : DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2026),
-    );
+  String stringDeadline = '';
+  String stringPostedTime = '';
+  String? selectedSalaryRange;
 
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
+  List<String> salaryExpectation = [
+    '1,000 - 5,000',
+    '5,000 - 10,000',
+    '10,000 - 20,000',
+    '20,000 - 30,000',
+    '30,000 - 40,000',
+    '40,000 - 50,000',
+    '50,000 - 60,000',
+    '60,000 - 70,000',
+    '70,000 - 80,000',
+    '80,000 - 90,000',
+    '90,000 - 100,000',
+    '100,000 - 110,000',
+    '110,000 - 120,000',
+    'Above 120,000',
+  ];
+  String saveDateAsString(DateTime selectedDate) {
+    if (selectedDate == null) return "";
+
+    final formatter = DateFormat('yyyy-MM-dd');
+
+    // Convert DateTime object to String
+    final formattedDate = formatter.format(selectedDate);
+    return formattedDate;
   }
 
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return user.uid;
-    } else {
-      return '';
+  String? currentUser;
+
+  Future<void> getUserUid() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUser = user.uid;
+        });
+        await fetchAndSaveCompanyData();
+      } else {
+        print('No user is signed in.');
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
     }
   }
 
   void createJobId() {
     var uuid = Uuid();
-    jobId = uuid.v5(Uuid.NAMESPACE_DNS, jobTitle);
+    setState(() {
+      jobId = uuid.v5(Uuid.NAMESPACE_DNS, jobTitle);
+    });
   }
 
   Future saveJobPost(JobPost jobData) async {
-    final job_document_ref = FirebaseFirestore.instance
+    final jobDocumentReference = FirebaseFirestore.instance
         .collection('employers-job-postings')
         .doc('post-id')
         .collection('job posting')
         .doc(jobId);
-    final company_job_post_ref = FirebaseFirestore.instance
+    final companyJobPostRef = FirebaseFirestore.instance
         .collection('employer')
-        .doc(getCurrentUserUid())
+        .doc(currentUser)
         .collection('job posting')
         .doc(jobId);
     final json = jobData.toJson();
-    await company_job_post_ref.set(json);
-    await job_document_ref.set(json);
+    await companyJobPostRef.set(json);
+    await jobDocumentReference.set(json);
   }
 
-  void getDataFromFirestore() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('employer')
-        .doc(getCurrentUserUid())
-        .collection('company profile')
-        .doc('profile')
-        .get();
-
-    if (snapshot.exists) {
-      setState(() {
-        companyData = snapshot.data();
-      });
-    }
-  }
-
-  Company object = Company(
-      companyId: 'companyId',
-      name: 'name',
-      address: 'address',
-      city: 'city',
-      state: 'state',
-      country: 'country',
-      phone: 'phone',
-      email: 'email',
-      website: 'website',
-      description: 'description',
-      industry: 'industry',
-      companySize: 'companySize',
-      logoUrl: 'logoUrl');
-  // final company_data;
-  Future<void> getData() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('employer')
-        .doc(getCurrentUserUid())
-        .collection('company profile')
-        .doc('profile')
-        .get();
-
-    if (snapshot.exists) {
-      Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
-      if (data != null) {
-        Company updatedObject = Company.fromJson(data);
-        // setState(() {
-        //   object = updatedObject;
-        // });
-
-        print('The city of the company is: ${updatedObject.city}');
-        print(updatedObject.description);
-      } else {
-        // Handle the case when data is null
+  Company? companyProfile;
+  Future<void> fetchAndSaveCompanyData() async {
+    try {
+      print('Fetching company data for user: $currentUser');
+      if (currentUser == null) {
+        throw Exception('Error: currentUser is null');
       }
-    } else {
-      print('Document does not exist');
+
+      final empDocRef =
+          FirebaseFirestore.instance.collection('employer').doc(currentUser);
+      final empProfileRef =
+          empDocRef.collection('company profile').doc('profile');
+
+      final docSnapshot = await empProfileRef.get();
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data();
+        if (data != null) {
+          setState(() {
+            companyProfile = Company.fromJson(data);
+          });
+          print(
+              'Company data fetched and saved to global variable: ${companyProfile!.toJson()}');
+        } else {
+          print('Error: No data found in the document.');
+        }
+      } else {
+        print('Error: Document does not exist.');
+      }
+    } on FirebaseException catch (e) {
+      print('Error fetching company data: ${e.message}');
+    } catch (e) {
+      print('Error: $e');
     }
+  }
+
+  // final company_data;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserUid();
   }
 
   @override
   Widget build(BuildContext context) {
-    createJobId();
+    // createJobId();
 
     // print('company data is :${globalData}');
     //getData();
@@ -198,36 +241,39 @@ class _JobPostingFormState extends State<JobPostingForm> {
                     }
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
-                Text('Job Category'),
+                const Text('Job Category'),
                 DropdownButtonFormField(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.grey),
+                        borderSide: const BorderSide(color: Colors.grey),
                       ),
                       filled: true,
                       fillColor: Colors.blue[100],
                       hintText: 'Select an option',
-                      hintStyle: TextStyle(color: Colors.white),
+                      hintStyle: const TextStyle(color: Colors.white),
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     ),
                     validator: (value) {
-                      if (value == null) return 'please select an option';
+                      if (value == null) {
+                        return 'please select an option';
+                      } else
+                        return null;
                     },
-                    items: jobCtegory
+                    items: jobCategory
                         .map((item) => DropdownMenuItem(
                               child: Text(item),
                               value: item,
                             ))
                         .toList(),
-                    value: jobCtegory[0],
+                    value: jobCategory[0],
                     onChanged: (value) {
                       setState(() {
                         jobCategorySelected = value.toString();
@@ -239,6 +285,15 @@ class _JobPostingFormState extends State<JobPostingForm> {
                   onSaved: (newValue) {
                     if (newValue != null) {
                       jobDescreption = newValue;
+                    }
+                  },
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Discribe your company.';
+                    } else if (value.toString().split(' ').length < 50) {
+                      return 'Please enter at least 50 words.';
+                    } else {
+                      return null;
                     }
                   },
                   maxLines: 5,
@@ -277,7 +332,10 @@ class _JobPostingFormState extends State<JobPostingForm> {
                   decoration: InputDecoration(
                     suffixIcon: IconButton(
                         onPressed: () {
-                          _addRequirement(requirementController.text);
+                          if (!requirementController.text.isEmpty) {
+                            _addRequirement(requirementController.text);
+                            requirementController.clear();
+                          }
                         },
                         icon: Icon(
                           Icons.add,
@@ -294,7 +352,7 @@ class _JobPostingFormState extends State<JobPostingForm> {
                     labelText: 'Requirement',
                   ),
                   validator: (value) {
-                    if (value!.isEmpty) {
+                    if (requirement.isEmpty) {
                       return 'Please enter a requirement';
                     }
                     return null;
@@ -320,42 +378,42 @@ class _JobPostingFormState extends State<JobPostingForm> {
                 ),
                 SizedBox(height: 16),
                 Text('Salary Range'),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Salary Range',
-                    labelStyle: TextStyle(color: Colors.grey),
-                    border: OutlineInputBorder(),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Colors.grey,
-                        width: 1.5,
+                DropdownButtonFormField(
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.blue[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.grey),
                       ),
+                      // filled: true,
+                      // fillColor: Colors.blue,
+                      hintText: 'Select an option',
+                      hintStyle: TextStyle(color: Colors.grey),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
-                    ),
-                  ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter a salary range';
-                    }
-                    final regex = RegExp(r'^\d+(\.\d{1,2})?$');
-                    if (!regex.hasMatch(value)) {
-                      return 'Please enter a valid salary range';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    if (value != null) {
-                      salary = value;
-                    }
-                  },
-                ),
+                    validator: ((value) {
+                      if (value == null) {
+                        return 'please select an option';
+                      } else {
+                        return null;
+                      }
+                    }),
+                    value: selectedSalaryRange,
+                    items: salaryExpectation.map((item) {
+                      return DropdownMenuItem(
+                        child: Text(item),
+                        value: item,
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedSalaryRange = value.toString();
+                      });
+                    }),
                 SizedBox(height: 16),
                 Text('Employment Type'),
-                SizedBox(height: 16),
                 DropdownButtonFormField(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
@@ -370,7 +428,11 @@ class _JobPostingFormState extends State<JobPostingForm> {
                           EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     ),
                     validator: (value) {
-                      if (value == null) return 'please select an option';
+                      if (value == null) {
+                        return 'please select an option';
+                      } else {
+                        return null;
+                      }
                     },
                     items: employmentType
                         .map((item) => DropdownMenuItem(
@@ -461,7 +523,11 @@ class _JobPostingFormState extends State<JobPostingForm> {
                           EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     ),
                     validator: (value) {
-                      if (value == null) return 'please select an option';
+                      if (value == null) {
+                        return 'please select an option';
+                      } else {
+                        return null;
+                      }
                     },
                     items: experienceLevel
                         .map((item) => DropdownMenuItem(
@@ -494,7 +560,11 @@ class _JobPostingFormState extends State<JobPostingForm> {
                           EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     ),
                     validator: (value) {
-                      if (value == null) return 'please select an option';
+                      if (value == null) {
+                        return 'please select an option';
+                      } else {
+                        return null;
+                      }
                     },
                     items: educationLevel
                         .map((item) => DropdownMenuItem(
@@ -508,68 +578,95 @@ class _JobPostingFormState extends State<JobPostingForm> {
                         educatonLelSeleceted = value.toString();
                       });
                     }),
-                Text('Application Deadline'),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Application Deadline',
-                    hintText: 'Select Deadline',
-                    suffixIcon: IconButton(
-                      icon: Icon(Icons.calendar_today),
-                      onPressed: () {
-                        _selectDate(context);
-                      },
-                    ),
-                    border: OutlineInputBorder(),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  child: DateFormField(
+                    label: 'Deadline',
+                    initialDate: DateTime.now(),
+                    onDateSelected: (date) {
+                      setState(() {
+                        deadLine = date;
+                        stringDeadline = saveDateAsString(deadLine);
+                      });
+                    },
                   ),
-                  validator: (value) {
-                    if (_selectedDate == null) {
-                      return 'Please select the application deadline';
-                    }
-                    return null;
-                  },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 16,
                 ),
                 Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState?.save();
-                        getDataFromFirestore();
-                        final job_post = JobPost(
-                            timePosted: postedTime,
-                            JobId: jobId,
-                            title: jobTitle,
-                            category: jobCategorySelected,
-                            description: jobDescreption,
-                            requirements: requirement,
-                            salary: salary,
-                            employmentType: employmentTypeSelected,
-                            location: jobLocation,
-                            experienceLevel: experienceLevelSelected,
-                            educationLevel: educatonLelSeleceted,
-                            deadline: _selectedDate,
-                            company: companyData);
-                        try {
-                          // getData();
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width - 100,
+                      height: 60,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState?.save();
+                            createJobId();
+                            if (currentUser == null) {
+                              print('Error: currentUser is null');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error: No user signed in.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              return;
+                            }
+                            stringPostedTime = saveDateAsString(postedTime);
 
-                          saveJobPost(job_post);
-                          EmpUtils.showSnackBar(
-                              'sucessfully posted', Colors.green);
-                        } on FirebaseException catch (e) {
-                          EmpUtils.showSnackBar(e.message, Colors.red);
-                        }
-                      }
-                    },
-                    child: Text('Post'),
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.blue,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                      textStyle: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                            try {
+                              await fetchAndSaveCompanyData();
+
+                              final jobPost = JobPost(
+                                  timePosted: stringPostedTime,
+                                  JobId: jobId,
+                                  title: jobTitle,
+                                  category: jobCategorySelected,
+                                  description: jobDescreption,
+                                  requirements: requirement,
+                                  salary: selectedSalaryRange,
+                                  employmentType: employmentTypeSelected,
+                                  location: jobLocation,
+                                  experienceLevel: experienceLevelSelected,
+                                  educationLevel: educatonLelSeleceted,
+                                  deadline: stringDeadline,
+                                  company: companyProfile?.toJson());
+                              await saveJobPost(jobPost);
+                              // EmpUtils.showSnackBar(
+                              //     'sucessfully posted', Colors.green);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Successfully saved'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            } catch (e) {
+                              print('Error during saving: $e');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'Error saving information. Please try again.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.blue,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 20),
+                          textStyle: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        child: const Text('Post'),
                       ),
                     ),
                   ),
