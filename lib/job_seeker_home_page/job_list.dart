@@ -172,10 +172,18 @@ class _JobsListState extends State<JobsList> {
     );
   }
 
-  String getPostedTime(Timestamp postedDate) {
-    final now = DateTime.now();
-    final difference = now.difference(postedDate.toDate());
+  DateTime parseDate(String date) {
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    return formatter.parse(date);
+  }
 
+//12 Jun 2023
+  String getPostedTime(String postedDate) {
+    final now = DateTime.now();
+
+    DateTime parsedDate = parseDate(postedDate);
+    final difference = now.difference(parsedDate);
+    print(parsedDate);
     if (difference.inDays > 0) {
       return '${difference.inDays} days ago';
     } else if (difference.inHours > 0) {
