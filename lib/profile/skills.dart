@@ -30,8 +30,8 @@ class _SkillSetState extends State<SkillSet> {
   String? selectedSalaryRange;
 
   List<String> salaryExpectation = [
-    '1,000 - 5,000'
-        '5,000 - 10,000',
+    '1,000 - 5,000',
+    '5,000 - 10,000',
     '10,000 - 20,000',
     '20,000 - 30,000',
     '30,000 - 40,000',
@@ -78,15 +78,15 @@ class _SkillSetState extends State<SkillSet> {
     'Nurse',
     'Pharmacist',
     'Product Manager',
-    'Project Manager',
     'Software Engineer',
     'Software Tester',
     'Solution Architect',
     'System Administrator',
     'Teacher',
-    'Doctor'
-        'UI/UX Designer',
-    'Web Developer' 'other'
+    'Doctor',
+    'UI/UX Designer',
+    'Web Developer',
+    'other'
   ];
 
   var experienceLevelChoosed;

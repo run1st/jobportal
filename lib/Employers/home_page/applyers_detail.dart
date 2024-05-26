@@ -57,7 +57,7 @@ class ApplicantPage extends StatelessWidget {
     final jobId = arguments[1];
     return Scaffold(
       appBar: AppBar(
-        title: Text('applicant.name'),
+        title: Text('Applicant Profile'),
       ),
       floatingActionButton: FloatingActionButton(
           child: Icon(Icons.arrow_back),
@@ -153,7 +153,7 @@ class ApplicantPage extends StatelessWidget {
                             } catch (e) {
                               EmpUtils.showSnackBar(e.toString(), Colors.green);
                             }
-                            ChooseCandidate(jobId, applicant_id);
+                            //   ChooseCandidate(jobId, applicant_id);
                           },
                           style: ElevatedButton.styleFrom(
                             primary: Colors.green,

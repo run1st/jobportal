@@ -57,6 +57,7 @@ class _JobPostingFormState extends State<JobPostingForm> {
     'Retail & Sales',
     'Science & Research',
     'Transportation & Logistics',
+    "Engineering",
     'Other'
   ];
 

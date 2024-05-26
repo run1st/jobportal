@@ -1,19 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:project1/Employers/models/jobs_model.dart';
 import 'package:project1/user_account/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../jobSeekerModel/job_seeker_profile_model.dart';
-
 class Job_detail extends StatefulWidget {
   int index;
   DocumentSnapshot<Object?> job;
-  // DocumentSnapshot<Object?> get Job => Job;
+
   Job_detail({Key? key, required this.index, required this.job})
       : super(key: key);
 
@@ -23,212 +18,97 @@ class Job_detail extends StatefulWidget {
 
 class _Job_detailState extends State<Job_detail> {
   bool favorite = false;
-  void favoriteClicked(DocumentSnapshot<Object?> job) {
-    setState(() {
-      favorite = !favorite;
-    });
-    if (favorite) {
-      addToFavorites(job); // Add the job to favorites list in Firebase
-    } else {
-      FirebaseFirestore.instance
-          .collection('job-seeker')
-          .doc(currentUser)
-          .collection('favorite-jobs')
-          .doc(job['job id'])
-          .delete();
-    }
-  }
+  bool isJobApplied = false;
+  String? currentUser;
 
   @override
   void initState() {
     super.initState();
-    _loadFavState(widget.job);
-    _loadapplicationState(widget.job);
     getUserUid();
   }
 
-  Future<void> _loadFavState(DocumentSnapshot<Object?> job) async {
-    final state =
-        await StatePersistence.getFavState("favorite_${job['job id']}");
-    setState(() {
-      if (state != null) {
-        favorite = state as bool;
-      }
-    });
-  }
-
-  Future<void> _loadapplicationState(DocumentSnapshot<Object?> job) async {
-    final state = await StatePersistence.getapplicationState(
-        "application_${job['job id']}");
-    setState(() {
-      if (state != null) {
-        isJobApplied = state as bool;
-      }
-    });
-  }
-
-  Future<void> _saveFavState(DocumentSnapshot<Object?> job) async {
-    // await StatePersistence.favState(job['job id'], favorite);
-    await StatePersistence.favState("favorite_${job['job id']}", true);
-  }
-
-  Future<void> _saveapplicationState(DocumentSnapshot<Object?> job) async {
-    // await StatePersistence.saveapplicatonState(
-    //     job['job id'] + 'application', isJobApplied);
-    await StatePersistence.saveapplicatonState(
-        "application_${job['job id']}", true);
-  }
-
-  bool isLoggedIn = false;
-  String randomText =
-      '   Porttitor eget dolor morbi non arcu risus. Eget arcu dictum varius duis at consectetur lorem. Velit sed ullamcorper morbi tincidunt ornare massa. At volutpat diam ut venenatis tellus. Tortor at auctor urna nunc id cursus metus aliquam eleifend. Amet commodo nulla facilisi nullam vehicula ipsum a. Vitae nunc sed velit dignissim sodales ut eu. Facilisis leo vel fringilla est ullamcorper. Faucibus scelerisque eleifend donec pretium vulputate sapien nec sagittis. Tempus egestas sed sed risus pretium quam vulputate dignissim suspendisse. Arcu non odio euismod lacinia at quis risus. Ante metus dictum at tempor commodo ullamcorper a lacus vestibulum. Ut placerat orci nulla pellentesque dignissim. Sed nisi lacus sed viverra tellus in. Posuere morbi leo urna molestie at elementum eu. Nibh sit amet commodo nulla facilisi nullam vehicula ipsum a. Non nisi est sit amet facilisis magna etiam tempor orci. Posuere sollicitudin aliquam ultrices sagittis orci a scelerisque purus semper. Mauris in aliquam sem fringilla ut morbi. Vitae nunc sed velit dignissim sodales ut eu. Dignissim diam quis enim lobortis scelerisque fermentum dui faucibus. Urna molestie at elementum eu facilisis sed odio morbi quis. Odio ut sem nulla pharetra diam. Nam libero justo laoreet sit amet. Mauris in aliquam sem fringilla ut morbi. Massa tincidunt nunc pulvinar sapien et. A lacus vestibulum sed arcu non odio euismod lacinia. Maecenas volutpat blandit aliquam etiam. Nunc sed id semper risus. Vel pharetra vel turpis nunc eget lorem dolor. Tellus rutrum tellus pellentesque eu tincidunt. Cum sociis natoque penatibus et. Sapien nec sagittis aliquam malesuada bibendum. Nulla posuere sollicitudin aliquam ultrices sagittis orci a. Massa vitae tortor condimentum lacinia quis. Odio tempor orci dapibus ultrices in iaculis nunc. Eu augue ut lectus arcu bibendum. Eu consequat ac felis donec et odio. Auctor neque vitae tempus quam pellentesque nec nam. Venenatis lectus magna fringilla urna porttitor rhoncus dolor purus. Lorem ipsum dolor sit amet consectetur adipiscing. Justo eget magna fermentum iaculis eu non diam phasellus vestibulum. Egestas integer eget aliquet nibh. Est ullamcorper eget nulla facilisi etiam dignissim. Feugiat in ante metus dictum.';
-  // String currentUser {
-  //   User? user = FirebaseAuth.instance.currentUser;
-  //   if (user != null) {
-  //     setState(() {
-  //       isLoggedIn = true;
-  //       print('the login status is ${isLoggedIn}');
-  //     });
-  //     return user.uid;
-  //   } else {
-  //     return '';
-  //   }
-  // }
-
-  String? currentUser;
   Future<void> getUserUid() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        setState(() {
-          currentUser = user.uid;
-          isLoggedIn = true;
-          print('the login status is ${isLoggedIn}');
-        });
+        currentUser = user.uid;
+        await _loadFavState(widget.job);
+        await _loadApplicationState(widget.job);
       }
     } catch (e) {
       print('Error getting current user UID: $e');
     }
   }
 
-  void checkSignInStatus() {
-    getUserUid();
+  Future<void> _loadFavState(DocumentSnapshot<Object?> job) async {
+    final state =
+        await StatePersistence.getFavState("favorite_${job['job id']}");
+    setState(() {
+      favorite = state ?? false;
+    });
+  }
 
-    if (currentUser != null) {
-      // User is signed in.
-      print('User is signed in.');
+  Future<void> _loadApplicationState(DocumentSnapshot<Object?> job) async {
+    final state = await StatePersistence.getApplicationState(
+        "application_${job['job id']}");
+    setState(() {
+      isJobApplied = state ?? false;
+    });
+  }
+
+  Future<void> _saveFavState(DocumentSnapshot<Object?> job, bool value) async {
+    await StatePersistence.favState("favorite_${job['job id']}", value);
+  }
+
+  Future<void> _saveApplicationState(
+      DocumentSnapshot<Object?> job, bool value) async {
+    await StatePersistence.saveApplicationState(
+        "application_${job['job id']}", value);
+  }
+
+  void favoriteClicked(DocumentSnapshot<Object?> job) async {
+    setState(() {
+      favorite = !favorite;
+    });
+    if (favorite) {
+      await addToFavorites(job);
     } else {
-      // User is not signed in.
-      print('User is not signed in.');
+      await removeFromFavorites(job);
     }
+    await _saveFavState(job, favorite);
   }
 
-  String? applicantId;
-  void createJobId() {
-    var uuid = Uuid();
-    applicantId = uuid.v4();
-  }
-
-  void addToFavorites(DocumentSnapshot<Object?> doc) {
-    Map<String, dynamic> jobData = doc.data() as Map<String, dynamic>;
-    //  JobPost job_post = JobPost.fromJson(jobData);
-    //print(job_post.deadline);
-    // JobPost postedJob = widget.job as JobPost;
+  Future<void> addToFavorites(DocumentSnapshot<Object?> doc) async {
     final DocumentReference favoritesCollection = FirebaseFirestore.instance
         .collection('job-seeker')
         .doc(currentUser)
         .collection('favorite-jobs')
         .doc(doc['job id']);
-
-    // Map<String, dynamic> json = postedJob.toJson();
-    favoritesCollection.set(doc.data());
-    // .then((docRef) {
-    //   print('Job added to favorites: ${docRef.id}');
-    // }).catchError((error) {
-    //   // Error occurred while adding the document
-    //   print('Failed to add job to favorites: $error');
-    // });
-    // _saveFavState(doc);
+    await favoritesCollection.set(doc.data());
   }
 
-// Inside the _Job_detailState class
-  bool isJobApplied = false;
+  Future<void> removeFromFavorites(DocumentSnapshot<Object?> doc) async {
+    final DocumentReference favoritesCollection = FirebaseFirestore.instance
+        .collection('job-seeker')
+        .doc(currentUser)
+        .collection('favorite-jobs')
+        .doc(doc['job id']);
+    await favoritesCollection.delete();
+  }
 
-  void _handleApplyButtonTap(DocumentSnapshot<Object?> doc) {
-    currentUser;
-    if (isLoggedIn) {
+  void _handleApplyButtonTap(DocumentSnapshot<Object?> doc) async {
+    if (currentUser != null) {
       if (!isJobApplied) {
-        saveApplication(doc);
-
-        setState(() {
-          isJobApplied = true;
-          print('is button dissabled : ${isJobApplied}');
-        });
+        await saveApplication(doc);
       } else {
-        // Button already disabled, handle accordingly
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Ooops !'),
-              content: Text('You already applied.'),
-              actions: [
-                TextButton(
-                  child: Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        showAlertDialog('Oops!', 'You already applied.');
       }
     } else {
-      // User not logged in, handle accordingly
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-              'Notice',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            content: Text(
-              'Please log in to apply.',
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            actions: [
-              TextButton(
-                child: Text(
-                  'OK',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.blue,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            backgroundColor: Colors.white,
-            elevation: 5,
-          );
-        },
-      );
+      showAlertDialog('Notice', 'Please log in to apply.');
     }
   }
 
-  void saveApplication(DocumentSnapshot<Object?> doc) {
+  Future<void> saveApplication(DocumentSnapshot<Object?> doc) async {
     final DocumentReference applicationDocumentReference = FirebaseFirestore
         .instance
         .collection('job-seeker')
@@ -236,28 +116,14 @@ class _Job_detailState extends State<Job_detail> {
         .collection('jobs-applied')
         .doc(doc['job id']);
     try {
-      applicationDocumentReference.set(doc.data());
-      getData(doc);
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-              'Application Submitted',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            content: Text('Your application has been submitted successfully.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      await applicationDocumentReference.set(doc.data());
+      await _saveApplicationState(widget.job, true);
+      setState(() {
+        isJobApplied = true;
+      });
+      await getData(doc);
+      showAlertDialog('Application Submitted',
+          'Your application has been submitted successfully.');
     } catch (e) {
       Utils.showSnackBar(context, e.toString(), Colors.red);
     }
@@ -271,45 +137,59 @@ class _Job_detailState extends State<Job_detail> {
             .collection('jobseeker-profile')
             .doc('profile')
             .get();
-    final DocumentReference applicant_Collection_Reference =
-        await FirebaseFirestore.instance
-            .collection('employers-job-postings')
-            .doc('post-id')
-            .collection('job posting')
-            .doc(doc['JobId'])
-            .collection("Applicants")
-            .doc(currentUser);
-    applicant_Collection_Reference.set(documentSnapshot.data());
+    final DocumentReference applicantCollectionReference = FirebaseFirestore
+        .instance
+        .collection('employers-job-postings')
+        .doc('post-id')
+        .collection('job posting')
+        .doc(doc['job id'])
+        .collection("Applicants")
+        .doc(currentUser);
+    await applicantCollectionReference.set(documentSnapshot.data());
   }
 
-  List<Map<String, dynamic>> education = [];
-  List<Map<String, dynamic>> skill = [];
-  List<Map<String, dynamic>> other = [];
-  List<Map<String, dynamic>> p_info = [];
+  void showAlertDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    // _loadFavState();
-    // print('this is the index of listile ${widget.index}');
-    // print(widget.job.data());
-    // currentUser;
-    print('${isLoggedIn}');
     return Column(
       children: [
+        // Your UI components here
+        // Example:
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [Icon(Icons.location_city), Text('Ethipia Addiss Ababa')],
+          children: [
+            Icon(Icons.location_city),
+            Text('Ethipia Addiss Ababa'),
+          ],
         ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [Text('Posted time'), Text('9 hours ago')],
+          children: [
+            Text('Posted time'),
+            Text('9 hours ago'),
+          ],
         ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -317,140 +197,102 @@ class _Job_detailState extends State<Job_detail> {
               'Job type',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
-            Text('salary',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))
+            Text(
+              'salary',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
           ],
         ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [Text('Full time'), Text('5000ETB')],
+          children: [
+            Text('Full time'),
+            Text('5000ETB'),
+          ],
         ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 10),
         Container(
-            margin: EdgeInsets.symmetric(horizontal: 20),
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text('${widget.job.get('description')}')
-            // Text(randomText),
-            ),
-        SizedBox(
-          height: 25,
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text('${widget.job.get('description')}'),
         ),
+        SizedBox(height: 25),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Container(
               width: MediaQuery.of(context).size.width / 2 - 20,
               decoration: BoxDecoration(
-                  color: isJobApplied ? Colors.grey : Colors.blue,
-                  border: !isJobApplied
-                      ? Border.all(
-                          color: Colors.blue,
-                          width: 2,
-                        )
-                      : Border.all(width: 0),
-                  borderRadius: BorderRadius.circular(15)),
+                color: isJobApplied ? Colors.grey : Colors.blue,
+                border: !isJobApplied
+                    ? Border.all(
+                        color: Colors.blue,
+                        width: 2,
+                      )
+                    : Border.all(width: 0),
+                borderRadius: BorderRadius.circular(15),
+              ),
               child: TextButton(
-                  onPressed: () {
-                    _handleApplyButtonTap(widget.job);
-
-                    ElevatedButton.styleFrom(
-                      onSurface: Colors.brown,
-                    );
-                  },
-                  child: !isJobApplied
-                      ? Text(
-                          'Apply',
-                          style: TextStyle(color: Colors.white),
-                        )
-                      : Text(
-                          'Applied',
-                          style: TextStyle(color: Colors.white),
-                        )),
+                onPressed: () {
+                  _handleApplyButtonTap(widget.job);
+                },
+                child: !isJobApplied
+                    ? Text('Apply', style: TextStyle(color: Colors.white))
+                    : Text('Applied', style: TextStyle(color: Colors.white)),
+              ),
             ),
             Container(
-              //width: MediaQuery.of(context).size.width / 2 - 20,
               decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.blue,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(15)),
-              child: TextButton.icon(
-                icon: Icon(
-                  favorite ? Icons.favorite : Icons.favorite_border,
+                border: Border.all(
+                  color: Colors.blue,
+                  width: 2,
                 ),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: TextButton.icon(
+                icon: Icon(favorite ? Icons.favorite : Icons.favorite_border),
                 onPressed: () {
                   favoriteClicked(widget.job);
                 },
-
-                // child: Text('Job descreption')
                 label: Text(''),
               ),
             ),
           ],
         ),
-        SizedBox(
-          height: 20,
-        )
+        SizedBox(height: 20),
       ],
     );
   }
 
   @override
   void dispose() {
-    _saveFavState(widget.job);
-    _saveapplicationState(widget.job);
     super.dispose();
   }
 }
 
 class StatePersistence {
-  static Future<bool> favState(String key, dynamic value) async {
-    final SharedPreferences prefs1 = await SharedPreferences.getInstance();
-    if (value is String) {
-      return await prefs1.setString(key, value);
-    } else if (value is int) {
-      return await prefs1.setInt(key, value);
-    } else if (value is double) {
-      return await prefs1.setDouble(key, value);
-    } else if (value is bool) {
-      return await prefs1.setBool(key, value);
-    } else {
-      return false;
-    }
+  static Future<bool> favState(String key, bool value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return await prefs.setBool(key, value);
   }
 
-  static Future<bool> saveapplicatonState(String key, dynamic value) async {
-    final SharedPreferences prefs2 = await SharedPreferences.getInstance();
-    if (value is String) {
-      return await prefs2.setString(key, value);
-    } else if (value is int) {
-      return await prefs2.setInt(key, value);
-    } else if (value is double) {
-      return await prefs2.setDouble(key, value);
-    } else if (value is bool) {
-      return await prefs2.setBool(key, value);
-    } else {
-      return false;
-    }
+  static Future<bool> saveApplicationState(String key, bool value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return await prefs.setBool(key, value);
   }
 
-  static Future<dynamic> getFavState(String key) async {
-    final SharedPreferences prefs2 = await SharedPreferences.getInstance();
-    return prefs2.get(key);
+  static Future<bool?> getFavState(String key) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(key);
   }
 
-  static Future<dynamic> getapplicationState(String key) async {
-    final SharedPreferences prefs2 = await SharedPreferences.getInstance();
-    return prefs2.get(key);
+  static Future<bool?> getApplicationState(String key) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(key);
   }
 }

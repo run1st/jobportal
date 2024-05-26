@@ -80,11 +80,29 @@ class _JobsListState extends State<JobsList> {
   }
 
   final List<String> jobCategory = [
+    'Accounting & Finance',
+    'Agriculture',
+    'Administrative & Office Support',
+    'Advertising & Marketing',
+    'Arts & Entertainment',
+    'Construction & Maintenance',
+    'Customer Service',
+    'Education & Training',
+    'Engineering',
+    'Healthcare & Medical',
+    'Hospitality & Tourism',
+    'Human Resources',
+    'Technology',
+    'Legal',
+    'Manufacturing & Production',
+    'Media & Communication',
+    'Non-Profit & Volunteer',
+    'Real Estate',
+    'Retail & Sales',
+    'Science & Research',
+    'Transportation & Logistics',
     "Engineering",
-    "Agriculture",
-    "Technology",
-    "social",
-    "health",
+    'Other'
   ];
   final List<String> Regions = [
     'Amhara',
@@ -100,7 +118,12 @@ class _JobsListState extends State<JobsList> {
   ];
 
   final List<String> educationLevel = ['Bachelor', 'MSC', 'PHD'];
-  final List<String> employmentType = ['Full time', 'Partime', 'remote'];
+  final List<String> employmentType = [
+    'Full time',
+    'Partime',
+    'remote',
+    'Onsite'
+  ];
   List companyName = [];
   final List<String> cities = [
     'Bahirdar',
@@ -195,6 +218,21 @@ class _JobsListState extends State<JobsList> {
     }
   }
 
+  List<Color> colorsList = [
+    const Color.fromRGBO(179, 229, 252, 1.0),
+    const Color.fromARGB(206, 243, 208, 231),
+    const Color.fromARGB(206, 241, 214, 205),
+    const Color.fromRGBO(200, 230, 201, 1.0),
+    const Color.fromRGBO(255, 249, 196, 1.0),
+    const Color.fromRGBO(248, 187, 208, 1.0),
+    const Color.fromRGBO(225, 190, 231, 1.0)
+  ];
+
+  Color colorMaker() {
+    final int colorIndex = Random().nextInt(6);
+    return colorsList[colorIndex];
+  }
+
   @override
   Widget build(BuildContext context) {
     print('selected value is :${selectedValue}');
@@ -284,61 +322,72 @@ class _JobsListState extends State<JobsList> {
               height: 20,
             ),
 // The job category griedview*****************************************************
-            SizedBox(
-              height: 100,
-              child: GridView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                scrollDirection: Axis.horizontal,
-                itemCount: jobCategory.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  mainAxisSpacing: 16.0,
-                  crossAxisSpacing: 16.0,
-                  childAspectRatio: 1.0,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        seleceByCategory = true;
-                        category = jobCategory[index];
-                      });
-                    },
-                    child: Container(
-                      // width: MediaQuery.of(context).size.width / 2,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        // color: Colors.blue,
-
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color.fromARGB(255, 51, 224, 255), // Start color
-                            Color.fromARGB(255, 55, 0, 255), // End color
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(15.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        jobCategory[index],
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+            Card(
+              margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  height: 100,
+                  child: GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: jobCategory.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 1,
+                      mainAxisSpacing: 16.0,
+                      crossAxisSpacing: 16.0,
+                      childAspectRatio: 1.0,
                     ),
-                  );
-                },
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            seleceByCategory = true;
+                            category = jobCategory[index];
+                          });
+                        },
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            // gradient: LinearGradient(
+                            //   begin: Alignment.topLeft,
+                            //   end: Alignment.bottomRight,
+                            //   colors: [
+                            //     Color.fromRGBO(
+                            //         51, 224, 255, 1.0), // Start color
+                            //     Color.fromRGBO(55, 0, 255, 1.0), // End color
+                            //   ],
+                            // ),
+                            color: colorMaker(),
+                            borderRadius: BorderRadius.circular(15.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            jobCategory[index],
+                            style: const TextStyle(
+                              color: Color.fromRGBO(0, 0, 0, 1.0),
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
 
@@ -671,19 +720,8 @@ class _JobsListState extends State<JobsList> {
                   }).toList();
                 }
 
-                List<Color> colorsList = [
-                  Color.fromRGBO(136, 223, 230, 0.808),
-                  Color.fromARGB(206, 243, 208, 231),
-                  Color.fromARGB(206, 241, 214, 205)
-                ];
-
-                Color colorMaker() {
-                  final int colorIndex = Random().nextInt(2);
-                  return colorsList[colorIndex];
-                }
-
                 if (selectRecommended && postedJobs.isEmpty) {
-                  return SafeArea(
+                  return const SafeArea(
                     child: Center(
                       child: ImageCard(
                           imagePath: 'assets/images/empty.png',
@@ -697,8 +735,8 @@ class _JobsListState extends State<JobsList> {
                         height: MediaQuery.of(context).size.height - 400,
                         child: ListView.builder(
                           shrinkWrap: true,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 10),
                           itemCount: postedJobs.length,
                           itemBuilder: (BuildContext context, int index) {
                             DocumentSnapshot document = postedJobs[index];
@@ -715,8 +753,8 @@ class _JobsListState extends State<JobsList> {
                                       index: index,
                                       job: document,
                                     ),
-                                    settings:
-                                        RouteSettings(name: "jobDetailRoute"),
+                                    settings: const RouteSettings(
+                                        name: "jobDetailRoute"),
                                   ),
                                 );
                               },
@@ -729,7 +767,7 @@ class _JobsListState extends State<JobsList> {
                                       // side:
                                       //     BorderSide(color: Colors.black, width: 1),
                                       // borderRadius: BorderRadius.circular(15),
-                                      borderRadius: BorderRadius.only(
+                                      borderRadius: const BorderRadius.only(
                                     bottomLeft: Radius.circular(20.0),
                                     topRight: Radius.circular(20.0),
                                     bottomRight: Radius.circular(20.0),
@@ -740,9 +778,19 @@ class _JobsListState extends State<JobsList> {
                                       horizontal: 5, vertical: 10),
                                   child: ListTile(
                                     style: ListTileStyle.drawer,
-                                    leading: CircleAvatar(
-                                      child: Icon(Icons.person),
-                                    ),
+                                    leading: document['company'] != null &&
+                                            document['company']?['logoUrl']
+                                                is String &&
+                                            document['company']?['logoUrl']
+                                                .isNotEmpty
+                                        ? CircleAvatar(
+                                            backgroundImage: NetworkImage(
+                                                document['company']?['logoUrl']
+                                                    as String),
+                                          )
+                                        : const CircleAvatar(
+                                            child: Icon(Icons.person),
+                                          ),
                                     title: Text(document['title']),
                                     subtitle: Wrap(
                                       children: [
@@ -750,7 +798,7 @@ class _JobsListState extends State<JobsList> {
                                           label:
                                               Text(document['employment type']),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           width: 5,
                                         ),
                                         Chip(
@@ -759,14 +807,15 @@ class _JobsListState extends State<JobsList> {
                                               child: Text(document[
                                                   'experience level'])),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           width: 5,
                                         ),
                                         Chip(
                                           label: Container(
                                               width: 50,
-                                              child: Text(
-                                                  document['company']['city'])),
+                                              child: Text(document['company']
+                                                      ?['city'] ??
+                                                  '-')),
                                         ),
                                       ],
                                     ),
