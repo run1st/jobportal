@@ -83,7 +83,17 @@ class ApplicantPage extends StatelessWidget {
                       ListTile(
                         leading: Icon(Icons.email),
                         title: Text('Send Email'),
-                        onTap: () {},
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(
+                                // Your content for the bottom sheet
+                                child: Text('This is the bottom sheet content'),
+                              );
+                            },
+                          );
+                        },
                       ),
                       Divider(),
                       ListTile(
@@ -120,8 +130,6 @@ class ApplicantPage extends StatelessWidget {
                                     ElevatedButton(
                                       child: Text('Send'),
                                       onPressed: () {
-                                        // Handle send message action
-                                        // ...
                                         Navigator.pop(
                                             context); // Close the bottom sheet
                                       },

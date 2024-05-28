@@ -20,35 +20,30 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
   List<Message> _sentMessages = [];
 
   String _statusMessage = '';
-  var companyData;
+
   // String messageId = '';
   TextEditingController _messageController = TextEditingController();
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return user.uid;
-    } else {
-      return '';
+
+  String currentUser = '';
+
+  Future<void> getUserUid() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUser = user.uid;
+        });
+        await fetchAndSaveCompanyData();
+      } else {
+        print('No user is signed in.');
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
     }
   }
 
   bool sendMessageToJobSeeker(String message) {
     return message.isNotEmpty; // Simulating success if the message is not empty
-  }
-
-  Future getSenderDataFromFirestore() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('employer')
-        .doc(getCurrentUserUid())
-        .collection('company profile')
-        .doc('profile')
-        .get();
-
-    if (snapshot.exists) {
-      setState(() {
-        companyData = snapshot.data();
-      });
-    }
   }
 
   String createMessageId() {
@@ -74,18 +69,60 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
     return DateFormat("yyyy-MM-dd").format(dateTime);
   }
 
+  Company? companyProfile;
+  Future<void> fetchAndSaveCompanyData() async {
+    try {
+      print('Fetching company data for user: $currentUser');
+      if (currentUser == null) {
+        throw Exception('Error: currentUser is null');
+      }
+
+      final empDocRef =
+          FirebaseFirestore.instance.collection('employer').doc(currentUser);
+      final empProfileRef =
+          empDocRef.collection('company profile').doc('profile');
+
+      final docSnapshot = await empProfileRef.get();
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data();
+        if (data != null) {
+          setState(() {
+            companyProfile = Company.fromJson(data);
+          });
+          print(
+              'Company data fetched and saved to global variable: ${companyProfile!.toJson()}');
+        } else {
+          print('Error: No data found in the document.');
+        }
+      } else {
+        print('Error: Document does not exist.');
+      }
+    } on FirebaseException catch (e) {
+      print('Error fetching company data: ${e.message}');
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserUid();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Compose Message'),
+        title: const Text('Compose Message'),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('job-seeker')
             .doc(widget.jobApplierId)
             .collection('messages')
-            .where('senderId', isEqualTo: getCurrentUserUid())
+            .where('senderId', isEqualTo: currentUser)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           //  final length = snapshot.data!.docs.where((element) {});
@@ -95,17 +132,17 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
             sentMessages = querySnapshot.docs.toList();
             // sentMessages = querySnapshot.docs.where((doc) {
             //   String id = doc.id;
-            //   return id == getCurrentUserUid();
+            //   return id == currentUser;
             // }).toList();
           }
-          if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
+          if (snapshot.hasError) return Text('Error: ${snapshot.error}');
           if (!snapshot.hasData) {
-            return Text('OOPS there is no posted jobs');
+            return const Text('OOPS there is no posted jobs');
           } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return new Text('Loading...');
+            return const Text('Loading...');
           } else {
             return Padding(
-              padding: EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -138,15 +175,15 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
                     onPressed: () {
                       String messageId = createMessageId();
                       String message = _messageController.text;
-                      getSenderDataFromFirestore();
+
                       final messageObject = Message(
                           id: messageId,
-                          senderId: getCurrentUserUid(),
+                          senderId: currentUser,
                           recipientId: widget.jobApplierId,
                           content: message,
                           timestamp: DateTime.now(),
                           isRead: false,
-                          company: companyData);
+                          company: companyProfile);
                       saveMessage(widget.jobApplierId, messageObject);
 
                       _messageController.clear();

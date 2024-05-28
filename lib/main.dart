@@ -1,4 +1,6 @@
 //import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -15,6 +17,7 @@ import 'package:project1/Employers/manage_posts/edit_posts.dart';
 import 'package:project1/Employers/manage_posts/manage_post.dart';
 import 'package:project1/hompage.dart';
 import 'package:project1/job_seeker_home_page/applied_jobs.dart';
+import 'package:project1/main_splash.dart';
 //import 'package:project1/profile/job_seeker_view_profile.dart';
 import 'package:project1/profile/personal_info.dart';
 import 'package:project1/splashScreen/splash2.dart';
@@ -83,8 +86,57 @@ class JobSeekerProfileWrapper extends StatelessWidget {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isJobSeeker = false;
+  bool isEmployer = false;
+
+  String? currentUser;
+  Future<String> getCurrentUserUid() async {
+    User? user = await FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      return user.uid;
+    } else {
+      return '';
+    }
+  }
+
+  Future<void> checkUserRole(String uid) async {
+    DocumentSnapshot userData = await FirebaseFirestore.instance
+        .collection('job-seeker')
+        .doc(uid)
+        .get();
+    DocumentSnapshot empData = await FirebaseFirestore.instance
+        .collection('job-seeker')
+        .doc(uid)
+        .get();
+    if (userData.exists) {
+      String role = userData.get('role');
+      setState(() {
+        isJobSeeker = role == 'jobseeker';
+      });
+    } else if (empData.exists) {
+      String role = userData.get('role');
+      setState(() {
+        isJobSeeker = role == 'employer';
+      });
+    }
+    //return isJobSeeker;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getCurrentUserUid();
+  }
 
   // This widget is the root of our application.
   @override
@@ -101,7 +153,26 @@ class MyApp extends StatelessWidget {
         backgroundColor: Colors.blue,
         errorColor: Colors.red,
       ),
-      home: Splash1(),
+      home: StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const MainSplash();
+            }
+            if (snapshot.hasData) {
+              User? user = snapshot.data;
+              checkUserRole(user?.uid ?? '');
+              if (isEmployer) {
+                Navigator.of(context).pushNamed(TabsScreen.routeName);
+              } else if (isJobSeeker) {
+                Navigator.of(context).pushNamed(home.routeName);
+              }
+            }
+            return const Splash1();
+          }),
+
+      //
+
       routes: {
         AuthPage.routName: (context) => AuthPage(
               isLogin: true,

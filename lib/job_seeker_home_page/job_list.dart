@@ -323,15 +323,19 @@ class _JobsListState extends State<JobsList> {
             ),
 // The job category griedview*****************************************************
             Card(
-              margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-              elevation: 5.0,
+              margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+              //  elevation: 5.0,
+
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                  height: 100,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 8,
+                  ),
+                  height: 120,
                   child: GridView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     scrollDirection: Axis.horizontal,
@@ -366,12 +370,12 @@ class _JobsListState extends State<JobsList> {
                             color: colorMaker(),
                             borderRadius: BorderRadius.circular(15.0),
                             boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: Offset(0, 2),
-                              ),
+                              // BoxShadow(
+                              //   color: Colors.grey.withOpacity(0.5),
+                              //   spreadRadius: 2,
+                              //   blurRadius: 5,
+                              //   offset: Offset(0, 2),
+                              // ),
                             ],
                           ),
                           child: Text(
@@ -760,7 +764,7 @@ class _JobsListState extends State<JobsList> {
                               },
                               child: Container(
                                 height:
-                                    MediaQuery.of(context).size.height - 600,
+                                    MediaQuery.of(context).size.height - 585,
                                 child: Card(
                                   color: Colors.white,
                                   shape: RoundedRectangleBorder(
@@ -777,72 +781,107 @@ class _JobsListState extends State<JobsList> {
                                   margin: EdgeInsets.symmetric(
                                       horizontal: 5, vertical: 10),
                                   child: ListTile(
-                                    style: ListTileStyle.drawer,
+                                    contentPadding: EdgeInsets.symmetric(
+                                        vertical: 10.0, horizontal: 15.0),
                                     leading: document['company'] != null &&
                                             document['company']?['logoUrl']
                                                 is String &&
                                             document['company']?['logoUrl']
                                                 .isNotEmpty
                                         ? CircleAvatar(
+                                            radius: 30,
                                             backgroundImage: NetworkImage(
                                                 document['company']?['logoUrl']
                                                     as String),
                                           )
-                                        : const CircleAvatar(
-                                            child: Icon(Icons.person),
+                                        : CircleAvatar(
+                                            radius: 30,
+                                            child: Icon(Icons.person, size: 30),
                                           ),
-                                    title: Text(document['title']),
-                                    subtitle: Wrap(
+                                    title: Text(
+                                      document['title'],
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.0),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Chip(
-                                          label:
-                                              Text(document['employment type']),
-                                        ),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
-                                        Chip(
-                                          label: Container(
-                                              width: 40,
-                                              child: Text(document[
-                                                  'experience level'])),
-                                        ),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
-                                        Chip(
-                                          label: Container(
-                                              width: 50,
-                                              child: Text(document['company']
-                                                      ?['city'] ??
-                                                  '-')),
+                                        SizedBox(height: 5),
+                                        Wrap(
+                                          spacing: 8.0,
+                                          runSpacing: 4.0,
+                                          children: [
+                                            Chip(
+                                              label: Text(
+                                                  document['employment type']),
+                                              backgroundColor:
+                                                  Colors.blue.shade50,
+                                            ),
+                                            Chip(
+                                              label: Container(
+                                                constraints: BoxConstraints(
+                                                    maxWidth: 60),
+                                                child: Text(
+                                                  document['experience level'],
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                              backgroundColor:
+                                                  Colors.green.shade50,
+                                            ),
+                                            Chip(
+                                              label: Container(
+                                                constraints: BoxConstraints(
+                                                    maxWidth: 90),
+                                                child: Text(
+                                                  document['company']
+                                                          ?['city'] ??
+                                                      '-',
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                              backgroundColor:
+                                                  Colors.orange.shade50,
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                    trailing: Flexible(
-                                      fit: FlexFit.tight,
-                                      child: Container(
-                                        height: 40,
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 5.0,
-                                          horizontal: 5.0,
+                                    trailing: Container(
+                                      width: 80,
+                                      height: 40,
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 5.0, horizontal: 5.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        getPostedTime(document['posted time']),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12.0,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue,
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
-                                        ),
-                                        child: Text(
-                                          getPostedTime(
-                                              document['posted time']),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12.0,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    tileColor: Colors.grey.shade100,
+                                    style: ListTileStyle.drawer,
                                   ),
                                 ),
                               ),

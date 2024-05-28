@@ -54,6 +54,7 @@ class _TabsScreenState extends State<TabsScreen> {
         actions: [
           _pages[selecetedPageIndex]['action'] ?? Container(),
         ],
+        backgroundColor: Colors.blueAccent,
       ),
       body: _pages[selecetedPageIndex]['page'],
       bottomNavigationBar: CurvedNavigationBar(

@@ -36,11 +36,6 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
 
   bool isJobSeeker = false;
   Future<void> checkUserRole(String uid) async {
-    // User? user = FirebaseAuth.instance.currentUser;
-    // if (user == null) {
-    //   return;
-    // }
-
     DocumentSnapshot userData = await FirebaseFirestore.instance
         .collection('job-seeker')
         .doc(uid)
@@ -67,7 +62,7 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
 
   bool _showProgressIndicator = false;
 
-  Future<void> signIn() async {
+  Future<void> signIn(BuildContext context) async {
     setState(() {
       _showProgressIndicator = true; // Show progress indicator
     });
@@ -87,6 +82,8 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
         } else {
           FirebaseAuth.instance.signOut();
           Utils.showSnackBar(context, 'Job seeker not found', Colors.red);
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Job seeker not found')));
           print('Job seeker not found');
         }
       } else {
@@ -191,7 +188,7 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     formKey.currentState?.save();
-                    signIn();
+                    signIn(context);
                   }
                 },
                 icon: const Icon(

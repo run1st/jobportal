@@ -165,7 +165,7 @@ class _ProfilePageViewState extends State<ProfilePageView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      SizedBox(height: 50),
+                      SizedBox(height: 30),
                       Row(
                         children: [
                           Padding(
@@ -175,7 +175,7 @@ class _ProfilePageViewState extends State<ProfilePageView> {
                               backgroundImage: otherData?['profile image'] !=
                                       null
                                   ? NetworkImage(otherData!['profile image'])
-                                  : AssetImage('assets/images/logo.jpeg')
+                                  : AssetImage('assets/images/profile2.jpeg')
                                       as ImageProvider,
                               radius: 50,
                             ),
@@ -187,13 +187,19 @@ class _ProfilePageViewState extends State<ProfilePageView> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
                         child: Text(
-                          '  ${personalInfo?['first name'] ?? ''} ${personalInfo?['last name'] ?? ''}',
-                          style: TextStyle(
+                          '  ${personalInfo?['first name'] ?? 'First Name'} ${personalInfo?['last name'] ?? 'Lat Name'}',
+                          style: const TextStyle(
                               fontSize: 30, fontWeight: FontWeight.bold),
                         ),
                       ),
                       education?['institution']?.isEmpty ?? true
-                          ? SizedBox()
+                          ? const SizedBox(
+                              child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                  ),
+                                  child: Text('  Institution: Not filled')),
+                            )
                           : Row(
                               children: [
                                 Padding(
@@ -211,7 +217,7 @@ class _ProfilePageViewState extends State<ProfilePageView> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 4),
                             child: Text(
-                                '${education?['levelOfEducation'] ?? ''} in ${education?['fieldOfStudy'] ?? ''}'),
+                                '${education?['levelOfEducation  '] ?? ''}  ${education?['fieldOfStudy'] ?? ''}'),
                           ),
                           const SizedBox(width: 10),
                         ],
@@ -241,9 +247,10 @@ class _ProfilePageViewState extends State<ProfilePageView> {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             ListTile(
-                              title: Text(experience?['job title'] ?? ''),
+                              title: Text(experience?['job title'] ??
+                                  'No experience Provided'),
                               subtitle: Text(
                                   '${experience?['company'] ?? ''}, $startDate - $finalDate'),
                             ),

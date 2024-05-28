@@ -134,7 +134,8 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
     'Small-Medium Business',
     'Medium Business',
     'Medium-Large Business',
-    'Large Business' 'Enterprise'
+    'Large Business',
+    'Enterprise'
   ];
   @override
   void initState() {
@@ -238,7 +239,7 @@ class _EmployerRegistrationFormState extends State<EmployerRegistrationForm> {
                       },
                     ),
                   ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 15.0, vertical: 10.0),
