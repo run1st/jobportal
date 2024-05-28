@@ -131,6 +131,21 @@ class _MyAppState extends State<MyApp> {
     //return isJobSeeker;
   }
 
+// Function to navigate to the employer page
+  void _navigateToEmployerPage(BuildContext context) {
+    Navigator.pushReplacementNamed(context, TabsScreen.routeName);
+  }
+
+// Function to navigate to the job seeker page
+  void _navigateToJobSeekerPage(BuildContext context) {
+    Navigator.pushReplacementNamed(context, home.routeName);
+  }
+
+// Function to navigate to the login page
+  void _navigateToLoginPage(BuildContext context) {
+    Navigator.pushReplacementNamed(context, LoginPage.routeName);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -153,23 +168,48 @@ class _MyAppState extends State<MyApp> {
         backgroundColor: Colors.blue,
         errorColor: Colors.red,
       ),
-      home: StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const MainSplash();
-            }
-            if (snapshot.hasData) {
-              User? user = snapshot.data;
-              checkUserRole(user?.uid ?? '');
-              if (isEmployer) {
-                Navigator.of(context).pushNamed(TabsScreen.routeName);
-              } else if (isJobSeeker) {
-                Navigator.of(context).pushNamed(home.routeName);
-              }
-            }
-            return const Splash1();
-          }),
+      home: Splash1(),
+      // StreamBuilder<User?>(
+      //     stream: FirebaseAuth.instance.authStateChanges(),
+      //     builder: (context, snapshot) {
+      //       if (snapshot.connectionState == ConnectionState.waiting) {
+      //         return const MainSplash();
+      //       }
+      //       if (snapshot.hasData) {
+      //         User? user = snapshot.data;
+      //         checkUserRole(user?.uid ?? '');
+      //         if (isEmployer) {
+      //           // Perform employer navigation
+      //           _navigateToEmployerPage(context);
+      //           return const SizedBox(); // Placeholder widget
+      //         } else if (isJobSeeker) {
+      //           // Perform job seeker navigation
+      //           _navigateToJobSeekerPage(context);
+      //           return const SizedBox(); // Placeholder widget
+      //         }
+      //       }
+      //       // Perform default navigation
+      //       _navigateToLoginPage(context);
+      //       return const Splash1();
+      //     }),
+
+      // StreamBuilder<User?>(
+      //     stream: FirebaseAuth.instance.authStateChanges(),
+      //     builder: (context, snapshot) {
+      //       if (snapshot.connectionState == ConnectionState.waiting) {
+      //         return const MainSplash();
+      //       }
+      //       if (snapshot.hasData) {
+      //         User? user = snapshot.data;
+      //         checkUserRole(user?.uid ?? '');
+      //         if (isEmployer) {
+      //           Navigator.of(context).pushNamed(TabsScreen.routeName);
+      //         } else if (isJobSeeker) {
+      //           Navigator.of(context).pushNamed(home.routeName);
+      //         }
+      //       }
+      //       return const Splash1();
+      //     }),
 
       //
 
