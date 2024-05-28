@@ -735,159 +735,142 @@ class _JobsListState extends State<JobsList> {
                 } else
                   return SafeArea(
                     child: SingleChildScrollView(
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height - 400,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 10),
-                          itemCount: postedJobs.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            DocumentSnapshot document = postedJobs[index];
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height - 400,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 10),
+                              itemCount: postedJobs.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                DocumentSnapshot document = postedJobs[index];
 
-                            return GestureDetector(
-                              onTap: () {
-                                // Navigator.pushNamed(
-                                //     context, JobDetailPage.routName,
-                                //     arguments: document);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => JobDetailPage(
-                                      index: index,
-                                      job: document,
-                                    ),
-                                    settings: const RouteSettings(
-                                        name: "jobDetailRoute"),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                height:
-                                    MediaQuery.of(context).size.height - 585,
-                                child: Card(
-                                  color: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                      // side:
-                                      //     BorderSide(color: Colors.black, width: 1),
-                                      // borderRadius: BorderRadius.circular(15),
-                                      borderRadius: const BorderRadius.only(
-                                    bottomLeft: Radius.circular(20.0),
-                                    topRight: Radius.circular(20.0),
-                                    bottomRight: Radius.circular(20.0),
-                                    topLeft: Radius.circular(20.0),
-                                  )),
-                                  elevation: 5,
-                                  margin: EdgeInsets.symmetric(
-                                      horizontal: 5, vertical: 10),
-                                  child: ListTile(
-                                    contentPadding: EdgeInsets.symmetric(
-                                        vertical: 10.0, horizontal: 15.0),
-                                    leading: document['company'] != null &&
-                                            document['company']?['logoUrl']
-                                                is String &&
-                                            document['company']?['logoUrl']
-                                                .isNotEmpty
-                                        ? CircleAvatar(
-                                            radius: 30,
-                                            backgroundImage: NetworkImage(
-                                                document['company']?['logoUrl']
-                                                    as String),
-                                          )
-                                        : CircleAvatar(
-                                            radius: 30,
-                                            child: Icon(Icons.person, size: 30),
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => JobDetailPage(
+                                          index: index,
+                                          job: document,
+                                        ),
+                                        settings: const RouteSettings(
+                                            name: "jobDetailRoute"),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 10),
+                                    child: Card(
+                                      color: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                      ),
+                                      elevation: 5,
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.symmetric(
+                                            vertical: 10.0, horizontal: 15.0),
+                                        leading: document['company'] != null &&
+                                                document['company']['logoUrl']
+                                                    is String &&
+                                                document['company']['logoUrl']
+                                                    .isNotEmpty
+                                            ? CircleAvatar(
+                                                radius: 30,
+                                                backgroundImage: NetworkImage(
+                                                    document['company']
+                                                        ['logoUrl']),
+                                              )
+                                            : CircleAvatar(
+                                                radius: 30,
+                                                child: Icon(Icons.person,
+                                                    size: 30),
+                                              ),
+                                        title: Text(
+                                          document['title'],
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16.0,
                                           ),
-                                    title: Text(
-                                      document['title'],
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16.0),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(height: 5),
-                                        Wrap(
-                                          spacing: 8.0,
-                                          runSpacing: 4.0,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Chip(
-                                              label: Text(
-                                                  document['employment type']),
-                                              backgroundColor:
-                                                  Colors.blue.shade50,
-                                            ),
-                                            Chip(
-                                              label: Container(
-                                                constraints: BoxConstraints(
-                                                    maxWidth: 60),
-                                                child: Text(
-                                                  document['experience level'],
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  maxLines: 1,
-                                                  textAlign: TextAlign.center,
+                                            SizedBox(height: 5),
+                                            Wrap(
+                                              spacing: 8.0,
+                                              runSpacing: 4.0,
+                                              children: [
+                                                Chip(
+                                                  label: Text(document[
+                                                      'employment type']),
+                                                  backgroundColor:
+                                                      Colors.blue.shade50,
                                                 ),
-                                              ),
-                                              backgroundColor:
-                                                  Colors.green.shade50,
+                                              ],
                                             ),
-                                            Chip(
-                                              label: Container(
-                                                constraints: BoxConstraints(
-                                                    maxWidth: 90),
-                                                child: Text(
-                                                  document['company']
-                                                          ?['city'] ??
-                                                      '-',
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  maxLines: 1,
-                                                  textAlign: TextAlign.center,
+                                            Row(
+                                              children: [
+                                                Chip(
+                                                  label: Text(document[
+                                                      'experience level']),
+                                                  backgroundColor:
+                                                      Colors.green.shade50,
                                                 ),
-                                              ),
-                                              backgroundColor:
-                                                  Colors.orange.shade50,
+                                                Chip(
+                                                  label: Text(
+                                                      document['company']
+                                                              ?['city'] ??
+                                                          '-'),
+                                                  backgroundColor:
+                                                      Colors.orange.shade50,
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                    trailing: Container(
-                                      width: 80,
-                                      height: 40,
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 5.0, horizontal: 5.0),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue,
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        getPostedTime(document['posted time']),
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12.0,
-                                          fontWeight: FontWeight.bold,
+                                        trailing: Container(
+                                          width: 80,
+                                          height: 40,
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 5.0, horizontal: 5.0),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue,
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            getPostedTime(
+                                                document['posted time']),
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12.0,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
                                         ),
-                                        textAlign: TextAlign.center,
+                                        tileColor: Colors.grey.shade100,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        style: ListTileStyle.drawer,
                                       ),
                                     ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                    tileColor: Colors.grey.shade100,
-                                    style: ListTileStyle.drawer,
                                   ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );

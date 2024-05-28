@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -181,17 +180,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   Map<String, dynamic>? skills =
                       snapshot.data!.data()?['skills'] as Map<String, dynamic>?;
                   final List<dynamic>? languageSkills =
-                      snapshot.data!.data()?['skills'] ??
-                          {}['language skills'] ??
-                          [];
+                      skills?['language skills'] as List<dynamic>?;
                   final List<dynamic>? personalSkills =
-                      snapshot.data!.data()?['skills'] ??
-                          {}['personal skills'] ??
-                          [];
+                      skills?['personal skills'] as List<dynamic>?;
                   final List<dynamic>? professionalSkills =
-                      snapshot.data!.data()?['skills'] ??
-                          {}['professional skills'] ??
-                          [];
+                      skills?['professional skills'] as List<dynamic>?;
                   Map<String, dynamic>? experience =
                       snapshot.data!.data()?['experiences'] ??
                           {}['experience'] as Map<String, dynamic>?;
@@ -633,103 +626,3 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
-
-class ImageCard extends StatelessWidget {
-  final String imagePath;
-  final String imageCaption;
-
-  const ImageCard({
-    Key? key,
-    required this.imagePath,
-    required this.imageCaption,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Image.asset(
-          imagePath,
-          fit: BoxFit.cover,
-        ),
-        Text(
-          imageCaption,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
-}
-
-class UpdateSkillsDialog extends StatelessWidget {
-  final String skill_Type;
-
-  const UpdateSkillsDialog({Key? key, required this.skill_Type})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Add $skill_Type'),
-      content: TextField(),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () {},
-          child: Text('Add'),
-        ),
-      ],
-    );
-  }
-}
-
-class UpdateEducationDialog extends StatelessWidget {
-  const UpdateEducationDialog({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Update Education'),
-      content: TextField(),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () {},
-          child: Text('Update'),
-        ),
-      ],
-    );
-  }
-}
-
-// class MyTimeLineWrapper extends StatelessWidget {
-//   final bool personal;
-//   final bool education;
-//   final bool experience;
-//   final bool skills;
-
-//   const MyTimeLineWrapper({
-//     Key? key,
-//     required this.personal,
-//     required this.education,
-//     required this.experience,
-//     required this.skills,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       child: Text('Timeline goes here...'),
-//     );
-//   }
-// }
