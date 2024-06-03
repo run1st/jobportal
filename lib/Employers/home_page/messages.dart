@@ -63,12 +63,6 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
     await messageDocumentReference.set(jsonData);
   }
 
-  String formatTimestamp(Timestamp timestamp) {
-    DateTime dateTime = timestamp.toDate();
-
-    return DateFormat("yyyy-MM-dd").format(dateTime);
-  }
-
   Company? companyProfile;
   Future<void> fetchAndSaveCompanyData() async {
     try {
@@ -104,6 +98,11 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
     }
   }
 
+  String formatTimestamp(Timestamp timestamp) {
+    DateTime dateTime = timestamp.toDate();
+    return '${DateFormat.yMMMd().format(dateTime)} at ${DateFormat.jm().format(dateTime)}';
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -137,7 +136,7 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
           }
           if (snapshot.hasError) return Text('Error: ${snapshot.error}');
           if (!snapshot.hasData) {
-            return const Text('OOPS there is no posted jobs');
+            return const Text('OOPS there is messages yet');
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const Text('Loading...');
           } else {
@@ -207,7 +206,7 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
                         DocumentSnapshot message = sentMessages[index];
                         String date = formatTimestamp(message['timestamp']);
                         return ListTile(
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16.0, vertical: 8.0),
                           tileColor: Colors.grey[200],
                           shape: RoundedRectangleBorder(
@@ -215,15 +214,15 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
                           ),
                           title: Text(
                             message['content'],
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           subtitle: Padding(
-                            padding: EdgeInsets.only(top: 4.0),
+                            padding: const EdgeInsets.only(top: 4.0),
                             child: Text(
-                              '${date}',
+                              date,
                               style: TextStyle(
                                 fontSize: 12.0,
                                 color: Colors.grey[600],

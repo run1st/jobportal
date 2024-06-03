@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project1/user_account/auth_page.dart';
 import 'package:project1/user_account/emp_sign_up_form.dart';
 import 'package:project1/user_account/rgister.dart';
 import 'package:project1/user_account/seeker_sign_up_form.dart';
@@ -95,12 +96,19 @@ class _Sign_up_inState extends State<Sign_up_in> {
                   ],
                 ),
                 button1 == true ? JobSeekerSignUPForm() : EmpSignUpForm(),
-                const Text('Alrady have an account'),
-                TextButton(
-                    onPressed: () {
-                      widget.onclickedSignUp();
-                    },
-                    child: const Text('Sing In')),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Alrady have an account'),
+                    TextButton(
+                        onPressed: () {
+                          // widget.onclickedSignUp();
+                          Navigator.pushNamed(context, AuthPage.routName,
+                              arguments: AuthPage(isLogin: true));
+                        },
+                        child: const Text('Sing In')),
+                  ],
+                ),
                 ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text('back'))

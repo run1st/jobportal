@@ -173,30 +173,26 @@ class _EmpSignUpFormState extends State<EmpSignUpForm> {
             const SizedBox(
               height: 20,
             ),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  minimumSize:
-                      Size.fromHeight(MediaQuery.of(context).size.height - 670),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
-                onPressed: () {
-                  if (formKey.currentState!.validate()) {
-                    formKey.currentState?.save();
-                    //  signUp();
-                    _isSigningUp ? null : EmpsignUp();
-                  }
-                },
-                icon: const Icon(Icons.person_add),
-                label: _isSigningUp
-                    ? const CircularProgressIndicator(
-                        color: Colors.amber,
-                      ) // Show progress indicator
-                    : const Text('Sign Up'),
+                minimumSize: Size.fromHeight(70),
               ),
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  formKey.currentState?.save();
+                  //  signUp();
+                  _isSigningUp ? null : EmpsignUp();
+                }
+              },
+              icon: const Icon(Icons.person_add),
+              label: _isSigningUp
+                  ? const CircularProgressIndicator(
+                      color: Colors.amber,
+                    ) // Show progress indicator
+                  : const Text('Sign Up'),
             ),
             const SizedBox(
               height: 24,

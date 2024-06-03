@@ -35,7 +35,7 @@ class _homeState extends State<home> {
   final List<Map<String, dynamic>> _pages = [
     {'page': JobsList(), 'title': Text('jobs')},
     {'page': Favorite(), 'title': Text('SavedJobs')},
-    {'page': JobSeekerNotification(), 'title': Text('profile')},
+    {'page': JobSeekerNotification(), 'title': Text('Notifications')},
     // {'page': EmpNotification(), 'title': Text('Notification')}
   ];
 
@@ -110,6 +110,7 @@ class _homeState extends State<home> {
           ),
         ),
         appBar: AppBar(
+          backgroundColor: Colors.blueAccent,
           title: _pages[_selectedIndex]['title'],
           actions: [
             CircleAvatar(

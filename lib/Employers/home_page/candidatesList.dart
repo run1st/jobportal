@@ -31,7 +31,8 @@ class _CandidatesListState extends State<CandidatesList> {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           if (!snapshot.hasData) {
-            return const Center(child: Text('OOPS there is no posted jobs'));
+            return const Center(
+                child: Text('OOPS there is no selected candidates'));
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else {

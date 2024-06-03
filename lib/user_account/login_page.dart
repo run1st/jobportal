@@ -114,19 +114,32 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 button1 == true ? JobSeekerLoginForm() : EmpLoginForm(),
-                RichText(
-                    text: TextSpan(
-                        style: TextStyle(color: Colors.black),
-                        text: 'No accont ?  ',
-                        children: [
-                      TextSpan(
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = widget.onclickedSignIn,
-                          text: 'Sign up',
-                          style: TextStyle(
-                              color: Colors.blue,
-                              decoration: TextDecoration.underline))
-                    ])),
+                // RichText(
+                //     text: TextSpan(
+                //         style: TextStyle(color: Colors.black),
+                //         text: 'No accont ?  ',
+                //         children: [
+                //       TextSpan(
+                //           recognizer: TapGestureRecognizer()
+                //          //   ..onTap = widget.onclickedSignIn,
+                //            ..onTap =
+                //           text: 'Sign up',
+                //           style: TextStyle(
+                //               color: Colors.blue,
+                //               decoration: TextDecoration.underline))
+                //     ])),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('No Account'),
+                    TextButton(
+                        onPressed: (() {
+                          Navigator.pushNamed(context, AuthPage.routName,
+                              arguments: AuthPage(isLogin: false));
+                        }),
+                        child: Text('Sign Up'))
+                  ],
+                )
                 // ElevatedButton(
                 //     onPressed: () => Navigator.of(context).pop(),
                 //     child: Text('back'))

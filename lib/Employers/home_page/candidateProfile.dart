@@ -59,7 +59,7 @@ class candidateProfile extends StatelessWidget {
     final jobId = arguments[1];
     return Scaffold(
       appBar: AppBar(
-        title: Text('Applicant Profile'),
+        title: Text('Candidates Profile'),
       ),
       floatingActionButton: FloatingActionButton(
           child: Icon(Icons.arrow_back),

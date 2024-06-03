@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project1/Employers/Employers_account/emp_forgote_account.dart';
+import 'package:project1/user_account/auth_page.dart';
+import 'package:project1/user_account/signup_signin.dart';
 import 'package:project1/user_account/utils.dart';
 import 'package:project1/user_account/verify_email.dart';
 import 'package:project1/job_seeker_home_page/jobSeekerHome.dart';
@@ -180,11 +182,11 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
               ),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    minimumSize: Size.fromHeight(
-                        MediaQuery.of(context).size.height - 670)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  minimumSize: Size.fromHeight(70),
+                ),
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     formKey.currentState?.save();
@@ -196,19 +198,19 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
                   size: 30.0,
                 ),
                 label: _showProgressIndicator
-                    ? CircularProgressIndicator(
+                    ? const CircularProgressIndicator(
                         color: Colors.amber,
                       ) // Show progress indicator
-                    : Text('Sign In'),
+                    : const Text('Sign In'),
               ),
               const SizedBox(
                 height: 24,
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               GestureDetector(
-                  child: Text(
+                  child: const Text(
                     'forgote password',
                     style: TextStyle(
                         decoration: TextDecoration.underline,
@@ -216,7 +218,7 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
                   ),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => ForgotePassword()))),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
             ],

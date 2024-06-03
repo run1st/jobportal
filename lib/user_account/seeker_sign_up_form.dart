@@ -221,7 +221,7 @@ class _JobSeekerSignUPFormState extends State<JobSeekerSignUPForm> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    minimumSize: Size.fromHeight(60)),
+                    minimumSize: Size.fromHeight(70)),
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     formKey.currentState?.save();

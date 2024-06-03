@@ -1,33 +1,50 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:project1/Employers/models/jobs_model.dart';
 import 'package:project1/job_seeker_home_page/image_card.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:intl/intl.dart'; // Import the intl package
 
 class JobSeekerNotification extends StatefulWidget {
   static const routeName = 'JobSeekerNotification';
+
   @override
   _JobSeekerNotificationState createState() => _JobSeekerNotificationState();
 }
 
 class _JobSeekerNotificationState extends State<JobSeekerNotification> {
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return user.uid;
-    } else {
-      return '';
+  String currentUser = '';
+
+  Future<void> getUserUid() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUser = user.uid;
+        });
+      } else {
+        print('No user is signed in.');
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    getUserUid();
+  }
+
+  String formatTimestamp(Timestamp timestamp) {
+    DateTime dateTime = timestamp.toDate();
+    return '${DateFormat.yMMMd().format(dateTime)} at ${DateFormat.jm().format(dateTime)}';
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (getCurrentUserUid().isEmpty) {
+    if (currentUser.isEmpty) {
       // User not logged in, show a placeholder widget
-      return Center(
+      return const Center(
         child: Text('Please log in to view notifications.'),
       );
     }
@@ -35,23 +52,25 @@ class _JobSeekerNotificationState extends State<JobSeekerNotification> {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('job-seeker')
-            .doc(getCurrentUserUid())
+            .doc(currentUser)
             .collection('messages')
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             // No data or empty messages list
-            return Center(
+            return const Center(
               child: ImageCard(
                 imagePath: 'assets/images/noNotification.jpg',
                 imageCaption: 'No messages found',
@@ -62,59 +81,77 @@ class _JobSeekerNotificationState extends State<JobSeekerNotification> {
           List<DocumentSnapshot> postedJobs = snapshot.data!.docs.toList();
 
           return SafeArea(
-            child: SingleChildScrollView(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                  itemCount: postedJobs.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    DocumentSnapshot document = postedJobs[index];
-                    return GestureDetector(
-                      onTap: () {
-                        // Handle onTap action
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          color: Colors.blueAccent,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(25),
-                            bottomRight: Radius.circular(25),
+            child: ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              itemCount: postedJobs.length,
+              itemBuilder: (BuildContext context, int index) {
+                DocumentSnapshot document = postedJobs[index];
+                Timestamp timestamp = document['timestamp'] as Timestamp;
+                String formattedDate = formatTimestamp(timestamp);
+
+                return GestureDetector(
+                  onTap: () {
+                    // Handle onTap action
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4.0,
+                          offset: Offset(0.0, 4.0),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.blueAccent,
+                          child: Icon(
+                            Icons.notifications,
+                            color: Colors.white,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 4.0,
-                              offset: Offset(0.0, 2.0),
+                        ),
+                        title: Text(
+                          document['senderInfo'] != null
+                              ? document['senderInfo']['name']
+                              : 'Company',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueAccent,
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              document['content'],
+                              style: const TextStyle(
+                                color: Colors.black87,
+                                fontSize: 16.0,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              'Date: $formattedDate',
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12.0,
+                              ),
                             ),
                           ],
                         ),
-                        child: ListTile(
-                          title: Text(
-                            'ABC company',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.yellow,
-                            ),
-                          ),
-                          subtitle: Text(
-                            document['content'],
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
                       ),
-                    );
-                  },
-                ),
-              ),
+                    ),
+                  ),
+                );
+              },
             ),
           );
         },

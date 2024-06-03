@@ -288,6 +288,8 @@ class _MyHomePageState extends State<MyHomePage> {
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.blueAccent,
           title: Text('Hulu Jobs'),
         ),
         body: SingleChildScrollView(
@@ -358,27 +360,31 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[for (int i = 0; i < 3; i++) dotIndicator(i)],
               ),
-              const Text(
-                'Register As',
+              const SizedBox(
+                height: 10,
               ),
-              SizedBox(
-                height: 20,
+              const Text(
+                'Have no Account ',
+              ),
+              const SizedBox(
+                height: 10,
               ),
               Container(
                 width: MediaQuery.of(context).size.width - 50,
-                margin: EdgeInsets.all(20),
+                margin: const EdgeInsets.all(20),
                 child: FloatingActionButton(
                   heroTag: "btn1",
                   // clipBehavior: Clip.hardEdge,
                   onPressed: () => Navigator.pushNamed(
                       context, AuthPage.routName,
                       arguments: AuthPage(isLogin: false)),
-                  child: Text('Register'),
+
                   // textColor: Colors.white,
                   // color: Colors.deepPurple,
                   // padding: EdgeInsets.all(20),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
+                  child: const Text('Register'),
                 ),
               ),
               Row(
