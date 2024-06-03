@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project1/jobSeekerModel/job_seeker_profile_model.dart';
 import 'package:project1/job_seeker_home_page/image_card.dart';
+import 'package:project1/profile/add_experience.dart';
 import 'package:project1/profile/tim_line_wraper.dart';
 import 'package:project1/profile/updateProfile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   List<Map<String, dynamic>> profData = [];
   bool addProfile = false;
   String? currentUser;
-
+  List<ExperienceModel> experiences = [];
   Future<void> getUserUid() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
@@ -63,14 +65,75 @@ class _ProfilePageState extends State<ProfilePage> {
     return prefs2.get(key) ?? false; // Provide a default value if null
   }
 
+  Future<void> _addExperienceDialog() async {
+    if (currentUser != null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return ExperienceFormDialog(currentUser: currentUser!);
+        },
+      );
+    }
+  }
+
+  Future<List<ExperienceModel>> _fetchExperiences() async {
+    if (currentUser == null) return [];
+
+    try {
+      final personalInfoDocRef = FirebaseFirestore.instance
+          .collection('job-seeker')
+          .doc(currentUser)
+          .collection('jobseeker-profile')
+          .doc('profile');
+
+      DocumentSnapshot profileSnapshot = await personalInfoDocRef.get();
+
+      if (profileSnapshot.exists) {
+        Map<String, dynamic>? data =
+            profileSnapshot.data() as Map<String, dynamic>?;
+
+        if (data != null && data.containsKey('experiences')) {
+          Map<String, dynamic> experiencesMap =
+              data['experiences'] as Map<String, dynamic>;
+          setState(() {
+            experiences = experiencesMap.values.map((exp) {
+              return ExperienceModel.fromMap(exp as Map<String, dynamic>);
+            }).toList();
+          });
+
+          // Log the fetched experiences
+          print('Fetched Experiences: $experiences');
+
+          return experiences;
+        }
+      }
+    } catch (e) {
+      // Log any errors that occur during data retrieval
+      print('Error fetching experiences: $e');
+    }
+
+    return [];
+  }
+
+  Future<void> _loadExperiences() async {
+    if (currentUser != null) {
+      List<ExperienceModel> fetchedExperiences = await _fetchExperiences();
+      setState(() {
+        experiences = fetchedExperiences;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getUserUid();
+    _loadExperiences();
   }
 
   @override
   Widget build(BuildContext context) {
+    //   _loadExperiences();
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
@@ -188,12 +251,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   Map<String, dynamic>? experience =
                       snapshot.data!.data()?['experiences'] ??
                           {}['experience'] as Map<String, dynamic>?;
+
                   Map<String, dynamic>? education = snapshot.data!
                       .data()?['education'] as Map<String, dynamic>?;
 
                   String startDate = experience?['startDte'] != null
                       ? formatTimestamp(experience?['startDte'])
                       : 'No start date';
+
                   String finalDate = experience?['End date'] != null
                       ? formatTimestamp(experience?['End date'])
                       : 'No end date';
@@ -202,7 +267,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      SizedBox(height: 50),
+                      const SizedBox(height: 50),
                       Row(
                         children: [
                           Padding(
@@ -212,25 +277,26 @@ class _ProfilePageState extends State<ProfilePage> {
                               backgroundImage: otherData?['profile image'] !=
                                       null
                                   ? NetworkImage(otherData!['profile image'])
-                                  : AssetImage('assets/images/logo.jpeg')
+                                  : const AssetImage(
+                                          'assets/images/profile2.jpeg')
                                       as ImageProvider,
                               radius: 50,
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
                         child: Text(
                           '  ${personalInfo?['first name'] ?? ''} ${personalInfo?['last name'] ?? ''}',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 30, fontWeight: FontWeight.bold),
                         ),
                       ),
                       education?['institution']?.isEmpty ?? true
-                          ? SizedBox()
+                          ? const SizedBox()
                           : Row(
                               children: [
                                 Padding(
@@ -239,10 +305,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                   child: Text(
                                       '${education?['institution'] ?? ''}'),
                                 ),
-                                SizedBox(width: 10),
+                                const SizedBox(width: 10),
                                 IconButton(
                                   onPressed: () {},
-                                  icon: Icon(Icons.edit, color: Colors.grey),
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.grey),
                                 ),
                               ],
                             ),
@@ -251,8 +318,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 4),
-                            child: Text(
-                                '${education?['levelOfEducation'] ?? ''} in ${education?['fieldOfStudy'] ?? ''}'),
+                            child: education != null
+                                ? Text(
+                                    '${education?['levelOfEducation'] ?? ''} in ${education?['fieldOfStudy'] ?? ''}')
+                                : const SizedBox(),
                           ),
                           SizedBox(width: 10),
                           IconButton(
@@ -282,38 +351,58 @@ class _ProfilePageState extends State<ProfilePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  'Experience',
+                                const Text(
+                                  'Experiences',
                                   style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.add),
+                                  onPressed: () {
+                                    _addExperienceDialog();
+                                  },
+                                  icon: const Icon(Icons.add),
                                 ),
                               ],
                             ),
-                            SizedBox(height: 10),
-                            ListTile(
-                              title: Text(experience?['job title'] ?? ''),
-                              subtitle: Text(
-                                  '${experience?['company'] ?? ''}, $startDate - $finalDate'),
-                              trailing: IconButton(
-                                onPressed: () {},
-                                icon: Icon(Icons.edit),
-                              ),
-                            ),
-                            Divider(),
-                            ListTile(
-                              title: Text('Front-end Developer'),
-                              subtitle: Text('XYZ Inc., Sep 2018 - Dec 2019'),
-                              trailing: Icon(Icons.edit),
-                            ),
+                            const SizedBox(height: 10),
+                            experiences.isEmpty
+                                ? const Center(
+                                    child: Text('No experiences found.'))
+                                : SingleChildScrollView(
+                                    child: Column(
+                                      children: [
+                                        ListView.builder(
+                                          shrinkWrap: true,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          itemCount: experiences.length,
+                                          itemBuilder: (context, index) {
+                                            ExperienceModel experience =
+                                                experiences[index];
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 5),
+                                              child: ListTile(
+                                                title: Text(experience.title ??
+                                                    'No title'),
+                                                subtitle: Text(
+                                                    '${experience.startDate != null ? DateFormat('yyyy-MM-dd').format(experience.startDate!) : 'No start date'} - ${experience.endDate != null ? DateFormat('yyyy-MM-dd').format(experience.endDate!) : 'No end date'}'),
+                                                trailing: Text(
+                                                    experience.company ??
+                                                        'No company'),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 20),
                         padding:
@@ -328,7 +417,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
+                                const Text(
                                   'Education',
                                   style: TextStyle(
                                       fontSize: 20,
@@ -336,204 +425,77 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                                 Row(
                                   children: [
-                                    IconButton(
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) =>
-                                              UpdateEducationDialog(),
-                                        );
-                                      },
-                                      icon: Icon(Icons.edit),
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) =>
-                                              UpdateEducationDialog(),
-                                        );
-                                      },
-                                      icon: Icon(Icons.add),
-                                    ),
+                                    education != null
+                                        ? IconButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        UpdateEducationDialog(),
+                                              );
+                                            },
+                                            icon: const Icon(Icons.edit),
+                                          )
+                                        : const SizedBox(),
+                                    education == null
+                                        ? IconButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        UpdateEducationDialog(),
+                                              );
+                                            },
+                                            icon: const Icon(Icons.add),
+                                          )
+                                        : const SizedBox(),
                                   ],
                                 ),
                               ],
                             ),
                             SizedBox(height: 10),
-                            ListTile(
-                              title: Text(
-                                  'Bachelor in ${education?['fieldOfStudy'] ?? ''}'),
-                              subtitle: Text(
-                                  'University of ABC, Sep 2014 - May 2018'),
-                            ),
+                            education != null
+                                ? ListTile(
+                                    title: Text(
+                                        'Bachelor in ${education?['fieldOfStudy'] ?? ''}'),
+                                    subtitle: Text(
+                                        'University of ABC, Sep 2014 - May 2018'),
+                                  )
+                                : const Center(
+                                    child: Text('No Education added'),
+                                  ),
                           ],
                         ),
                       ),
                       SizedBox(height: 20),
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 15),
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Professional skills',
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text('Add'),
-                                        IconButton(
-                                          onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) =>
-                                                  UpdateSkillsDialog(
-                                                      skill_Type:
-                                                          'professional skills'),
-                                            );
-                                          },
-                                          icon: Icon(Icons.add,
-                                              color: Colors.amber),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                professionalSkills!.isEmpty
-                                    ? SizedBox()
-                                    : Wrap(
-                                        spacing: 8.0,
-                                        runSpacing: 4.0,
-                                        children: [
-                                          ...professionalSkills.map(
-                                            (skill) => Chip(
-                                              labelStyle: TextStyle(
-                                                  color: Colors.white),
-                                              backgroundColor: Color.fromARGB(
-                                                  255, 22, 125, 209),
-                                              deleteIconColor: Colors.yellow,
-                                              label: Text(skill),
-                                              onDeleted: () {},
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                              ],
+                      if (professionalSkills != null) ...[
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 15),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
                             ),
-                          ),
-                        ),
-                      ),
-                      Column(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.symmetric(horizontal: 15),
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 10),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            'Personal skills',
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Professional skills',
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold),
                                         ),
-                                        Row(
-                                          children: [
-                                            Text('Add'),
-                                            IconButton(
-                                              onPressed: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext
-                                                          context) =>
-                                                      UpdateSkillsDialog(
-                                                          skill_Type:
-                                                              'personal skills'),
-                                                );
-                                              },
-                                              icon: Icon(Icons.add,
-                                                  color: Colors.amber),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    personalSkills!.isEmpty
-                                        ? SizedBox()
-                                        : Wrap(
-                                            spacing: 8.0,
-                                            runSpacing: 4.0,
-                                            children: [
-                                              ...personalSkills.map(
-                                                (skill) => Chip(
-                                                  deleteIconColor: Colors.red,
-                                                  label: Text(skill),
-                                                  onDeleted: () {},
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 15),
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Language skills',
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold),
                                       ),
-                                    ),
-                                    GestureDetector(
-                                      child: Row(
+                                      Row(
                                         children: [
                                           Text('Add'),
                                           IconButton(
@@ -544,7 +506,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                         context) =>
                                                     UpdateSkillsDialog(
                                                         skill_Type:
-                                                            'language skills'),
+                                                            'professional skills'),
                                               );
                                             },
                                             icon: Icon(Icons.add,
@@ -552,31 +514,171 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                languageSkills!.isEmpty
-                                    ? SizedBox()
-                                    : Wrap(
-                                        spacing: 8.0,
-                                        runSpacing: 4.0,
-                                        children: [
-                                          ...languageSkills.map(
-                                            (skill) => Chip(
-                                              backgroundColor: Color.fromARGB(
-                                                  255, 48, 214, 226),
-                                              deleteIconColor: Colors.red,
-                                              label: Text(skill),
-                                              onDeleted: () {},
+                                    ],
+                                  ),
+                                  professionalSkills.isEmpty
+                                      ? SizedBox()
+                                      : Wrap(
+                                          spacing: 8.0,
+                                          runSpacing: 4.0,
+                                          children: [
+                                            ...professionalSkills.map(
+                                              (skill) => Chip(
+                                                labelStyle: TextStyle(
+                                                    color: Colors.white),
+                                                backgroundColor: Color.fromARGB(
+                                                    255, 22, 125, 209),
+                                                deleteIconColor: Colors.yellow,
+                                                label: Text(skill),
+                                                onDeleted: () {},
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                              ],
+                                          ],
+                                        ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
+                      if (personalSkills != null) ...[
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 15),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 10),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Personal skills',
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text('Add'),
+                                          IconButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext
+                                                        context) =>
+                                                    UpdateSkillsDialog(
+                                                        skill_Type:
+                                                            'personal skills'),
+                                              );
+                                            },
+                                            icon: Icon(Icons.add,
+                                                color: Colors.amber),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  personalSkills.isEmpty
+                                      ? SizedBox()
+                                      : Wrap(
+                                          spacing: 8.0,
+                                          runSpacing: 4.0,
+                                          children: [
+                                            ...personalSkills.map(
+                                              (skill) => Chip(
+                                                deleteIconColor: Colors.red,
+                                                label: Text(skill),
+                                                onDeleted: () {},
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      if (languageSkills != null) ...[
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 15),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 10),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Language skills',
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        child: Row(
+                                          children: [
+                                            Text('Add'),
+                                            IconButton(
+                                              onPressed: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (BuildContext
+                                                          context) =>
+                                                      UpdateSkillsDialog(
+                                                          skill_Type:
+                                                              'language skills'),
+                                                );
+                                              },
+                                              icon: Icon(Icons.add,
+                                                  color: Colors.amber),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  languageSkills.isEmpty
+                                      ? SizedBox()
+                                      : Wrap(
+                                          spacing: 8.0,
+                                          runSpacing: 4.0,
+                                          children: [
+                                            ...languageSkills.map(
+                                              (skill) => Chip(
+                                                backgroundColor: Color.fromARGB(
+                                                    255, 48, 214, 226),
+                                                deleteIconColor: Colors.red,
+                                                label: Text(skill),
+                                                onDeleted: () {},
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                       SizedBox(height: 20),
                       Center(
                         child: Container(

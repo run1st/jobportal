@@ -324,8 +324,8 @@ class _EducationFormState extends State<EducationForm> {
                                 levelOfEducation: eduLevelChoosed,
                                 institution: collageNameController.text,
                                 fieldOfStudy: fieldOfStudyChoosed,
-                                startDate: stringStartDate,
-                                endDate: stringEndDate);
+                                startDate: startDateSelected,
+                                endDate: endDateSelected);
 
                             try {
                               await saveEducationInfo(educationInfo);

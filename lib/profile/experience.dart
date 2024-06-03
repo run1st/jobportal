@@ -183,7 +183,7 @@ class _ExperienceState extends State<Experience> {
                         },
                       ),
                     ),
-                    Text('Region'),
+                    const Text('Region'),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 15, vertical: 10),

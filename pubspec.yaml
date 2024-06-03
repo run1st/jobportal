@@ -50,7 +50,7 @@ dependencies:
   shared_preferences: ^2.1.1
   syncfusion_flutter_pdf: ^21.2.4
   pdf: ^3.6.0
-  url_launcher: ^6.1.13
+  url_launcher: ^6.0.20
   open_file: ^3.0.1
   flutter_pdfview: ^1.2.5
   file_picker: ^5.2.1

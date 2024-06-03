@@ -41,7 +41,8 @@ class _ProfilePageViewState extends State<ProfilePageView> {
     }
   }
 
-  String formatTimestamp(Timestamp timestamp) {
+  String formatTimestamp(Timestamp? timestamp) {
+    if (timestamp == null) return 'No date provided';
     DateTime dateTime = timestamp.toDate();
     return DateFormat("yyyy-MM-dd").format(dateTime);
   }
@@ -187,12 +188,12 @@ class _ProfilePageViewState extends State<ProfilePageView> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
                         child: Text(
-                          '  ${personalInfo?['first name'] ?? 'First Name'} ${personalInfo?['last name'] ?? 'Lat Name'}',
+                          '  ${personalInfo?['first name'] ?? 'First Name'} ${personalInfo?['last name'] ?? 'Last Name'}',
                           style: const TextStyle(
                               fontSize: 30, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      education?['institution']?.isEmpty ?? true
+                      (education?['institution']?.isEmpty ?? true)
                           ? const SizedBox(
                               child: Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -217,7 +218,7 @@ class _ProfilePageViewState extends State<ProfilePageView> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 4),
                             child: Text(
-                                '${education?['levelOfEducation  '] ?? ''}  ${education?['fieldOfStudy'] ?? ''}'),
+                                '${education?['levelOfEducation'] ?? ''}  ${education?['fieldOfStudy'] ?? ''}'),
                           ),
                           const SizedBox(width: 10),
                         ],
@@ -250,19 +251,15 @@ class _ProfilePageViewState extends State<ProfilePageView> {
                             const SizedBox(height: 10),
                             ListTile(
                               title: Text(experience?['job title'] ??
-                                  'No experience Provided'),
+                                  'No prior experience Provided'),
                               subtitle: Text(
                                   '${experience?['company'] ?? ''}, $startDate - $finalDate'),
                             ),
                             const Divider(),
-                            const ListTile(
-                              title: Text('Front-end Developer'),
-                              subtitle: Text('XYZ Inc., Sep 2018 - Dec 2019'),
-                            ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 20),
                         padding:
@@ -285,19 +282,23 @@ class _ProfilePageViewState extends State<ProfilePageView> {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             ListTile(
-                              title: Text(
-                                  'Bachelor in ${education?['fieldOfStudy'] ?? ''}'),
-                              subtitle: Text(
-                                  'University of ABC, Sep 2014 - May 2018'),
+                              title: (education?['fieldOfStudy'] != null)
+                                  ? Text(
+                                      'Bachelor in ${education?['fieldOfStudy'] ?? ''}')
+                                  : const Text('No Education Data Added'),
+                              subtitle: (education?['fieldOfStudy'] != null)
+                                  ? Text(
+                                      'University of ${education?['institution'] ?? ''}, $startDate - $finalDate')
+                                  : const SizedBox(),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Container(
-                        margin: EdgeInsets.symmetric(horizontal: 15),
+                        margin: const EdgeInsets.symmetric(horizontal: 15),
                         child: Card(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15.0),
@@ -307,7 +308,7 @@ class _ProfilePageViewState extends State<ProfilePageView> {
                                 horizontal: 20, vertical: 10),
                             child: Column(
                               children: [
-                                Row(
+                                const Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [

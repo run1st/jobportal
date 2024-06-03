@@ -126,6 +126,13 @@ class _AppliersState extends State<Appliers> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Applicants'),
+        backgroundColor: Colors.blueAccent,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.filter_list),
+            onPressed: toggleFilterVisibility,
+          ),
+        ],
       ),
       body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
@@ -205,14 +212,20 @@ class _AppliersState extends State<Appliers> {
                     width: MediaQuery.of(context).size.width / 2,
                     height: MediaQuery.of(context).size.width / 7,
                     decoration: BoxDecoration(
-                      color: Colors.blue,
-                      border: Border.all(color: Colors.blue, width: 2),
+                      color: Colors.blueAccent,
+                      border: Border.all(color: Colors.blueAccent, width: 2),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text('Applicants'),
+                        Text(
+                          'Applicants',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         Container(
                           width: 30,
                           height: 30,
@@ -221,7 +234,12 @@ class _AppliersState extends State<Appliers> {
                             color: Colors.yellow,
                           ),
                           child: Center(
-                            child: Text('${snapshot.data!.docs.length}'),
+                            child: Text(
+                              '${snapshot.data!.docs.length}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -263,7 +281,7 @@ class _AppliersState extends State<Appliers> {
                               isExpanded: true,
                               borderRadius: BorderRadius.circular(15),
                               style: TextStyle(color: Colors.black),
-                              dropdownColor: Colors.blue,
+                              dropdownColor: Colors.blueAccent,
                               hint: Text('Filter'),
                               elevation: 16,
                               icon: Icon(Icons.filter_list),
@@ -358,9 +376,13 @@ class _AppliersState extends State<Appliers> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           leading: CircleAvatar(
-                            child: Icon(Icons.person),
+                            backgroundColor: Colors.blueAccent,
+                            child: Icon(Icons.person, color: Colors.white),
                           ),
-                          title: Text(firstName),
+                          title: Text(
+                            firstName,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           subtitle: Text(fieldOfStudy),
                           trailing: GestureDetector(
                             onTap: () {
@@ -375,7 +397,7 @@ class _AppliersState extends State<Appliers> {
                             },
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.blue,
+                                color: Colors.blueAccent,
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               width: 100,
@@ -414,7 +436,7 @@ class OverlayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Icon(icon, size: 40),
+      title: Icon(icon, size: 40, color: Colors.blueAccent),
       content: SizedBox(
         width: double.minPositive,
         height: 200,

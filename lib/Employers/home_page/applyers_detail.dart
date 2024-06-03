@@ -55,12 +55,13 @@ class ApplicantPage extends StatelessWidget {
     final arguments = ModalRoute.of(context)?.settings.arguments as List;
     final applicant_id = arguments[0];
     final jobId = arguments[1];
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Applicant Profile'),
+        title: const Text('Applicant Profile'),
       ),
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.arrow_back),
+          child: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.of(context).pop();
           }),
@@ -81,24 +82,25 @@ class ApplicantPage extends StatelessWidget {
                   child: Column(
                     children: [
                       ListTile(
-                        leading: Icon(Icons.email),
-                        title: Text('Send Email'),
+                        leading: const Icon(Icons.email),
+                        title: const Text('Send Email'),
                         onTap: () {
                           showModalBottomSheet(
                             context: context,
                             builder: (BuildContext context) {
                               return Container(
+                                height: 300,
                                 // Your content for the bottom sheet
-                                child: Text('This is the bottom sheet content'),
+                                child: const Text('Email'),
                               );
                             },
                           );
                         },
                       ),
-                      Divider(),
+                      const Divider(),
                       ListTile(
-                        leading: Icon(Icons.message),
-                        title: Text('Send Message'),
+                        leading: const Icon(Icons.message),
+                        title: const Text('Send Message'),
                         onTap: () {
                           showModalBottomSheet(
                             context: context,
@@ -106,19 +108,19 @@ class ApplicantPage extends StatelessWidget {
                                 true, // Allow the bottom sheet to take up full screen height
                             builder: (BuildContext context) {
                               return Container(
-                                padding: EdgeInsets.all(16.0),
+                                padding: const EdgeInsets.all(16.0),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(
+                                    const Text(
                                       'Compose Message',
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    SizedBox(height: 16),
-                                    TextField(
+                                    const SizedBox(height: 16),
+                                    const TextField(
                                       maxLines: null,
                                       keyboardType: TextInputType.multiline,
                                       decoration: InputDecoration(
@@ -126,9 +128,9 @@ class ApplicantPage extends StatelessWidget {
                                         hintText: 'Enter your message...',
                                       ),
                                     ),
-                                    SizedBox(height: 16),
+                                    const SizedBox(height: 16),
                                     ElevatedButton(
-                                      child: Text('Send'),
+                                      child: const Text('Send'),
                                       onPressed: () {
                                         Navigator.pop(
                                             context); // Close the bottom sheet

@@ -94,10 +94,10 @@ class _Posted_jobsState extends State<Posted_jobs> {
                                 backgroundImage: data['company']?['logoUrl'] !=
                                         null
                                     ? NetworkImage(data['company']?['logoUrl'])
-                                    : NetworkImage(
+                                    : const NetworkImage(
                                         'https://via.placeholder.com/150/000000/FFFFFF/?text=Company'),
                                 onBackgroundImageError: (_, __) =>
-                                    Icon(Icons.error, color: Colors.red),
+                                    const Icon(Icons.error, color: Colors.red),
                               ),
                               title: Text(
                                 data['title'] ?? 'Title',

@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(MyApp());
-}
 
 class MyApp extends StatelessWidget {
   @override
@@ -80,20 +72,33 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
             'subject=${Uri.encodeComponent(_subjectController.text)}&body=${Uri.encodeComponent(_messageController.text)}',
       );
 
-      if (await canLaunch(emailUri.toString())) {
-        try {
-          await launch(emailUri.toString());
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Email app launched!')),
-          );
-        } catch (error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to launch email app: $error')),
-          );
-        }
-      } else {
+      print('Generated email URI: $emailUri');
+
+      if (!await canLaunchUrl(emailUri)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No email app found to send email.')),
+          SnackBar(
+            content: Text('No default email app found.'),
+            action: SnackBarAction(
+              label: 'Install',
+              onPressed: () => launchUrl(Uri.parse(
+                  'https://play.google.com/store/apps/details?id=com.google.android.gm')), // Open Google Play Store for Gmail app
+            ),
+          ),
+        );
+        return;
+      }
+
+      try {
+        await launchUrl(
+          emailUri,
+          mode: LaunchMode.externalApplication,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Email app launched!')),
+        );
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to launch email app: $error')),
         );
       }
     }
@@ -137,10 +142,10 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _subjectController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Subject',
                   border: OutlineInputBorder(),
                 ),
@@ -151,12 +156,12 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _messageController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Message',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
                 maxLines: 6,
                 validator: (value) {
@@ -166,7 +171,7 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _sendEmail,
                 child: Text('Send Email'),

@@ -45,12 +45,65 @@ class _personal_infoState extends State<personal_info> {
     }
   }
 
+  Future<String> getPersonalInfoId(String? userCredential) async {
+    try {
+      // Get the UID of the currently authenticated user
+      String? uid = userCredential;
+
+      // Reference to the document in Firestore
+      DocumentReference documentReference = FirebaseFirestore.instance
+          .collection('job-seeker')
+          .doc(uid)
+          .collection('jobseeker-profile')
+          .doc('profile');
+
+      // Fetch the document from Firestore
+      DocumentSnapshot documentSnapshot = await documentReference.get();
+
+      // Check if the document exists and contains the personal-info field
+      if (documentSnapshot.exists && documentSnapshot.data() != null) {
+        // Extract the personal-info map from the document data
+        Map<String, dynamic> data =
+            documentSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic>? personalInfo =
+            data['personal-info'] as Map<String, dynamic>?;
+
+        // Extract the id from the personal-info map
+        if (personalInfo != null && personalInfo['id'] != null) {
+          String personalInfoId = personalInfo['id'];
+          print('Personal Info ID: $personalInfoId');
+          return personalInfoId;
+        } else {
+          print('Personal info or id field is missing');
+          return '';
+        }
+      } else {
+        print('Document does not exist or is empty');
+        return '';
+      }
+    } catch (e) {
+      print('Error fetching personal info: $e');
+      return '';
+    }
+  }
+
+// iLswkoCdV0XTrSB9ryLaktgYMQ83
+// 2tMMBTjVk2ZjuDzaLHXaogmiSiL2
+// 2k1uJ418RQPmTWeW7xvUrRkqOhC3
+// InoofAxMjaVuWvrNoL4A4gdxScZ2
+// DEScqk8rjkQvRygdsMf4xg1DRrG2
+// TW4PC7NA7nb0gge35d7boFy1jGy2
+// GHhoHdsyNUbAHdAQV0pdRhXe2hF2
+// KYL3M0tKgZXRi7QpWdkPWBgGTTq1
+// fz6fTqnAI9d0bAQVD9wU13RP2Oh2
   Future<void> savePersonalInfo(PersonalInfo personalInfo) async {
     try {
+      String? id = await getPersonalInfoId(currentUser);
       final personalInfoDocRef =
           FirebaseFirestore.instance.collection('job-seeker').doc(currentUser);
 
-      personalInfo.id = personalInfoDocRef.id;
+      personalInfo.id =
+          getPersonalInfoId(currentUser) != '' ? id : personalInfoDocRef.id;
       final json = personalInfo.toJson();
 
       await personalInfoDocRef

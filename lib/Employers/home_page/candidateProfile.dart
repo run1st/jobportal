@@ -83,8 +83,8 @@ class candidateProfile extends StatelessWidget {
                   child: Column(
                     children: [
                       ListTile(
-                        leading: Icon(Icons.email),
-                        title: Text('Send Email'),
+                        leading: const Icon(Icons.email),
+                        title: const Text('Send Email'),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -94,10 +94,10 @@ class candidateProfile extends StatelessWidget {
                           );
                         },
                       ),
-                      Divider(),
+                      const Divider(),
                       ListTile(
-                        leading: Icon(Icons.message),
-                        title: Text('Send Message'),
+                        leading: const Icon(Icons.message),
+                        title: const Text('Send Message'),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -105,56 +105,14 @@ class candidateProfile extends StatelessWidget {
                                 builder: (context) => ComposeMessageScreen(
                                     jobApplierId: applicant_id)),
                           );
-
-                          // showModalBottomSheet(
-                          //   context: context,
-                          //   isScrollControlled:
-                          //       true, // Allow the bottom sheet to take up full screen height
-                          //   builder: (BuildContext context) {
-                          //     return Container(
-                          //       padding: EdgeInsets.all(16.0),
-                          //       child: Column(
-                          //         mainAxisSize: MainAxisSize.min,
-                          //         children: [
-                          //           Text(
-                          //             'Compose Message',
-                          //             style: TextStyle(
-                          //               fontSize: 20,
-                          //               fontWeight: FontWeight.bold,
-                          //             ),
-                          //           ),
-                          //           SizedBox(height: 16),
-                          //           TextField(
-                          //             maxLines: null,
-                          //             keyboardType: TextInputType.multiline,
-                          //             decoration: InputDecoration(
-                          //               border: OutlineInputBorder(),
-                          //               hintText: 'Enter your message...',
-                          //             ),
-                          //           ),
-                          //           SizedBox(height: 16),
-                          //           ElevatedButton(
-                          //             child: Text('Send'),
-                          //             onPressed: () {
-                          //               // Handle send message action
-                          //               // ...
-                          //               Navigator.pop(
-                          //                   context); // Close the bottom sheet
-                          //             },
-                          //           ),
-                          //         ],
-                          //       ),
-                          //     );
-                          //   },
-                          // );
                         },
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -164,10 +122,10 @@ class candidateProfile extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             primary: Colors.red,
                           ),
-                          child: Text('Reject'),
+                          child: const Text('Reject'),
                         ),
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {},

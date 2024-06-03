@@ -19,6 +19,7 @@ class _JobSeekerSignUPFormState extends State<JobSeekerSignUPForm> {
   final emailController = TextEditingController();
   final passwordController1 = TextEditingController();
   final passwordController2 = TextEditingController();
+  Map<String, dynamic> personalinfo = {};
   bool _isSigningUp = false;
   // Future signUp() async {
   //   final isValid = formKey.currentState!.validate();
@@ -75,6 +76,13 @@ class _JobSeekerSignUPFormState extends State<JobSeekerSignUPForm> {
         'email': emailController.text,
         'role': 'jobseeker', // Set user role
       });
+      Map<String, dynamic> personalinfo = {'id': userCredential.user!.uid};
+      await FirebaseFirestore.instance
+          .collection('job-seeker')
+          .doc(userCredential.user!.uid)
+          .collection('jobseeker-profile')
+          .doc('profile')
+          .set({'personal-info': personalinfo});
     } on FirebaseAuthException catch (e) {
       // Handle FirebaseAuthException
       print('FirebaseAuthException: ${e.code}');

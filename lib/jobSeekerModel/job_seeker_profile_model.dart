@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:project1/profile/experience.dart';
 import 'package:provider/provider.dart';
 
@@ -89,8 +90,8 @@ class Education {
   String? levelOfEducation;
   String? institution;
   String? fieldOfStudy;
-  String? startDate;
-  String? endDate;
+  DateTime? startDate;
+  DateTime? endDate;
   String? GPA;
 
   Education({
@@ -105,15 +106,19 @@ class Education {
         'levelOfEducation': levelOfEducation,
         'institution': institution,
         'fieldOfStudy': fieldOfStudy,
-        'startDte': startDate,
-        'endDate': endDate,
+        'startDte': startDate != null ? Timestamp.fromDate(startDate!) : null,
+        'endDate': endDate != null ? Timestamp.fromDate(endDate!) : null,
       };
   factory Education.fromMap(Map<String, dynamic> json) => Education(
       levelOfEducation: json['levelOfEducation'],
       institution: json['institution'],
       fieldOfStudy: json['fieldOfStudy'],
-      startDate: json['startDate'],
-      endDate: json['endDate']);
+      startDate: json['startDate'] != null
+          ? (json['startDate'] as Timestamp).toDate()
+          : null,
+      endDate: json['endDate'] != null
+          ? (json['endDate'] as Timestamp).toDate()
+          : null);
 }
 
 class ExperienceModel {
@@ -135,16 +140,22 @@ class ExperienceModel {
   Map<String, dynamic> toJson() => {
         'job title': title,
         'company': company,
-        'startDte': startDate,
-        'End date': endDate,
+        'startDate': startDate != null ? Timestamp.fromDate(startDate!) : null,
+        'endDate': endDate != null ? Timestamp.fromDate(endDate!) : null,
         'Region': region,
         'city': city
       };
   factory ExperienceModel.fromMap(Map<String, dynamic> json) => ExperienceModel(
       title: json['job title'],
       company: json['company'],
-      startDate: json['startDte'],
-      endDate: json['End Date'],
+      // startDate: json['startDte'],
+      // endDate: json['End Date'],
+      startDate: json['startDte'] != null
+          ? (json['startDte'] as Timestamp).toDate()
+          : null,
+      endDate: json['End date'] != null
+          ? (json['End date'] as Timestamp).toDate()
+          : null,
       region: json['Region'],
       city: json['city']);
 }
