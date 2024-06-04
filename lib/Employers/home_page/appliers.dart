@@ -127,12 +127,12 @@ class _AppliersState extends State<Appliers> {
       appBar: AppBar(
         title: const Text('Applicants'),
         backgroundColor: Colors.blueAccent,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.filter_list),
-            onPressed: toggleFilterVisibility,
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.filter_list),
+        //     onPressed: toggleFilterVisibility,
+        //   ),
+        // ],
       ),
       body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
@@ -207,7 +207,7 @@ class _AppliersState extends State<Appliers> {
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Container(
                     width: MediaQuery.of(context).size.width / 2,
                     height: MediaQuery.of(context).size.width / 7,
@@ -219,7 +219,7 @@ class _AppliersState extends State<Appliers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text(
+                        const Text(
                           'Applicants',
                           style: TextStyle(
                             color: Colors.white,
@@ -229,14 +229,14 @@ class _AppliersState extends State<Appliers> {
                         Container(
                           width: 30,
                           height: 30,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.yellow,
                           ),
                           child: Center(
                             child: Text(
                               '${snapshot.data!.docs.length}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -246,45 +246,57 @@ class _AppliersState extends State<Appliers> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          flex: 3,
-                          child: TextField(
-                            controller: searchController,
-                            onChanged: (value) {
-                              setState(() {
-                                searchQuery = value;
-                              });
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Search applicants',
-                              prefixIcon: Icon(Icons.search),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.blueAccent),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                            ),
+                        // Expanded(
+                        //   flex: 3,
+                        //   child: TextField(
+                        //     controller: searchController,
+                        //     onChanged: (value) {
+                        //       setState(() {
+                        //         searchQuery = value;
+                        //       });
+                        //     },
+                        //     decoration: InputDecoration(
+                        //       hintText: 'Search applicants',
+                        //       prefixIcon: Icon(Icons.search),
+                        //       enabledBorder: OutlineInputBorder(
+                        //         borderSide: BorderSide(color: Colors.grey),
+                        //         borderRadius: BorderRadius.circular(15),
+                        //       ),
+                        //       focusedBorder: OutlineInputBorder(
+                        //         borderSide:
+                        //             BorderSide(color: Colors.blueAccent),
+                        //         borderRadius: BorderRadius.circular(15),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        const SizedBox(width: 10),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: Colors.blueAccent,
                           ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          flex: 1,
+                          width: MediaQuery.of(context).size.width - 50,
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               isExpanded: true,
-                              borderRadius: BorderRadius.circular(15),
-                              style: TextStyle(color: Colors.black),
+                              borderRadius: BorderRadius.circular(5),
+                              style: const TextStyle(color: Colors.black),
                               dropdownColor: Colors.blueAccent,
-                              hint: Text('Filter'),
+                              hint: const Text(
+                                'Filter Applicants',
+                                style: TextStyle(color: Colors.white),
+                              ),
                               elevation: 16,
-                              icon: Icon(Icons.filter_list),
+                              icon: const Icon(
+                                Icons.filter_list,
+                                color: Colors.white,
+                              ),
                               onChanged: (newValue) {
                                 setState(() {
                                   selectedCategory = newValue!;
@@ -381,7 +393,7 @@ class _AppliersState extends State<Appliers> {
                           ),
                           title: Text(
                             firstName,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(fieldOfStudy),
                           trailing: GestureDetector(
@@ -402,7 +414,7 @@ class _AppliersState extends State<Appliers> {
                               ),
                               width: 100,
                               height: 40,
-                              child: Center(
+                              child: const Center(
                                 child: Text(
                                   'View Profile',
                                   style: TextStyle(color: Colors.white),

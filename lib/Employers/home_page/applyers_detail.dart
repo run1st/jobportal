@@ -58,6 +58,7 @@ class ApplicantPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blueAccent,
         title: const Text('Applicant Profile'),
       ),
       floatingActionButton: FloatingActionButton(
@@ -70,7 +71,7 @@ class ApplicantPage extends StatelessWidget {
           children: [
             ConstrainedBox(
               constraints: BoxConstraints.expand(
-                  height: (MediaQuery.of(context).size.height) - 400,
+                  height: (MediaQuery.of(context).size.height) - 300,
                   width: MediaQuery.of(context).size.width),
               child: ProfilePageView(
                 id: applicant_id,
@@ -78,119 +79,144 @@ class ApplicantPage extends StatelessWidget {
             ),
             Column(
               children: [
-                Card(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: const Icon(Icons.email),
-                        title: const Text('Send Email'),
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Container(
-                                height: 300,
-                                // Your content for the bottom sheet
-                                child: const Text('Email'),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                      const Divider(),
-                      ListTile(
-                        leading: const Icon(Icons.message),
-                        title: const Text('Send Message'),
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled:
-                                true, // Allow the bottom sheet to take up full screen height
-                            builder: (BuildContext context) {
-                              return Container(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Text(
-                                      'Compose Message',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    const TextField(
-                                      maxLines: null,
-                                      keyboardType: TextInputType.multiline,
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(),
-                                        hintText: 'Enter your message...',
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    ElevatedButton(
-                                      child: const Text('Send'),
-                                      onPressed: () {
-                                        Navigator.pop(
-                                            context); // Close the bottom sheet
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+                const Card(
+                    // child: Column(
+                    //   children: [
+                    //     ListTile(
+                    //       leading: const Icon(Icons.email),
+                    //       title: const Text('Send Email'),
+                    //       onTap: () {
+                    //         showModalBottomSheet(
+                    //           context: context,
+                    //           builder: (BuildContext context) {
+                    //             return Container(
+                    //               height: 300,
+                    //               // Your content for the bottom sheet
+                    //               child: const Text('Email'),
+                    //             );
+                    //           },
+                    //         );
+                    //       },
+                    //     ),
+                    //     const Divider(),
+                    //     ListTile(
+                    //       leading: const Icon(Icons.message),
+                    //       title: const Text('Send Message'),
+                    //       onTap: () {
+                    //         showModalBottomSheet(
+                    //           context: context,
+                    //           isScrollControlled:
+                    //               true, // Allow the bottom sheet to take up full screen height
+                    //           builder: (BuildContext context) {
+                    //             return Container(
+                    //               padding: const EdgeInsets.all(16.0),
+                    //               child: Column(
+                    //                 mainAxisSize: MainAxisSize.min,
+                    //                 children: [
+                    //                   const Text(
+                    //                     'Compose Message',
+                    //                     style: TextStyle(
+                    //                       fontSize: 20,
+                    //                       fontWeight: FontWeight.bold,
+                    //                     ),
+                    //                   ),
+                    //                   const SizedBox(height: 16),
+                    //                   const TextField(
+                    //                     maxLines: null,
+                    //                     keyboardType: TextInputType.multiline,
+                    //                     decoration: InputDecoration(
+                    //                       border: OutlineInputBorder(),
+                    //                       hintText: 'Enter your message...',
+                    //                     ),
+                    //                   ),
+                    //                   const SizedBox(height: 16),
+                    //                   ElevatedButton(
+                    //                     child: const Text('Send'),
+                    //                     onPressed: () {
+                    //                       Navigator.pop(
+                    //                           context); // Close the bottom sheet
+                    //                     },
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             );
+                    //           },
+                    //         );
+                    //       },
+                    //     ),
+                    //   ],
+                    // ),
+                    ),
                 SizedBox(height: 16),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Code to perform action - Shortlist the applicant
-                            try {
-                              ChooseCandidate(jobId, applicant_id);
-                              EmpUtils.showSnackBar(
-                                  'saved Successfully', Colors.green);
-                            } catch (e) {
-                              EmpUtils.showSnackBar(e.toString(), Colors.green);
-                            }
-                            //   ChooseCandidate(jobId, applicant_id);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.green,
+                      const Wrap(
+                        runAlignment: WrapAlignment.center,
+                        spacing: 5,
+                        direction: Axis.horizontal,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          Text(
+                            'Interseted in the applicant profile ?',
+                            style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.w900),
                           ),
-                          child: Text('Shortlist'),
-                        ),
+                          Text(
+                            'select as candidate and further contact ',
+                            style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.w900),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                // Code to Shortlist the applicant
+                                try {
+                                  await ChooseCandidate(jobId, applicant_id);
+                                  EmpUtils.showSnackBar(
+                                      'saved Successfully', Colors.green);
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                    content: const Text(
+                                      'Applicant Shortlistes Successfuly !',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    backgroundColor: Colors.blueAccent,
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    margin: const EdgeInsets.all(10),
+                                  ));
+                                } catch (e) {
+                                  EmpUtils.showSnackBar(
+                                      e.toString(), Colors.green);
+                                }
+                                //   ChooseCandidate(jobId, applicant_id);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.green,
+                              ),
+                              child: Text('Shortlist'),
+                            ),
+                          ),
+                        ],
                       ),
                       SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.red,
-                          ),
-                          child: Text('Reject'),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.blue,
-                          ),
-                          child: Text('Schedule Interview'),
-                        ),
-                      ),
                     ],
                   ),
                 ),

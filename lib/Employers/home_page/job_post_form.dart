@@ -88,6 +88,11 @@ class _JobPostingFormState extends State<JobPostingForm> {
   String stringPostedTime = '';
   String? selectedSalaryRange;
 
+  String formatTimestamp(Timestamp timestamp) {
+    DateTime dateTime = timestamp.toDate();
+    return '${DateFormat.yMMMd().format(dateTime)} at ${DateFormat.jm().format(dateTime)}';
+  }
+
   List<String> salaryExpectation = [
     '1,000 - 5,000',
     '5,000 - 10,000',
@@ -207,6 +212,7 @@ class _JobPostingFormState extends State<JobPostingForm> {
     //getData();
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blueAccent,
         title: Text('Post a Job'),
       ),
       body: SingleChildScrollView(
@@ -601,7 +607,7 @@ class _JobPostingFormState extends State<JobPostingForm> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15)),
                     child: Container(
-                      width: MediaQuery.of(context).size.width - 100,
+                      width: MediaQuery.of(context).size.width - 70,
                       height: 60,
                       child: ElevatedButton(
                         onPressed: () async {

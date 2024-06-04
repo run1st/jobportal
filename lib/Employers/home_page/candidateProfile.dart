@@ -52,6 +52,24 @@ class candidateProfile extends StatelessWidget {
     candidate_Collection_Reference.set(documentSnapshot.data());
   }
 
+  Future<void> deleteCandidate(String jobId, String applierId) async {
+    try {
+      DocumentReference candidateCollectionReference =
+          FirebaseFirestore.instance
+              .collection('employers-job-postings')
+              .doc('post-id') // Replace 'post-id' with the actual post id
+              .collection('job posting')
+              .doc(jobId)
+              .collection("candidates")
+              .doc(applierId);
+
+      await candidateCollectionReference.delete();
+      print('Candidate deleted successfully');
+    } catch (e) {
+      print('Error deleting candidate: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final arguments = ModalRoute.of(context)?.settings.arguments as List;
@@ -59,10 +77,10 @@ class candidateProfile extends StatelessWidget {
     final jobId = arguments[1];
     return Scaffold(
       appBar: AppBar(
-        title: Text('Candidates Profile'),
+        title: const Text('Candidates Profile'),
       ),
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.arrow_back),
+          child: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.of(context).pop();
           }),
@@ -71,7 +89,7 @@ class candidateProfile extends StatelessWidget {
           children: [
             ConstrainedBox(
               constraints: BoxConstraints.expand(
-                  height: (MediaQuery.of(context).size.height) - 400,
+                  height: (MediaQuery.of(context).size.height) - 350,
                   width: MediaQuery.of(context).size.width),
               child: ProfilePageView(
                 id: applicant_id,
@@ -111,6 +129,7 @@ class candidateProfile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
+                const Text('NOT INTERESTED ?'),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
@@ -118,7 +137,24 @@ class candidateProfile extends StatelessWidget {
                     children: [
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            await deleteCandidate(jobId, applicant_id);
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: const Text(
+                                'Candidate Deleted Successfuly !',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              backgroundColor: Colors.blueAccent,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              margin: const EdgeInsets.all(10),
+                            ));
+                          },
                           style: ElevatedButton.styleFrom(
                             primary: Colors.red,
                           ),
@@ -126,15 +162,15 @@ class candidateProfile extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.blue,
-                          ),
-                          child: Text('Schedule Interview'),
-                        ),
-                      ),
+                      // Expanded(
+                      //   child: ElevatedButton(
+                      //     onPressed: () {},
+                      //     style: ElevatedButton.styleFrom(
+                      //       primary: Colors.blue,
+                      //     ),
+                      //     child: const Text('Schedule Interview'),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
