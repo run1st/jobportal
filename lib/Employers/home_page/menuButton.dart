@@ -5,6 +5,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:project1/Employers/Employers_account/emp_auth_page.dart';
 import 'package:project1/Employers/emp_profile/edit_emp_profile.dart';
 import 'package:project1/start_page.dart';
+import 'package:project1/user_account/auth_page.dart';
 
 enum menu { updateProfile, logout }
 
@@ -25,14 +26,22 @@ class _popUpMenuState extends State<popUpMenu> {
               print('the value is ${value}'),
               if (value == menu.updateProfile)
                 {
+                  setState(() {
+                    value == menu.updateProfile;
+                  }),
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => EditEmployerProfile())),
                 },
               if (value == menu.logout)
                 {
+                  setState(() {
+                    value == menu.logout;
+                  }),
                   FirebaseAuth.instance.signOut(),
                   //  Navigator.pushReplacementNamed(context, EmpAuthPage.routName),
-                  Navigator.pop(context),
+                  Navigator.pushNamed(context, AuthPage.routName,
+                      arguments: AuthPage(isLogin: true))
+                  // Navigator.pop(context),
                 }
             },
         itemBuilder: (context) => [

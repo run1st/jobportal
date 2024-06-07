@@ -6,12 +6,13 @@ import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 
 class ComposeMessageScreen extends StatefulWidget {
-  String jobApplierId;
+  final String? jobApplierId;
 
   ComposeMessageScreen({
     Key? key,
     required this.jobApplierId,
   }) : super(key: key);
+
   @override
   _ComposeMessageScreenState createState() => _ComposeMessageScreenState();
 }
@@ -21,9 +22,7 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
 
   String _statusMessage = '';
 
-  // String messageId = '';
   TextEditingController _messageController = TextEditingController();
-
   String currentUser = '';
 
   Future<void> getUserUid() async {
@@ -48,9 +47,7 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
 
   String createMessageId() {
     var uuid = Uuid();
-
-    String messageId = uuid.v4();
-    return messageId;
+    return uuid.v4();
   }
 
   Future saveMessage(String id, Message message) async {
@@ -105,13 +102,35 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getUserUid();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.jobApplierId == null || widget.jobApplierId!.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Compose Message'),
+        ),
+        body: const Center(
+          child: Wrap(
+            direction: Axis.vertical,
+            children: [
+              Text(
+                'Invalid job applier ID.',
+                style: TextStyle(fontSize: 16.0, color: Colors.red),
+              ),
+              Text(
+                'Or Applier is not available.',
+                style: TextStyle(fontSize: 16.0, color: Colors.red),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Compose Message'),
@@ -124,19 +143,14 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
             .where('senderId', isEqualTo: currentUser)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          //  final length = snapshot.data!.docs.where((element) {});
           List<DocumentSnapshot> sentMessages = [];
           if (snapshot.hasData) {
             QuerySnapshot querySnapshot = snapshot.data!;
             sentMessages = querySnapshot.docs.toList();
-            // sentMessages = querySnapshot.docs.where((doc) {
-            //   String id = doc.id;
-            //   return id == currentUser;
-            // }).toList();
           }
           if (snapshot.hasError) return Text('Error: ${snapshot.error}');
           if (!snapshot.hasData) {
-            return const Text('OOPS there is messages yet');
+            return const Text('OOPS there are no messages yet');
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const Text('Loading...');
           } else {
@@ -175,18 +189,28 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
                       String messageId = createMessageId();
                       String message = _messageController.text;
 
+                      if (message.isEmpty) {
+                        setState(() {
+                          _statusMessage = 'Message cannot be empty';
+                        });
+                        return;
+                      }
+
                       final messageObject = Message(
                           id: messageId,
                           senderId: currentUser,
-                          recipientId: widget.jobApplierId,
+                          recipientId: widget.jobApplierId!,
                           content: message,
                           timestamp: DateTime.now(),
                           isRead: false,
                           company: companyProfile);
-                      saveMessage(widget.jobApplierId, messageObject);
+                      saveMessage(widget.jobApplierId!, messageObject);
+
+                      setState(() {
+                        _statusMessage = 'Message sent successfully';
+                      });
 
                       _messageController.clear();
-                      // _sentMessages.add(messageObject);
                     },
                     child: Text('Send'),
                     style: ElevatedButton.styleFrom(
@@ -196,6 +220,18 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
                       ),
                     ),
                   ),
+                  if (_statusMessage.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        _statusMessage,
+                        style: TextStyle(
+                          color: _statusMessage.contains('success')
+                              ? Colors.green
+                              : Colors.red,
+                        ),
+                      ),
+                    ),
                   SizedBox(
                     height: 15,
                   ),
@@ -205,27 +241,31 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
                       itemBuilder: (context, index) {
                         DocumentSnapshot message = sentMessages[index];
                         String date = formatTimestamp(message['timestamp']);
-                        return ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 8.0),
-                          tileColor: Colors.grey[200],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          title: Text(
-                            message['content'],
-                            style: const TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
+                        return Card(
+                          elevation: 0,
+                          margin: EdgeInsets.symmetric(vertical: 5),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0),
+                            tileColor: Colors.grey[200],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 4.0),
-                            child: Text(
-                              date,
+                            title: Text(
+                              message['content'],
                               style: TextStyle(
                                 fontSize: 12.0,
                                 color: Colors.grey[600],
+                              ),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                date,
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
@@ -235,12 +275,11 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
                   ),
                   SizedBox(
                     height: 10,
-                  )
+                  ),
                 ],
               ),
             );
           }
-          ;
         },
       ),
     );

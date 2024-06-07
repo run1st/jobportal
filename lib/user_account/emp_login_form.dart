@@ -51,7 +51,7 @@ class _EmpLoginFormState extends State<EmpLoginForm> {
   }
 
   bool _showProgressIndicator = false;
-
+  bool _isObscured = true;
   Future<void> signIn() async {
     setState(() {
       _showProgressIndicator = true; // Show progress indicator
@@ -72,16 +72,11 @@ class _EmpLoginFormState extends State<EmpLoginForm> {
               .pushNamed(TabsScreen.routeName); //Navigate to Employer main page
         } else {
           FirebaseAuth.instance.signOut();
-          EmpUtils.showSnackBar('Employer not found', Colors.red);
-          Scaffold.of(context).showBottomSheet((context) => Container(
-                height: 40,
-                child: Center(
-                  child: Text(
-                    'USER NOT FOUND',
-                    style: TextStyle(color: Colors.deepPurpleAccent),
-                  ),
-                ),
-              ));
+          //   EmpUtils.showSnackBar('Employer not found', Colors.red);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: const Center(
+            child: Text('Employer not found'),
+          )));
           print('Employer not found');
         }
       } else {
@@ -146,13 +141,14 @@ class _EmpLoginFormState extends State<EmpLoginForm> {
             TextFormField(
               controller: passwordController1,
               keyboardType: TextInputType.visiblePassword,
+              obscureText: _isObscured,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Color.fromARGB(255, 252, 234, 240),
+                fillColor: const Color.fromARGB(255, 252, 234, 240),
                 label: const Text('password'),
                 enabledBorder: OutlineInputBorder(
                   borderSide: const BorderSide(
-                      color: const Color.fromARGB(255, 252, 234, 240)),
+                      color: Color.fromARGB(255, 252, 234, 240)),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -162,6 +158,15 @@ class _EmpLoginFormState extends State<EmpLoginForm> {
                 errorBorder: OutlineInputBorder(
                   borderSide: const BorderSide(color: Colors.red),
                   borderRadius: BorderRadius.circular(10),
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                      _isObscured ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _isObscured = !_isObscured;
+                    });
+                  },
                 ),
               ),
               autovalidateMode: AutovalidateMode.onUserInteraction,

@@ -58,7 +58,7 @@ class _EmpHomePageState extends State<EmpHomePage> {
                     color: Colors.black54),
               ),
             ),
-            Padding(
+            const Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
                 'Post Jobs & Find Candidates',
@@ -87,7 +87,7 @@ class _EmpHomePageState extends State<EmpHomePage> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             ElevatedButton(

@@ -444,7 +444,8 @@ class _ProfilePageViewState extends State<ProfilePageView> {
                         );
                       },
                     )
-                  : Center(child: Text('Invalid user ID')),
+                  : const Center(
+                      child: Text('Invalid user ID or User not found')),
             ],
           ),
         ),

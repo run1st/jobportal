@@ -37,7 +37,6 @@ class _JobsListState extends State<JobsList> {
   String selectedCategory = 'All';
   List<String> categories = [
     'All',
-    'Region',
     'City',
     'Employment type',
     'Education level',
@@ -132,7 +131,7 @@ class _JobsListState extends State<JobsList> {
     'Addis Ababa',
     'Mekele',
     'Dere Dawa',
-    'Hawasa',
+    'Hawassa',
     'Dessie',
     'jigjiga',
     'Jimma',
@@ -525,8 +524,7 @@ class _JobsListState extends State<JobsList> {
                             switch ('${selectedCategory}') {
                               case 'All':
                                 return null;
-                              case 'Region':
-                                return openAlertDialog(Regions, Icons.public);
+
                               case 'City':
                                 return openAlertDialog(
                                     cities, Icons.location_city);
@@ -792,14 +790,14 @@ class _JobsListState extends State<JobsList> {
                   }).toList();
                 }
 
-                if (selectedCategory == 'Company name') {
+                if (selectedCategory == 'Adress') {
                   // QuerySnapshot querySnapshot = snapshot.data!;
                   // List<DocumentSnapshot> allJobs = querySnapshot.docs.toList();
                   List<QueryDocumentSnapshot> AllpostedJobs =
                       jobPostings.docs.toList();
                   postedJobs = AllpostedJobs.where((doc) {
                     String company_name =
-                        doc['company']['name'].toString().toLowerCase();
+                        doc['company']['adress'].toString().toLowerCase();
 
                     return company_name == selectedValue.toLowerCase();
                   }).toList();
@@ -888,36 +886,67 @@ class _JobsListState extends State<JobsList> {
                                                       TextOverflow.ellipsis,
                                                 ),
                                                 SizedBox(height: 5),
-                                                Wrap(
-                                                  spacing: 8.0,
-                                                  runSpacing: 4.0,
+                                                Row(
                                                   children: [
-                                                    Chip(
-                                                      label: Text(document[
-                                                          'employment type']),
-                                                      backgroundColor:
-                                                          Colors.blue.shade50,
+                                                    Flexible(
+                                                      child: Chip(
+                                                        label: Text(
+                                                          document[
+                                                              'employment type'],
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                        backgroundColor:
+                                                            Colors.blue.shade50,
+                                                      ),
                                                     ),
-                                                    Chip(
-                                                      label: Text(document[
-                                                          'experience level']),
-                                                      backgroundColor:
-                                                          Colors.green.shade50,
+                                                    SizedBox(width: 5),
+                                                    Flexible(
+                                                      child: Chip(
+                                                        label: Text(
+                                                          document[
+                                                              'experience level'],
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                        backgroundColor: Colors
+                                                            .green.shade50,
+                                                      ),
                                                     ),
-                                                    Chip(
-                                                      label: Text(
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Flexible(
+                                                      child: Chip(
+                                                        label: Text(
                                                           document['company']
                                                                   ?['city'] ??
-                                                              '-'),
-                                                      backgroundColor:
-                                                          Colors.orange.shade50,
+                                                              '-',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                        backgroundColor: Colors
+                                                            .orange.shade50,
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 5),
+                                                    Flexible(
+                                                      child: Chip(
+                                                        label: Text(
+                                                          document['salary'] ??
+                                                              'Not specified',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                        backgroundColor: Colors
+                                                            .purple.shade50,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
                                                 SizedBox(height: 5),
-                                                Wrap(
-                                                  alignment:
-                                                      WrapAlignment.start,
+                                                Row(
                                                   children: [
                                                     Icon(
                                                       Icons.calendar_today,
@@ -939,27 +968,15 @@ class _JobsListState extends State<JobsList> {
                                             ),
                                           ),
                                           SizedBox(width: 10),
-                                          Container(
-                                            width: 80,
-                                            height: 40,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 5.0, horizontal: 5.0),
-                                            decoration: BoxDecoration(
+                                          Text(
+                                            getPostedTime(formatTimestamp(
+                                                document['posted time'])),
+                                            style: TextStyle(
                                               color: Colors.blue,
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
+                                              fontSize: 12.0,
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              getPostedTime(formatTimestamp(
-                                                  document['posted time'])),
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12.0,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
+                                            textAlign: TextAlign.center,
                                           ),
                                         ],
                                       ),

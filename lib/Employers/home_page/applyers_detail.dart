@@ -189,7 +189,7 @@ class ApplicantPage extends StatelessWidget {
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(SnackBar(
                                     content: const Text(
-                                      'Applicant Shortlistes Successfuly !',
+                                      'Applicant Shortlisted Successfuly !',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,

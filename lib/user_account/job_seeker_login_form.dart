@@ -36,6 +36,7 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
     // });
   }
 
+  bool _isObscured = true;
   bool isJobSeeker = false;
   Future<void> checkUserRole(String uid) async {
     DocumentSnapshot userData = await FirebaseFirestore.instance
@@ -83,18 +84,22 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
           Navigator.of(context).pushNamed(home.routeName);
         } else {
           FirebaseAuth.instance.signOut();
-          Utils.showSnackBar(context, 'Job seeker not found', Colors.red);
+          //  Utils.showSnackBar(context, 'Job seeker not found', Colors.red);
           ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Job seeker not found')));
-          print('Job seeker not found');
+          // print('Job seeker not found');
         }
       } else {
         // Authentication failed (user is null)
         Utils.showSnackBar(context, 'Sign-in failed', Colors.red);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Sign-in failed')));
       }
     } on FirebaseAuthException catch (e) {
       // Handle FirebaseAuthException errors
-      Utils.showSnackBar(context, 'Sign-in failed: ${e.message}', Colors.red);
+      // Utils.showSnackBar(context, 'Sign-in failed: ${e.message}', Colors.red);
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign-in failed: ${e.message}')));
       print('FirebaseAuthException: ${e.message}');
     } catch (e) {
       // Handle other errors
@@ -154,6 +159,7 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
               TextFormField(
                 controller: passwordController1,
                 keyboardType: TextInputType.visiblePassword,
+                obscureText: _isObscured,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: const Color.fromARGB(255, 252, 234, 240),
@@ -170,6 +176,15 @@ class _JobSeekerLoginFormState extends State<JobSeekerLoginForm> {
                   errorBorder: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.red),
                     borderRadius: BorderRadius.circular(10),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                        _isObscured ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _isObscured = !_isObscured;
+                      });
+                    },
                   ),
                 ),
                 autovalidateMode: AutovalidateMode.onUserInteraction,

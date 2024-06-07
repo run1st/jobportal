@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project1/Employers/home_page/menuButton.dart';
 import 'package:project1/hompage.dart';
+import 'package:project1/user_account/login_page.dart';
 import 'emp_home_page.dart';
 import 'package:flutter/material.dart';
 import 'posted_jobs.dart';
@@ -92,38 +93,47 @@ class _TabsScreenState extends State<TabsScreen> {
       {'page': EmpNotification(), 'title': Text('Notification')}
     ];
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: _pages[selectedPageIndex]['title'],
-        actions: [
-          _pages[selectedPageIndex]['action'] ?? Container(),
-        ],
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: _pages[selectedPageIndex]['page'],
-      bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: Colors.blue,
-        index: selectedPageIndex,
-        onTap: _selectPage,
-        items: [
-          const CurvedNavigationBarItem(
-            child: Icon(Icons.home),
-            label: 'home',
-          ),
-          const CurvedNavigationBarItem(
-            child: Icon(Icons.post_add),
-            label: 'job posts',
-          ),
-          const CurvedNavigationBarItem(
-            child: Icon(Icons.people),
-            label: 'candidates',
-          ),
-          const CurvedNavigationBarItem(
-            child: Icon(Icons.notification_add),
-            label: 'not',
-          ),
-        ],
+    return WillPopScope(
+      onWillPop: () async {
+        await FirebaseAuth.instance.signOut();
+        // Navigator.pushNamedAndRemoveUntil(
+        //     context, LoginPage.routeName, (route) => false);
+        Navigator.pop(context);
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: _pages[selectedPageIndex]['title'],
+          actions: [
+            _pages[selectedPageIndex]['action'] ?? Container(),
+          ],
+          backgroundColor: Colors.blueAccent,
+        ),
+        body: _pages[selectedPageIndex]['page'],
+        bottomNavigationBar: CurvedNavigationBar(
+          backgroundColor: Colors.blue,
+          index: selectedPageIndex,
+          onTap: _selectPage,
+          items: [
+            const CurvedNavigationBarItem(
+              child: Icon(Icons.home),
+              label: 'home',
+            ),
+            const CurvedNavigationBarItem(
+              child: Icon(Icons.post_add),
+              label: 'job posts',
+            ),
+            const CurvedNavigationBarItem(
+              child: Icon(Icons.people),
+              label: 'candidates',
+            ),
+            const CurvedNavigationBarItem(
+              child: Icon(Icons.notification_add),
+              label: 'not',
+            ),
+          ],
+        ),
       ),
     );
   }
