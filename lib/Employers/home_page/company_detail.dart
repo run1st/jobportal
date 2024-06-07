@@ -1,10 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
 class company_detail extends StatefulWidget {
-  const company_detail({Key? key}) : super(key: key);
+  DocumentSnapshot<Object?> job;
+
+  company_detail({Key? key, required this.job}) : super(key: key);
 
   @override
   State<company_detail> createState() => _company_detailState();

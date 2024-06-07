@@ -210,7 +210,7 @@ class _JobSeekerSignUPFormState extends State<JobSeekerSignUPForm> {
                     if (passwordController2.text != passwordController1.text) {
                       return 'Password is not match';
                     } else {
-                      return value;
+                      return null;
                     }
                   }),
               SizedBox(

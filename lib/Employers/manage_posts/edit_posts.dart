@@ -28,6 +28,7 @@ class _EditJobPostingFormState extends State<EditJobPostingForm> {
   final experienceController = TextEditingController();
   final educationController = TextEditingController();
   final deadlineConroller = TextEditingController();
+
   void _addRequirement(String skill) {
     if (!requirement.contains(skill)) {
       setState(() {

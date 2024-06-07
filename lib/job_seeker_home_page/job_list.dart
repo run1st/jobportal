@@ -954,12 +954,14 @@ class _JobsListState extends State<JobsList> {
                                                       color: Colors.red,
                                                     ),
                                                     SizedBox(width: 5),
-                                                    Text(
-                                                      "Deadline: ${deadLineTime(formatTimestamp(document['deadline']))}",
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontWeight:
-                                                            FontWeight.bold,
+                                                    Expanded(
+                                                      child: Text(
+                                                        "Deadline: ${deadLineTime(formatTimestamp(document['deadline']))}",
+                                                        style: TextStyle(
+                                                          color: Colors.red,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
                                                       ),
                                                     ),
                                                   ],

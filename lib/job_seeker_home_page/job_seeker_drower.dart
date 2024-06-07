@@ -116,24 +116,24 @@ class _DrowerState extends State<Drower> {
               }
             },
           ),
-          ListTile(
-            leading: Icon(Icons.notifications),
-            title: Text("Job Alerts"),
-            onTap: () {
-              if (currentUser != 'null') {}
-            },
-          ),
+          // ListTile(
+          //   leading: Icon(Icons.notifications),
+          //   title: Text("Job Alerts"),
+          //   onTap: () {
+          //     if (currentUser != 'null') {}
+          //   },
+          // ),
           Divider(),
           ListTile(
             leading: Icon(Icons.settings),
             title: Text("Settings"),
             onTap: () {
-              // if (currentUser != 'null') {
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(builder: (context) => Settings()),
-              //   );
-              // }
+              if (currentUser != 'null') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AppSettings()),
+                );
+              }
             },
           ),
           ListTile(

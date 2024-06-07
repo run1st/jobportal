@@ -1,22 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:project1/user_account/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 
-class Job_detail extends StatefulWidget {
-  int index;
-  DocumentSnapshot<Object?> job;
+class JobDetail extends StatefulWidget {
+  final int index;
+  final DocumentSnapshot<Object?> job;
 
-  Job_detail({Key? key, required this.index, required this.job})
+  JobDetail({Key? key, required this.index, required this.job})
       : super(key: key);
 
   @override
-  State<Job_detail> createState() => _Job_detailState();
+  State<JobDetail> createState() => _JobDetailState();
 }
 
-class _Job_detailState extends State<Job_detail> {
+class _JobDetailState extends State<JobDetail> {
   bool favorite = false;
   bool isJobApplied = false;
   String? currentUser;
@@ -129,6 +129,15 @@ class _Job_detailState extends State<Job_detail> {
     }
   }
 
+  String randomText =
+      '   Porttitor eget dolor morbi non arcu risus. Eget arcu dictum varius duis at consectetur lorem. Velit sed ullamcorper morbi tincidunt ornare massa. At volutpat diam ut venenatis tellus. Tortor at auctor urna nunc id cursus metus aliquam eleifend. Amet commodo nulla facilisi nullam vehicula ipsum a. Vitae nunc sed velit dignissim sodales ut eu. Facilisis leo vel fringilla est ullamcorper. Faucibus scelerisque eleifend donec pretium vulputate sapien nec sagittis. Tempus egestas sed sed risus pretium quam vulputate dignissim suspendisse. Arcu non odio euismod lacinia at quis risus. Ante metus dictum at tempor commodo ullamcorper a lacus vestibulum. Ut placerat orci nulla pellentesque dignissim. Sed nisi lacus sed viverra tellus in. Posuere morbi leo urna molestie at elementum eu. Nibh sit amet commodo nulla facilisi nullam vehicula ipsum a. Non nisi est sit amet facilisis magna etiam tempor orci. Posuere sollicitudin aliquam ultrices sagittis orci a scelerisque purus semper. Mauris in aliquam sem fringilla ut morbi. Vitae nunc sed velit dignissim sodales ut eu. Dignissim diam quis enim lobortis scelerisque fermentum dui faucibus. Urna molestie at elementum eu facilisis sed odio morbi quis. Odio ut sem nulla pharetra diam. Nam libero justo laoreet sit amet. Mauris in aliquam sem fringilla ut morbi. Massa tincidunt nunc pulvinar sapien et. A lacus vestibulum sed arcu non odio euismod lacinia. Maecenas volutpat blandit aliquam etiam. Nunc sed id semper risus. Vel pharetra vel turpis nunc eget lorem dolor. Tellus rutrum tellus pellentesque eu tincidunt. Cum sociis natoque penatibus et. Sapien nec sagittis aliquam malesuada bibendum. Nulla posuere sollicitudin aliquam ultrices sagittis orci a. Massa vitae tortor condimentum lacinia quis. Odio tempor orci dapibus ultrices in iaculis nunc. Eu augue ut lectus arcu bibendum. Eu consequat ac felis donec et odio. Auctor neque vitae tempus quam pellentesque nec nam. Venenatis lectus magna fringilla urna porttitor rhoncus dolor purus. Lorem ipsum dolor sit amet consectetur adipiscing. Justo eget magna fermentum iaculis eu non diam phasellus vestibulum. Egestas integer eget aliquet nibh. Est ullamcorper eget nulla facilisi etiam dignissim. Feugiat in ante metus dictum.';
+
+  String formatTimestamp(Timestamp? timestamp) {
+    if (timestamp == null) return 'Unknown date';
+    DateTime dateTime = timestamp.toDate();
+    return '${DateFormat.yMMMd().format(dateTime)} at ${DateFormat.jm().format(dateTime)}';
+  }
+
   Future<void> getData(DocumentSnapshot<Object?> doc) async {
     final DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
         await FirebaseFirestore.instance
@@ -172,21 +181,20 @@ class _Job_detailState extends State<Job_detail> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Your UI components here
-        // Example:
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Icon(Icons.location_city),
-            Text('Ethipia Addiss Ababa'),
+            Text(widget.job.get('location') ?? 'Ethiopia Addis Ababa'),
           ],
         ),
         SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text('Posted time'),
-            Text('9 hours ago'),
+            Text('posted time'),
+            Text(formatTimestamp(widget.job.get('posted time')) ??
+                '7 Hours ago'),
           ],
         ),
         SizedBox(height: 10),
@@ -198,7 +206,7 @@ class _Job_detailState extends State<Job_detail> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
             Text(
-              'salary',
+              'Salary',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
           ],
@@ -207,8 +215,8 @@ class _Job_detailState extends State<Job_detail> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text('Full time'),
-            Text('5000ETB'),
+            Text(widget.job.get('employment type') ?? 'Full Time'),
+            Text('${widget.job.get('salary') ?? '1000 ETB'}  ')
           ],
         ),
         SizedBox(height: 10),
@@ -219,7 +227,7 @@ class _Job_detailState extends State<Job_detail> {
             color: Colors.grey[200],
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Text('${widget.job.get('description')}'),
+          child: Text('${widget.job.get('description') ?? randomText}'),
         ),
         SizedBox(height: 25),
         Row(

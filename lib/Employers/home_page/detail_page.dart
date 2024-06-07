@@ -148,11 +148,13 @@ class _JobDetailPageState extends State<JobDetailPage> {
                               ],
                             ),
                             button1 == true
-                                ? Job_detail(
+                                ? JobDetail(
                                     index: widget.index,
                                     job: widget.job,
                                   )
-                                : company_detail(),
+                                : company_detail(
+                                    job: widget.job,
+                                  ),
                           ],
                         ),
                       ),
