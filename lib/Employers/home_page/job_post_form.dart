@@ -630,7 +630,7 @@ class _JobPostingFormState extends State<JobPostingForm> {
                               await fetchAndSaveCompanyData();
 
                               final jobPost = JobPost(
-                                  timePosted: stringPostedTime,
+                                  timePosted: postedTime,
                                   JobId: jobId,
                                   title: jobTitle,
                                   category: jobCategorySelected,
@@ -641,7 +641,7 @@ class _JobPostingFormState extends State<JobPostingForm> {
                                   location: jobLocation,
                                   experienceLevel: experienceLevelSelected,
                                   educationLevel: educatonLelSeleceted,
-                                  deadline: stringDeadline,
+                                  deadline: deadLine,
                                   company: companyProfile?.toJson());
                               await saveJobPost(jobPost);
                               // EmpUtils.showSnackBar(

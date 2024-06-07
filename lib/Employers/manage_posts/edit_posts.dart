@@ -110,6 +110,7 @@ class _EditJobPostingFormState extends State<EditJobPostingForm> {
   DateTime postedTime = DateTime.now();
   String stringDeadline = '';
   String stringPostedTime = '';
+
   String? selectedSalaryRange = '1,000 - 5,000';
   var companyData;
   // Future<void> _selectDate(BuildContext context) async {
@@ -673,7 +674,7 @@ class _EditJobPostingFormState extends State<EditJobPostingForm> {
                           // getDataFromFirestore();
                           stringPostedTime = saveDateAsString(postedTime);
                           final job_post = JobPost(
-                              timePosted: stringPostedTime,
+                              timePosted: postedTime,
                               JobId: jobId,
                               title: jobTitle,
                               category: jobCategorySelected,
@@ -684,7 +685,7 @@ class _EditJobPostingFormState extends State<EditJobPostingForm> {
                               location: jobLocation,
                               experienceLevel: experienceLevelSelected,
                               educationLevel: educatonLelSeleceted,
-                              deadline: stringDeadline,
+                              deadline: deadLine,
                               company: companyProfile);
                           try {
                             // getData();

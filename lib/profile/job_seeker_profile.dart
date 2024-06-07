@@ -60,20 +60,42 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  //shows bottom sheat to update education info
+  void showEducationBottomSheet(BuildContext context, String? currentUser) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: EducationBottomSheet(currentUser: currentUser),
+        );
+      },
+    );
+  }
+
   static Future<dynamic> getFavState(String key) async {
     final SharedPreferences prefs2 = await SharedPreferences.getInstance();
     return prefs2.get(key) ?? false; // Provide a default value if null
   }
 
-  Future<void> _addExperienceDialog() async {
-    if (currentUser != null) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return ExperienceFormDialog(currentUser: currentUser!);
-        },
-      );
-    }
+  void showExperienceBottomSheet(BuildContext context, String? currentUser) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: ExperienceBottomSheet(currentUser: currentUser),
+        );
+      },
+    );
   }
 
   Future<List<ExperienceModel>> _fetchExperiences() async {
@@ -303,14 +325,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 20, vertical: 4),
                                   child: Text(
-                                      '${education?['institution'] ?? ''}'),
+                                    '${education?['institution'] ?? ''}',
+                                    style: TextStyle(
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                                 const SizedBox(width: 10),
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.edit,
-                                      color: Colors.grey),
-                                ),
+                                // IconButton(
+                                //   onPressed: () {},
+                                //   icon: const Icon(Icons.edit,
+                                //       color: Colors.grey),
+                                // ),
                               ],
                             ),
                       Row(
@@ -320,22 +346,23 @@ class _ProfilePageState extends State<ProfilePage> {
                                 horizontal: 20, vertical: 4),
                             child: education != null
                                 ? Text(
-                                    '${education?['levelOfEducation'] ?? ''} in ${education?['fieldOfStudy'] ?? ''}')
+                                    '${education?['levelOfEducation'] ?? ''} in ${education?['fieldOfStudy'] ?? ''}',
+                                    style: TextStyle(
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.bold),
+                                  )
                                 : const SizedBox(),
                           ),
                           SizedBox(width: 10),
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.edit, color: Colors.grey),
-                          ),
+                          // IconButton(
+                          //   onPressed: () {},
+                          //   icon: Icon(Icons.edit, color: Colors.grey),
+                          // ),
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          TextButton(onPressed: () {}, child: Text('Edit')),
-                          //  DownloadCv(),
-                        ],
+                        children: [],
                       ),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 20),
@@ -359,7 +386,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                                 IconButton(
                                   onPressed: () {
-                                    _addExperienceDialog();
+                                    showExperienceBottomSheet(
+                                        context, currentUser);
                                   },
                                   icon: const Icon(Icons.add),
                                 ),
@@ -428,12 +456,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                     education != null
                                         ? IconButton(
                                             onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        UpdateEducationDialog(),
-                                              );
+                                              showEducationBottomSheet(
+                                                  context, currentUser);
                                             },
                                             icon: const Icon(Icons.edit),
                                           )
@@ -441,12 +465,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                     education == null
                                         ? IconButton(
                                             onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        UpdateEducationDialog(),
-                                              );
+                                              // showDialog(
+                                              //   context: context,
+                                              //   builder:
+                                              //       (BuildContext context) =>
+                                              //           UpdateEducationDialog(),
+                                              // );
+                                              showEducationBottomSheet(
+                                                  context, currentUser);
                                             },
                                             icon: const Icon(Icons.add),
                                           )

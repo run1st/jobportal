@@ -50,7 +50,7 @@ class _MyTimeLineWrapperState extends State<MyTimeLineWrapper> {
                 isFirst: false,
                 isLast: true,
                 isPast: widget.skills,
-                section: 'Skills',
+                section: 'Skills & other',
               )
             ],
           ),

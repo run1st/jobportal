@@ -117,15 +117,15 @@ class _HomePageState extends State<HomePage> {
               'Welcome  ',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 50),
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.symmetric(horizontal: 30),
               child: Text(
-                'Find your dream job with here. Build your profile and get started',
+                'Find your dream job here. Build your profile and get started',
                 style: TextStyle(color: Colors.black, fontSize: 18),
                 textAlign: TextAlign.center,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Container(

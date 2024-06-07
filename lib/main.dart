@@ -290,13 +290,13 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: Colors.blueAccent,
-          title: Text('Hulu Jobs'),
+          title: const Text('Hulu Jobs'),
         ),
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               SizedBox(

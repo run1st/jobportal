@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project1/Employers/models/jobs_model.dart';
+import 'package:project1/jobSeekerModel/job_seeker_profile_model.dart';
 import 'package:project1/job_seeker_home_page/favorites.dart';
 import 'package:project1/job_seeker_home_page/filter.dart';
 import 'package:project1/job_seeker_home_page/image_card.dart';
@@ -137,13 +138,18 @@ class _JobsListState extends State<JobsList> {
     'Jimma',
     'shashemene'
   ];
-
-  String getCurrentUserUid() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return user.uid;
-    } else {
-      return '';
+  String? currentUser;
+  List<ExperienceModel> experiences = [];
+  Future<void> getUserUid() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUser = user.uid;
+        });
+      }
+    } catch (e) {
+      print('Error getting current user UID: $e');
     }
   }
 
@@ -195,18 +201,73 @@ class _JobsListState extends State<JobsList> {
     );
   }
 
+  Future<List<ExperienceModel>> _fetchExperiences() async {
+    if (currentUser == null) return [];
+
+    try {
+      final personalInfoDocRef = FirebaseFirestore.instance
+          .collection('job-seeker')
+          .doc(currentUser)
+          .collection('jobseeker-profile')
+          .doc('profile');
+
+      DocumentSnapshot profileSnapshot = await personalInfoDocRef.get();
+
+      if (profileSnapshot.exists) {
+        Map<String, dynamic>? data =
+            profileSnapshot.data() as Map<String, dynamic>?;
+
+        if (data != null && data.containsKey('experiences')) {
+          Map<String, dynamic> experiencesMap =
+              data['experiences'] as Map<String, dynamic>;
+          setState(() {
+            experiences = experiencesMap.values.map((exp) {
+              return ExperienceModel.fromMap(exp as Map<String, dynamic>);
+            }).toList();
+          });
+
+          // Log the fetched experiences
+          print('Fetched Experiences: $experiences');
+
+          return experiences;
+        }
+      }
+    } catch (e) {
+      // Log any errors that occur during data retrieval
+      print('Error fetching experiences: $e');
+    }
+
+    return [];
+  }
+
+  Future<void> _loadExperiences() async {
+    if (currentUser != null) {
+      List<ExperienceModel> fetchedExperiences = await _fetchExperiences();
+      setState(() {
+        experiences = fetchedExperiences;
+      });
+    }
+  }
+
   DateTime parseDate(String date) {
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     return formatter.parse(date);
   }
 
-//12 Jun 2023
+  String formatTimestamp(Timestamp timestamp) {
+    DateTime dateTime = timestamp.toDate();
+    return DateFormat('MMM d, yyyy at h:mm a').format(dateTime);
+  }
+
+// Parses the formatted date string
+  DateTime parseFormattedDate(String formattedDate) {
+    return DateFormat('MMM d, yyyy at h:mm a').parse(formattedDate);
+  }
+
   String getPostedTime(String postedDate) {
     final now = DateTime.now();
-
-    DateTime parsedDate = parseDate(postedDate);
+    DateTime parsedDate = parseFormattedDate(postedDate);
     final difference = now.difference(parsedDate);
-    print(parsedDate);
     if (difference.inDays > 0) {
       return '${difference.inDays} days ago';
     } else if (difference.inHours > 0) {
@@ -215,6 +276,22 @@ class _JobsListState extends State<JobsList> {
       return '${difference.inMinutes} minutes ago';
     } else {
       return 'Just now';
+    }
+  }
+
+  String deadLineTime(String postedDate) {
+    final now = DateTime.now();
+    DateTime parsedDate = parseFormattedDate(postedDate);
+    final difference = parsedDate
+        .difference(now); // corrected the calculation to be deadline - now
+    if (difference.inDays > 0) {
+      return '${difference.inDays} days left';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} hours left';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} minutes left';
+    } else {
+      return 'Deadline passed';
     }
   }
 
@@ -231,6 +308,14 @@ class _JobsListState extends State<JobsList> {
   Color colorMaker() {
     final int colorIndex = Random().nextInt(6);
     return colorsList[colorIndex];
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserUid();
+    _loadExperiences();
   }
 
   @override
@@ -321,6 +406,7 @@ class _JobsListState extends State<JobsList> {
             const SizedBox(
               height: 20,
             ),
+
 // The job category griedview*****************************************************
             Card(
               margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
@@ -335,7 +421,7 @@ class _JobsListState extends State<JobsList> {
                   margin: const EdgeInsets.symmetric(
                     vertical: 8,
                   ),
-                  height: 120,
+                  height: 100,
                   child: GridView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     scrollDirection: Axis.horizontal,
@@ -404,7 +490,7 @@ class _JobsListState extends State<JobsList> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
                     child: TextButton(
                         onPressed: () {
                           setState(() {
@@ -415,79 +501,78 @@ class _JobsListState extends State<JobsList> {
                         },
                         child: Text('See all')),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.filter_list),
-                          onPressed: toggleFilterVisibility,
-                        ),
-                        Visibility(
-                          visible: isFilterVisible,
-                          child: DropdownButton<String>(
-                            value: selectedCategory,
-                            onChanged: (newValue) {
-                              setState(() {
-                                selectedCategory = newValue!;
-                                dropDownSelected = true;
-                              });
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //       builder: (context) => OverlayScreen()),
-                              // );
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.filter_list),
+                        onPressed: toggleFilterVisibility,
+                      ),
+                      Visibility(
+                        visible: isFilterVisible,
+                        child: DropdownButton<String>(
+                          value: selectedCategory,
+                          onChanged: (newValue) {
+                            setState(() {
+                              selectedCategory = newValue!;
+                              dropDownSelected = true;
+                            });
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //       builder: (context) => OverlayScreen()),
+                            // );
 
-                              switch ('${selectedCategory}') {
-                                case 'All':
-                                  return null;
-                                case 'Region':
-                                  return openAlertDialog(Regions, Icons.public);
-                                case 'City':
-                                  return openAlertDialog(
-                                      cities, Icons.location_city);
-                                case 'Education level':
-                                  return openAlertDialog(
-                                      educationLevel, Icons.school);
-                                case 'Employment type':
-                                  return openAlertDialog(
-                                      employmentType, Icons.work);
-                                // case 'Company name':
-                                //   return openAlertDialog(
-                                //       companyName, Icons.business);
+                            switch ('${selectedCategory}') {
+                              case 'All':
+                                return null;
+                              case 'Region':
+                                return openAlertDialog(Regions, Icons.public);
+                              case 'City':
+                                return openAlertDialog(
+                                    cities, Icons.location_city);
+                              case 'Education level':
+                                return openAlertDialog(
+                                    educationLevel, Icons.school);
+                              case 'Employment type':
+                                return openAlertDialog(
+                                    employmentType, Icons.work);
+                              // case 'Company name':
+                              //   return openAlertDialog(
+                              //       companyName, Icons.business);
 
-                                default:
-                                  return null;
-                              }
-                            },
-                            items: categories
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                          ),
+                              default:
+                                return null;
+                            }
+                          },
+                          items: categories
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: TextButton(
-                        onPressed: () {
-                          // final profile = FirebaseFirestore.instance
-                          //     .collection('job-seeker')
-                          //     .doc(getCurrentUserUid())
-                          //     .collection('jobseeker-profile')
-                          //     .doc('profile')
-                          //     .snapshots();
-                          setState(() {
-                            selectRecommended = true;
-                            postedJobs = [];
-                          });
-                        },
-                        child: Text('Recommended')),
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: TextButton(
+                          onPressed: () {
+                            // final profile = FirebaseFirestore.instance
+                            //     .collection('job-seeker')
+                            //     .doc(currentUser)
+                            //     .collection('jobseeker-profile')
+                            //     .doc('profile')
+                            //     .snapshots();
+                            setState(() {
+                              selectRecommended = true;
+                              postedJobs = [];
+                            });
+                          },
+                          child: const Text('Recommended')),
+                    ),
                   ),
                 ],
               ),
@@ -499,7 +584,7 @@ class _JobsListState extends State<JobsList> {
               stream: CombineLatestStream.list([
                 FirebaseFirestore.instance
                     .collection('job-seeker')
-                    .doc(getCurrentUserUid())
+                    .doc(currentUser)
                     .collection('jobseeker-profile')
                     .doc('profile')
                     .snapshots(),
@@ -518,9 +603,9 @@ class _JobsListState extends State<JobsList> {
                   return const Text('Loading...');
                 } else if (snapshot.data?[0] == null &&
                     snapshot.data?[1] == null) {
-                  return Center(child: const Text('No data available'));
+                  return const Center(child: Text('No data available'));
                 } else if (snapshot.data?[1] == null) {
-                  return Center(child: const Text('No job postings available'));
+                  return const Center(child: Text('No job postings available'));
                 } else if (snapshot.data?[0] != null) {
                   // return const Text('No job postings available');
                   profileSnapshot =
@@ -607,50 +692,46 @@ class _JobsListState extends State<JobsList> {
 
                       print(
                           'boolian value is : ${jobTitle == otherData?['preferred job'].toString().toLowerCase() && experienceLevel == otherData?['Experience level'].toString().toLowerCase()}');
-                      bool isMatching = (jobTitle ==
-                              otherData?['preferred job']
+                      String? jobSeekerPreference = otherData?['preferred job']
+                              ?.toString()
+                              .toLowerCase() ??
+                          '';
+                      // String? jobSeekerWorkExperience =
+                      //     experiences.first['job title'];
+                      String? jobSeekerExperience =
+                          otherData?['experience level']
                                   ?.toString()
-                                  .toLowerCase()) &&
-                          (experienceLevel ==
-                              otherData?['experience level']
-                                  ?.toString()
-                                  .toLowerCase());
+                                  .toLowerCase() ??
+                              '';
+                      String? jobSeekerLocation =
+                          personalInfo?['city'].toString().toLowerCase() ?? '';
+                      bool isMatchingTitle =
+                          (jobTitle == jobSeekerPreference) ||
+                              (experienceLevel == jobSeekerExperience);
 
-                      print('boolean value is: $isMatching');
-                      String lowercaseQuery = searchQuery.toLowerCase();
+                      print('boolean value is: $isMatchingTitle');
+                      // String lowercaseQuery = searchQuery.toLowerCase();
 
                       return jobTitle ==
-                                  otherData?['preferred job']
-                                      .toString()
-                                      .toLowerCase()
-                                      .replaceAll(' ', '') &&
-                              location ==
-                                  personalInfo?['city']
-                                      .toString()
-                                      .toLowerCase()
-                                      .replaceAll(' ', '') ||
-                          jobTitle ==
-                                  otherData?['preferred job']
-                                      .toString()
-                                      .toLowerCase() &&
+                              jobSeekerPreference.replaceAll(' ', '') ||
+                          location == jobSeekerLocation.replaceAll(' ', '') ||
+                          jobTitle == jobSeekerPreference ||
+                          (jobTitle == jobSeekerPreference &&
                               educationLevel ==
-                                  education?['levelOfEducation'] ||
-                          jobTitle ==
-                                  otherData?['preferred job']
-                                      .toString()
-                                      .toLowerCase() &&
+                                  education?['levelOfEducation']) ||
+                          (jobTitle == jobSeekerPreference &&
                               experienceLevel ==
-                                  otherData?['Experience level'] ||
+                                  otherData?['Experience level']) ||
                           //if all are matched
-                          jobTitle == otherData?['preferred job'] &&
-                              salary == otherData?['Expected salary'] ||
-                          jobTitle == otherData?['preferred job'] &&
+                          (jobTitle == otherData?['preferred job'] &&
+                              salary == otherData?['Expected salary']) ||
+                          (jobTitle == otherData?['preferred job'] &&
                               location == personalInfo?['city'] &&
                               educationLevel ==
                                   education?['levelOfEducation'] &&
                               experienceLevel ==
                                   otherData?['Experience level'] &&
-                              salary == otherData?['Expected salary'];
+                              salary == otherData?['Expected salary']);
                     }).toList();
                   } else {
                     postedJobs = [];
@@ -737,138 +818,156 @@ class _JobsListState extends State<JobsList> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height - 400,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 10),
-                              itemCount: postedJobs.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                DocumentSnapshot document = postedJobs[index];
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 10),
+                            itemCount: postedJobs.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              DocumentSnapshot document = postedJobs[index];
 
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => JobDetailPage(
-                                          index: index,
-                                          job: document,
-                                        ),
-                                        settings: const RouteSettings(
-                                            name: "jobDetailRoute"),
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => JobDetailPage(
+                                        index: index,
+                                        job: document,
                                       ),
-                                    );
-                                  },
-                                  child: Container(
-                                    margin: EdgeInsets.symmetric(
-                                        horizontal: 5, vertical: 10),
-                                    child: Card(
-                                      color: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
-                                      ),
-                                      elevation: 5,
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.symmetric(
-                                            vertical: 10.0, horizontal: 15.0),
-                                        leading: document['company'] != null &&
-                                                document['company']['logoUrl']
-                                                    is String &&
-                                                document['company']['logoUrl']
-                                                    .isNotEmpty
-                                            ? CircleAvatar(
-                                                radius: 30,
-                                                backgroundImage: NetworkImage(
-                                                    document['company']
-                                                        ['logoUrl']),
-                                              )
-                                            : CircleAvatar(
-                                                radius: 30,
-                                                child: Icon(Icons.person,
-                                                    size: 30),
-                                              ),
-                                        title: Text(
-                                          document['title'],
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16.0,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        subtitle: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(height: 5),
-                                            Wrap(
-                                              spacing: 8.0,
-                                              runSpacing: 4.0,
-                                              children: [
-                                                Chip(
-                                                  label: Text(document[
-                                                      'employment type']),
-                                                  backgroundColor:
-                                                      Colors.blue.shade50,
-                                                ),
-                                              ],
-                                            ),
-                                            Row(
-                                              children: [
-                                                Chip(
-                                                  label: Text(document[
-                                                      'experience level']),
-                                                  backgroundColor:
-                                                      Colors.green.shade50,
-                                                ),
-                                                Chip(
-                                                  label: Text(
+                                      settings: const RouteSettings(
+                                          name: "jobDetailRoute"),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 5, vertical: 10),
+                                  child: Card(
+                                    color: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    elevation: 5,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10.0),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          document['company'] != null &&
+                                                  document['company']['logoUrl']
+                                                      is String &&
+                                                  document['company']['logoUrl']
+                                                      .isNotEmpty
+                                              ? CircleAvatar(
+                                                  radius: 30,
+                                                  backgroundImage: NetworkImage(
                                                       document['company']
-                                                              ?['city'] ??
-                                                          '-'),
-                                                  backgroundColor:
-                                                      Colors.orange.shade50,
+                                                          ['logoUrl']),
+                                                )
+                                              : CircleAvatar(
+                                                  radius: 30,
+                                                  child: Icon(Icons.person,
+                                                      size: 30),
+                                                ),
+                                          SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  document['title'],
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16.0,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                SizedBox(height: 5),
+                                                Wrap(
+                                                  spacing: 8.0,
+                                                  runSpacing: 4.0,
+                                                  children: [
+                                                    Chip(
+                                                      label: Text(document[
+                                                          'employment type']),
+                                                      backgroundColor:
+                                                          Colors.blue.shade50,
+                                                    ),
+                                                    Chip(
+                                                      label: Text(document[
+                                                          'experience level']),
+                                                      backgroundColor:
+                                                          Colors.green.shade50,
+                                                    ),
+                                                    Chip(
+                                                      label: Text(
+                                                          document['company']
+                                                                  ?['city'] ??
+                                                              '-'),
+                                                      backgroundColor:
+                                                          Colors.orange.shade50,
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 5),
+                                                Wrap(
+                                                  alignment:
+                                                      WrapAlignment.start,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.calendar_today,
+                                                      size: 16,
+                                                      color: Colors.red,
+                                                    ),
+                                                    SizedBox(width: 5),
+                                                    Text(
+                                                      "Deadline: ${deadLineTime(formatTimestamp(document['deadline']))}",
+                                                      style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
-                                          ],
-                                        ),
-                                        trailing: Container(
-                                          width: 80,
-                                          height: 40,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 5.0, horizontal: 5.0),
-                                          decoration: BoxDecoration(
-                                            color: Colors.blue,
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
                                           ),
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            getPostedTime(
-                                                document['posted time']),
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12.0,
-                                              fontWeight: FontWeight.bold,
+                                          SizedBox(width: 10),
+                                          Container(
+                                            width: 80,
+                                            height: 40,
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 5.0, horizontal: 5.0),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue,
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
                                             ),
-                                            textAlign: TextAlign.center,
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              getPostedTime(formatTimestamp(
+                                                  document['posted time'])),
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12.0,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
                                           ),
-                                        ),
-                                        tileColor: Colors.grey.shade100,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
-                                        ),
-                                        style: ListTileStyle.drawer,
+                                        ],
                                       ),
                                     ),
                                   ),
-                                );
-                              },
-                            ),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

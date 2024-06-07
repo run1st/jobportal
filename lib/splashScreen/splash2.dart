@@ -45,7 +45,7 @@ class _Splash1State extends State<Splash1> {
                 children: [
                   _buildSplashItem('assets/images/splash3.jpg',
                       'Looking for job ? Get your dream job !'),
-                  _buildSplashItem('assets/images/splash12.jpeg',
+                  _buildSplashItem('assets/images/images.jpeg',
                       ' Emplolyer ? Find the best potentials !'),
                   _buildCenteredTextSplashItem(' Hullu Jobs'),
                 ],

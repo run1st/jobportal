@@ -69,7 +69,7 @@ class Company {
 
 //Job Post Model
 class JobPost {
-  String timePosted;
+  DateTime timePosted;
   String JobId;
   String title;
   String category;
@@ -81,7 +81,7 @@ class JobPost {
   String location;
   String experienceLevel;
   String educationLevel;
-  String deadline;
+  DateTime deadline;
   Map<String, dynamic>? company;
   //bool isFavorite;
 
@@ -104,14 +104,14 @@ class JobPost {
 
   factory JobPost.fromJson(Map<String, dynamic> json) {
     return JobPost(
-      timePosted: json['posted time'],
+      timePosted: DateTime.parse(json['posted time']),
       JobId: json['job id'],
       title: json['title'],
       description: json['description'],
       requirements: json['requirements'],
       location: json['location'],
       salary: json['salary'],
-      deadline: json['deadline'],
+      deadline: DateTime.parse(json['deadline']),
       company: json['company'],
       employmentType: json['employment type'],
       experienceLevel: json['experience level'],

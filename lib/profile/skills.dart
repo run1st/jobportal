@@ -289,7 +289,7 @@ class _SkillSetState extends State<SkillSet> {
                   child: TextFormField(
                     // onSubmitted: _addProffSkill,
                     validator: (value) {
-                      if (value?.isEmpty ?? true) {
+                      if (proffesionalSkill.isEmpty) {
                         return 'Add professional skill';
                       } else {
                         return null;
@@ -349,7 +349,7 @@ class _SkillSetState extends State<SkillSet> {
                   width: MediaQuery.of(context).size.width * 4 / 5,
                   child: TextFormField(
                     validator: (value) {
-                      if (value?.isEmpty ?? true) {
+                      if (personalSkill.isEmpty) {
                         return 'Add professional skill';
                       } else {
                         return null;
@@ -409,21 +409,21 @@ class _SkillSetState extends State<SkillSet> {
                   //     left: 60.0, right: 10.0, top: 10.0, bottom: 10.0),
                   width: MediaQuery.of(context).size.width * 4 / 5,
                   child: TextFormField(
+                    // onSubmitted: _addProffSkill,
                     validator: (value) {
-                      if (value?.isEmpty ?? true) {
-                        return 'Add professional skill';
+                      if (languageSkill.isEmpty) {
+                        return 'Add Language skill';
                       } else {
                         return null;
                       }
                     },
-                    //onChanged: _addLanguageSkill,
                     controller: langSkillController,
                     decoration: InputDecoration(
                       label: Text(' Language skills'),
                       suffixIcon: IconButton(
                           onPressed: () {
                             if (profSkillController.text.isNotEmpty) {
-                              _addLanguageSkill(langSkillController.text);
+                              _addLanguageSkill(profSkillController.text);
                               langSkillController.clear();
                             }
                           },
@@ -455,7 +455,7 @@ class _SkillSetState extends State<SkillSet> {
                     ...languageSkill.map(
                       (skill) => Chip(
                         label: Text(skill),
-                        onDeleted: () => _removeLanguageSkill(skill),
+                        onDeleted: () => _removeproffSkill(skill),
                       ),
                     ),
                   ],
